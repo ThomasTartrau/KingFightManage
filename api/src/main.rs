@@ -16,7 +16,7 @@ mod auth;
 mod users_settings;
 mod utils;
 
-const APP_TITLE: &str = "Thomas's template";
+const APP_TITLE: &str = "KingFightManage";
 const WEBAPP_INDEX_FILE: &str = "index.html";
 #[derive(Debug, Clone, Parser)]
 #[clap(author, about, version, name = APP_TITLE)]
