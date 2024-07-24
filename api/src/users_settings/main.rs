@@ -31,7 +31,7 @@ const ALLOWED_FILE_TYPES: [Mime; 2] = [IMAGE_JPEG, IMAGE_PNG];
 /* #[api_v2_operation(
     summary = "Change profile picture",
     description = "Change the profile picture of a user.",
-    operation_id = "user_settings.change_profile_picture",
+    operation_id = "user-settings.change_profile_picture",
     consumes = "multipart/form-data",
     produces = "application/json",
     tags("UserSettings")
@@ -90,7 +90,7 @@ pub async fn change_profile_picture(
 #[api_v2_operation(
     summary = "Change name",
     description = "Change the name of the user.",
-    operation_id = "user_settings.change_name",
+    operation_id = "user-settings.change_name",
     produces = "application/json",
     tags("UserSettings")
 )]
@@ -122,7 +122,7 @@ pub async fn change_name(
 #[api_v2_operation(
     summary = "Delete user",
     description = "Delete the user and all he's information.",
-    operation_id = "user_settings.delete_user",
+    operation_id = "user-settings.delete_user",
     produces = "application/json",
     tags("UserSettings")
 )]

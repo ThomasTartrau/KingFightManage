@@ -1,11 +1,12 @@
-use actix_web::web::Data;
+use actix_web::web::{Data, ReqData};
+use biscuit_auth::Biscuit;
 use log::debug;
 use paperclip::actix::{api_v2_operation, Apiv2Schema, CreatedJson};
 use serde::{Deserialize, Serialize};
 use sqlx::query_as;
 use uuid::Uuid;
 
-use crate::{auth::iam::create_registration_token, utils::problems::MyProblem};
+use crate::{auth::iam::{authorize_only_user, create_registration_token, Action}, utils::{openapi::OaBiscuitUserAccess, problems::MyProblem}};
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct GenerateRegistrationTokenResponse {
@@ -35,16 +36,22 @@ pub struct GetUsersResponse {
 )]
 pub async fn generate_registration_token(
     state: Data<crate::State>,
+    _: OaBiscuitUserAccess,
+    biscuit: ReqData<Biscuit>,
 ) -> Result<CreatedJson<GenerateRegistrationTokenResponse>, MyProblem> {
 
-    let token = create_registration_token(&state.biscuit_private_key).map_err(|e| {
-        debug!("{e}");
-        MyProblem::Forbidden
-    })?;
-
-    Ok(CreatedJson(GenerateRegistrationTokenResponse {
-        registration_token: token.serialized_biscuit,
-    }))
+    if let Ok(_token) = authorize_only_user(&biscuit, Action::UsersGenerateRegistrationToken) {
+        let token = create_registration_token(&state.biscuit_private_key).map_err(|e| {
+            debug!("{e}");
+            MyProblem::Forbidden
+        })?;
+    
+        Ok(CreatedJson(GenerateRegistrationTokenResponse {
+            registration_token: token.serialized_biscuit,
+        }))
+    } else {
+        Err(MyProblem::Forbidden)
+    }
 }
 
 #[api_v2_operation(
@@ -57,17 +64,24 @@ pub async fn generate_registration_token(
 )]
 pub async fn get_users(
     state: Data<crate::State>,
+    _: OaBiscuitUserAccess,
+    biscuit: ReqData<Biscuit>,
 ) -> Result<CreatedJson<GetUsersResponse>, MyProblem> {
-    let users = query_as!(
-        User,
-        "SELECT user__id as user_id, first_name, last_name, role FROM iam.user"
-    )
-    .fetch_all(&state.db)
-    .await
-    .map_err(|e| {
-        debug!("{e}");
-        MyProblem::InternalServerError
-    })?;
 
-    Ok(CreatedJson(GetUsersResponse { users }))
+    if let Ok(_token) = authorize_only_user(&biscuit, Action::UsersGetUsers) {
+        let users = query_as!(
+            User,
+            "SELECT user__id as user_id, first_name, last_name, role FROM iam.user"
+        )
+        .fetch_all(&state.db)
+        .await
+        .map_err(|e| {
+            debug!("{e}");
+            MyProblem::InternalServerError
+        })?;
+
+        Ok(CreatedJson(GetUsersResponse { users }))
+    } else {
+        Err(MyProblem::Forbidden)
+    }
 }

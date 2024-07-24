@@ -92,6 +92,8 @@ pub enum Action {
     UserSettingsChangeProfilePicture,
     UserSettingsChangeName,
     UserSettingsDeleteUser,
+    UsersGenerateRegistrationToken,
+    UsersGetUsers,
 }
 
 impl<'a> Action {
@@ -99,9 +101,11 @@ impl<'a> Action {
         match self {
             Action::AuthLogout => "auth:logout",
             Action::AuthChangePassword => "auth:change_password",
-            Action::UserSettingsChangeProfilePicture => "users_settings:change_profile_picture",
-            Action::UserSettingsChangeName => "users_settings:change_name",
-            Action::UserSettingsDeleteUser => "users_settings:delete_user",
+            Action::UserSettingsChangeProfilePicture => "users-settings:change_profile_picture",
+            Action::UserSettingsChangeName => "users-settings:change_name",
+            Action::UserSettingsDeleteUser => "users-settings:delete_user",
+            Action::UsersGenerateRegistrationToken => "users-management:generate_registration_token",
+            Action::UsersGetUsers => "users-management:get_users",
         }
     }
 
@@ -114,6 +118,8 @@ impl<'a> Action {
             Self::UserSettingsChangeProfilePicture => vec![Role::Administrateur, Role::Moderateur],
             Self::UserSettingsChangeName => vec![Role::Administrateur, Role::Moderateur],
             Self::UserSettingsDeleteUser => vec![Role::Administrateur, Role::Moderateur],
+            Self::UsersGenerateRegistrationToken => vec![],
+            Self::UsersGetUsers => vec![Role::Administrateur, Role::Moderateur],
         };
 
         roles.append(&mut per_action_roles);
@@ -127,6 +133,8 @@ impl<'a> Action {
             Self::UserSettingsChangeProfilePicture => vec![],
             Self::UserSettingsChangeName => vec![],
             Self::UserSettingsDeleteUser => vec![],
+            Self::UsersGenerateRegistrationToken => vec![],
+            Self::UsersGetUsers => vec![],
         };
 
         facts.push(fact!("action({action})", action = self.action_name()));
