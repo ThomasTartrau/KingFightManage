@@ -14,6 +14,7 @@ use crate::auth::middleware_biscuit;
 
 mod auth;
 mod users_settings;
+mod users_management;
 mod utils;
 
 const APP_TITLE: &str = "KingFightManage";
@@ -90,6 +91,11 @@ struct Config {
     /// Path to the profile picture directory
     #[clap(long, env, default_value = "../frontend/public/profile-pictures/")]
     profile_picture_dir: String,
+
+
+    /// Default role for new users
+    #[clap(long, env, default_value = "Moderateur")]
+    default_role: String,
 }
 
 #[derive(Debug, Clone)]
@@ -100,6 +106,7 @@ struct State {
     mailer: utils::mailer::Mailer,
     app_url: Url,
     profile_picture_dir: String,
+    default_role: String,
 }
 
 fn parse_biscuit_private_key(input: &str) -> Result<PrivateKey, String> {
@@ -151,6 +158,7 @@ async fn main() -> anyhow::Result<()> {
             mailer,
             app_url: config.app_url,
             profile_picture_dir: config.profile_picture_dir,
+            default_role: config.default_role,
         };
 
         // Run web server
@@ -249,7 +257,7 @@ async fn main() -> anyhow::Result<()> {
                                         .service(
                                             web::resource("/password")
                                                 .wrap(biscuit_auth.clone())
-                                                .route(web::post().to(auth::auth::change_password)),
+                                                .route(web::get().to(auth::auth::change_password)),
                                         ),
                                 )
                                 .service(
@@ -269,7 +277,15 @@ async fn main() -> anyhow::Result<()> {
                                         )
                                     .wrap(biscuit_auth.clone())
                                     .route("", web::delete().to(users_settings::main::delete_user)),
-                                ),
+                                )
+                                .service(
+                                    web::scope("/users-management")
+                                    .service(
+                                        web::resource("/generate-registration-token")
+                                        .wrap(biscuit_auth.clone())
+                                        .route(web::get().to(users_management::main::generate_registration_token)),
+                                    )
+                                )
                                 
                         )
                 );

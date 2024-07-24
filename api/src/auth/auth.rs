@@ -39,6 +39,7 @@ struct UserLookup {
     first_name: String,
     last_name: String,
     email_verified_at: Option<DateTime<Utc>>,
+    role: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
@@ -104,7 +105,7 @@ pub async fn login(
     let user_lookup = query_as!(
         UserLookup,
         "
-            SELECT user__id AS user_id, password AS password_hash, email, first_name, last_name, email_verified_at
+            SELECT user__id AS user_id, password AS password_hash, email, first_name, last_name, role, email_verified_at
             FROM iam.user
             WHERE email = $1
         ",
@@ -158,6 +159,7 @@ async fn do_login<'a, A: Acquire<'a, Database = Postgres>>(
         &user.email,
         &user.first_name,
         &user.last_name,
+        &user.role,
     )
     .and_then(|rt| {
         if let Some(expired_at) = rt.expired_at {
@@ -264,7 +266,7 @@ pub async fn refresh(
         let user = query_as!(
             UserLookup,
             "
-                SELECT user__id AS user_id, password AS password_hash, email, first_name, last_name, email_verified_at
+                SELECT user__id AS user_id, password AS password_hash, email, first_name, last_name, role, email_verified_at
                 FROM iam.user
                 WHERE user__id = $1
             ",
@@ -403,7 +405,7 @@ pub async fn resend_email_verification(
         let user_lookup = query_as!(
             UserLookup,
             "
-                SELECT user__id AS user_id, email, first_name, last_name, email_verified_at, password AS password_hash
+                SELECT user__id AS user_id, email, first_name, last_name, role, email_verified_at, password AS password_hash
                 FROM iam.user
                 WHERE user__id = $1 AND email_verified_at IS NULL
             ",

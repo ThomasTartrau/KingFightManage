@@ -1,7 +1,7 @@
 use std::time::{Duration, SystemTime};
 use biscuit_auth::{builder::Fact, builder_ext::AuthorizerExt, error, macros::*, AuthorizerLimits, Biscuit, KeyPair, PrivateKey};
 use chrono::{DateTime, Utc};
-use log::{error, trace};
+use log::{error, trace, warn};
 use paperclip::v2::schema::TypedData;
 use serde::Serialize;
 use strum::{AsRefStr, EnumIter, EnumString, VariantNames};
@@ -55,13 +55,14 @@ pub struct AuthorizedResetPasswordToken {
 )]
 #[strum(serialize_all = "snake_case")]
 pub enum Role {
-    User,
-    Administrator,
+    Moderateur,
+    Administrateur,
+    Developpeur,
 }
 
 impl Default for Role {
     fn default() -> Self {
-        Self::User
+        Self::Moderateur
     }
 }
 
@@ -105,7 +106,7 @@ impl<'a> Action {
     }
 
     fn allowed_roles(&self) -> Vec<Role> {
-        let mut roles = vec![Role::User];
+        let mut roles = vec![Role::Moderateur];
 
         let mut per_action_roles = match self {
             Self::AuthLogout => vec![],
@@ -149,6 +150,7 @@ pub fn create_user_access_token(
     email: &str,
     first_name: &str,
     last_name: &str,
+    role: &str,
 ) -> Result<RootToken, biscuit_auth::error::Token> {
     let keypair = KeyPair::from(private_key);
     let created_at = SystemTime::now();
@@ -166,6 +168,7 @@ pub fn create_user_access_token(
                 email({email});
                 first_name({first_name});
                 last_name({last_name});
+                role({role});
 
                 check if time($t), $t < {expired_at};
             "#,
@@ -404,6 +407,7 @@ pub fn authorize(
     });
     authorizer.add_token(biscuit)?;
     let result = authorizer.authorize();
+    warn!("Authorizer state:\n{}", authorizer.print_world());
     trace!("Authorizer state:\n{}", authorizer.print_world());
     result?;
 
@@ -559,4 +563,67 @@ pub fn authorize_reset_password(
         .ok_or(biscuit_auth::error::Token::InternalError)?;
 
     Ok(AuthorizedResetPasswordToken { user_id })
+}
+
+const REGISTRATION_TOKEN_VERSION: i64 = 1;
+const REGISTRATION_TOKEN_EXPIRATION: Duration = Duration::from_secs(60 * 30);
+
+pub fn create_registration_token(
+    private_key: &PrivateKey,
+) -> Result<RootToken, biscuit_auth::error::Token> {
+    let keypair = KeyPair::from(private_key);
+    let created_at = SystemTime::now();
+    let expired_at = created_at + REGISTRATION_TOKEN_EXPIRATION;
+
+    let biscuit = biscuit!(
+        r#"
+            type("registration");
+            version({REGISTRATION_TOKEN_VERSION});
+            created_at({created_at});
+            expired_at({expired_at});
+        "#,
+    )
+    .build(&keypair)?;
+    let serialized_biscuit = biscuit.to_base64()?;
+    let revocation_id = biscuit
+        .revocation_identifiers()
+        .first()
+        .map(|rid| rid.to_owned())
+        .ok_or(biscuit_auth::error::Token::InternalError)?;
+
+    Ok(RootToken {
+        biscuit,
+        serialized_biscuit,
+        revocation_id,
+        expired_at: Some(DateTime::from(expired_at)),
+    })
+}
+
+pub fn authorize_registration(
+    biscuit: &Biscuit,
+) -> Result<(), biscuit_auth::error::Token> {
+    let mut authorizer = authorizer!(
+        r#"
+            supported_version("registration", 1);
+            valid_version($t, $v) <- type($t), version($v), supported_version($t, $v);
+            check if valid_version($t, $v);
+
+            expired($t) <- expired_at($exp), time($t), $exp < $t;
+            deny if expired($t);
+        "#
+    );
+    authorizer.set_time();
+    authorizer.add_allow_all();
+
+    authorizer.set_limits(AuthorizerLimits {
+        max_time: Duration::from_secs(1800),
+        ..Default::default()
+    });
+
+    authorizer.add_token(biscuit)?;
+    let result = authorizer.authorize();
+    trace!("Authorizer state:\n{}", authorizer.print_world());
+    result?;
+
+    Ok(())
 }

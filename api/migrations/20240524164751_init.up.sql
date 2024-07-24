@@ -11,6 +11,7 @@ create table iam.user (
     password text not null,
     first_name text not null,
     last_name text not null,
+    role text not null,
     created_at timestamptz not null default now(),
     email_verified_at timestamptz,
     last_login timestamptz

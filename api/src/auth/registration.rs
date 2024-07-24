@@ -1,9 +1,10 @@
 use argon2::password_hash::rand_core::OsRng;
 use argon2::password_hash::SaltString;
 use argon2::{Argon2, PasswordHasher};
+use biscuit_auth::Biscuit;
 use lettre::message::Mailbox;
 use lettre::Address;
-use log::{error, warn};
+use log::{debug, error, warn};
 use paperclip::actix::web::{Data, Json};
 use paperclip::actix::{api_v2_operation, Apiv2Schema, CreatedJson};
 use serde::{Deserialize, Serialize};
@@ -15,6 +16,8 @@ use validator::Validate;
 use crate::utils::problems::MyProblem;
 use crate::utils::mailer::Mail;
 use crate::auth::iam::create_email_verification_token;
+
+use super::iam::authorize_registration;
 
 #[derive(Debug, Serialize, Apiv2Schema)]
 pub struct Registration {
@@ -31,6 +34,8 @@ pub struct RegistrationPost {
     email: String,
     #[validate(non_control_character, length(min = 10, max = 100))]
     password: String,
+    #[validate(non_control_character, length(min = 1, max = 1000))]
+    registration_token: String,
 }
 
 #[api_v2_operation(
@@ -49,6 +54,19 @@ pub async fn register(
     if let Err(e) = body.validate() {
         return Err(MyProblem::Validation(e));
     }
+
+    let body = body.into_inner();
+
+    let token =
+        Biscuit::from_base64(body.registration_token, state.biscuit_private_key.public()).map_err(|e| {
+            debug!("{e}");
+            MyProblem::Forbidden
+        })?;
+
+    authorize_registration(&token).map_err(|e| {
+        debug!("{e}");
+        MyProblem::Forbidden
+    })?;
 
     let recipient_address = Address::from_str(&body.email).map_err(|e| {
         // Should not happen because we checked (using a validator) that body.email is a well structured email address
@@ -70,14 +88,15 @@ pub async fn register(
             .serialize();
         query!(
             "
-                INSERT INTO iam.user (user__id, email, password, first_name, last_name)
-                VALUES ($1, $2, $3, $4, $5)
+                INSERT INTO iam.user (user__id, email, password, first_name, last_name, role)
+                VALUES ($1, $2, $3, $4, $5, $6)
             ",
             &user_id,
             &body.email,
             password_hash.as_str(),
             &body.first_name,
             &body.last_name,
+            state.default_role
         )
         .execute(&mut *tx)
         .await?;
