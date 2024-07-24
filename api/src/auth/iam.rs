@@ -106,14 +106,14 @@ impl<'a> Action {
     }
 
     fn allowed_roles(&self) -> Vec<Role> {
-        let mut roles = vec![Role::Moderateur];
+        let mut roles = vec![Role::Developpeur];
 
         let mut per_action_roles = match self {
-            Self::AuthLogout => vec![],
-            Self::AuthChangePassword => vec![],
-            Self::UserSettingsChangeProfilePicture => vec![],
-            Self::UserSettingsChangeName => vec![],
-            Self::UserSettingsDeleteUser => vec![],
+            Self::AuthLogout => vec![Role::Administrateur, Role::Moderateur],
+            Self::AuthChangePassword => vec![Role::Administrateur, Role::Moderateur],
+            Self::UserSettingsChangeProfilePicture => vec![Role::Administrateur, Role::Moderateur],
+            Self::UserSettingsChangeName => vec![Role::Administrateur, Role::Moderateur],
+            Self::UserSettingsDeleteUser => vec![Role::Administrateur, Role::Moderateur],
         };
 
         roles.append(&mut per_action_roles);
