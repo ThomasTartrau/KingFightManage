@@ -37,7 +37,10 @@ const formSchema = toTypedSchema(
     lastName: z.string().min(1, t("sign_up_page.last_name.errors.too_short")),
     email: z.string().email(t("sign_up_page.email.errors.type")),
     password: z.string().min(12, t("sign_up_page.password.errors.too_short")),
-  }),
+    registration_token: z
+      .string()
+      .min(1, t("sign_up_page.registration_token.errors.required")),
+  })
 );
 
 const { handleSubmit } = useForm({
@@ -53,12 +56,14 @@ async function submit(values: {
   lastName: string;
   email: string;
   password: string;
+  registration_token: string;
 }) {
   await register(
     values.email,
     values.firstName,
     values.lastName,
     values.password,
+    values.registration_token
   )
     .then(() => {
       push.success({
@@ -134,6 +139,21 @@ async function submit(values: {
           <FormField v-slot="{ componentField }" name="password">
             <FormItem v-auto-animate>
               <FormLabel>{{ t("sign_up_page.password.label") }}</FormLabel>
+              <FormControl>
+                <Input
+                  type="password"
+                  placeholder="********"
+                  v-bind="componentField"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+          <FormField v-slot="{ componentField }" name="registration_token">
+            <FormItem v-auto-animate>
+              <FormLabel>
+                {{ t("sign_up_page.registration_token.label") }}
+              </FormLabel>
               <FormControl>
                 <Input
                   type="password"

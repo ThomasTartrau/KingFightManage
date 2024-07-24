@@ -78,6 +78,12 @@
         "too_short": "Password is too short, minimum 12 characters"
       }
     },
+    "registration_token": {
+      "label": "Registration token",
+      "errors": {
+        "required": "Registration token is required"
+      }
+    },
     "sign_up_button": "Create an account",
     "sign_in": {
       "label": "Already have an account?",

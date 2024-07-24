@@ -46,7 +46,7 @@ function readStateFromStorage(): State | null {
     if (parsed !== null) {
       const accessTokenExpirationDate = new Date(parsed.accessTokenExpiration);
       const refreshTokenExpirationDate = new Date(
-        parsed.refreshTokenExpiration,
+        parsed.refreshTokenExpiration
       );
 
       if (refreshTokenExpirationDate <= new Date()) {
@@ -92,7 +92,7 @@ async function scheduleAutoRefresh(): Promise<void> {
       } else {
         const refreshInMs = differenceInMilliseconds(
           subMinutes(state.value.accessTokenExpiration, 1),
-          new Date(),
+          new Date()
         );
 
         refreshTimerId = window.setTimeout(() => {
@@ -131,12 +131,14 @@ export async function register(
   firstName: string,
   lastName: string,
   password: string,
+  registration_token: string
 ): Promise<void> {
   return http.unauthenticated.post("/auth/register", {
     email,
     first_name: firstName,
     last_name: lastName,
     password,
+    registration_token,
   });
 }
 
@@ -163,7 +165,10 @@ export async function refresh(): Promise<void> {
 
 export async function logout(): Promise<void> {
   if (state.value) {
-    await http.post("/auth/logout");
+    await http.post("/auth/logout").catch(() => {
+      state.value = null;
+      removeStateFromStorage();
+    });
     if (refreshTimerId !== null) {
       clearTimeout(refreshTimerId);
     }
