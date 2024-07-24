@@ -6,6 +6,7 @@ import UserSettings from "@/pages/users/UserSettings.vue";
 import Error404 from "@/pages/others/Error404.vue";
 import BeginResetpassword from "@/pages/users/BeginResetpassword.vue";
 import ResetPassword from "@/pages/users/ResetPassword.vue";
+import GetStaffs from "@/pages/staffs/GetStaffs.vue";
 
 export type TemplateRoutes = string;
 
@@ -22,6 +23,8 @@ export const routes: Record<TemplateRoutes, string> = {
   SecuritySettings: "SecuritySettings",
   DeleteAccountSettings: "DeleteAccountSettings",
 
+  Staffs: "Staffs",
+
   Error404: "Error404",
 };
 
@@ -31,6 +34,7 @@ export default [
     path: "/",
     component: HomePage,
   },
+
   {
     name: routes.Login,
     path: "/login",
@@ -69,6 +73,7 @@ export default [
       redirectIfLoggedIn: false,
     },
   },
+
   {
     name: routes.Settings,
     path: "/settings",
@@ -84,6 +89,13 @@ export default [
     path: "/settings/delete-account",
     component: UserSettings,
   },
+
+  {
+    name: routes.Staffs,
+    path: "/staffs",
+    component: GetStaffs,
+  },
+
   {
     name: routes.Error404,
     path: "/:pathMatch(.*)*",

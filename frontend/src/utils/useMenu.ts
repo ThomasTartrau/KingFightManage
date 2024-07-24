@@ -1,7 +1,7 @@
 import { createSharedComposable } from "@vueuse/core";
 import { computed } from "vue";
 import { useRouter } from "vue-router";
-import { LayoutGrid, Settings, Users } from "lucide-vue-next";
+import { LayoutGrid, Settings, Shield, Users } from "lucide-vue-next";
 import { useI18n } from "vue-i18n";
 import type { Group } from "@/lib/menu";
 import { useRoute } from "@/router/routes";
@@ -77,6 +77,18 @@ function _useMenu() {
               currentRoute.value.fullPath.includes(useRoute("Settings")) &&
               true,
             icon: Settings,
+            submenus: [],
+          },
+        ],
+      },
+      {
+        groupLabel: "Admin",
+        menus: [
+          {
+            route: "Staffs",
+            label: "Staffs",
+            active: currentRoute.value.fullPath.includes(useRoute("Staffs")),
+            icon: Shield,
             submenus: [],
           },
         ],
