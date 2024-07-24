@@ -52,6 +52,7 @@ pub struct LoginResponse {
     email: String,
     first_name: String,
     last_name: String,
+    role: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema, Validate)]
@@ -231,6 +232,7 @@ async fn do_login<'a, A: Acquire<'a, Database = Postgres>>(
         email: user.email,
         first_name: user.first_name,
         last_name: user.last_name,
+        role: user.role,
     }))
 }
 

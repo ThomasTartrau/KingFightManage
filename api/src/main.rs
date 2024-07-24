@@ -279,12 +279,14 @@ async fn main() -> anyhow::Result<()> {
                                     .route("", web::delete().to(users_settings::main::delete_user)),
                                 )
                                 .service(
-                                    web::scope("/users-management")
+                                    web::scope("/users")
                                     .service(
                                         web::resource("/generate-registration-token")
                                         .wrap(biscuit_auth.clone())
                                         .route(web::get().to(users_management::main::generate_registration_token)),
                                     )
+                                    .wrap(biscuit_auth.clone())
+                                    .route("", web::get().to(users_management::main::get_users)),
                                 )
                                 
                         )
