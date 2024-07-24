@@ -91,7 +91,7 @@ onUpdated(_load);
 </script>
 
 <template>
-  <Card>
+  <Card class="shadow-2xl shadow-slate-900">
     <CardHeader>
       <CardTitle> Personnal information </CardTitle>
     </CardHeader>

@@ -51,7 +51,7 @@ async function submit() {
 </script>
 
 <template>
-  <Card>
+  <Card class="shadow-2xl shadow-slate-900">
     <CardHeader>
       <CardTitle> Security settings </CardTitle>
     </CardHeader>

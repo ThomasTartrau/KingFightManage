@@ -41,7 +41,7 @@ async function submit() {
 </script>
 
 <template>
-  <Card>
+  <Card class="shadow-2xl shadow-slate-900">
     <CardHeader>
       <CardTitle> Delete account </CardTitle>
     </CardHeader>
