@@ -390,6 +390,11 @@ pub fn authorize(
             valid_version($t, $v) <- type($t), version($v), supported_version($t, $v);
             check if valid_version($t, $v);
 
+            authorize_role($r) <- type("user_access"), role($r);
+            valid_role($r) <- authorize_role($r), allowed_role($r);
+            valid_role("service") <- type("service_access");
+            check if valid_role($r);
+
             expired($t) <- expired_at($exp), time($t), $exp < $t;
             deny if expired($t);
         "#
