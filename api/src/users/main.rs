@@ -1,9 +1,10 @@
 use actix_web::web::ReqData;
 use biscuit_auth::Biscuit;
-use log::debug;
+use log::{debug, trace};
 use paperclip::actix::web::{Data, Json, Path};
 use paperclip::actix::{api_v2_operation, Apiv2Schema, CreatedJson, NoContent};
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use sqlx::{query, query_as};
 use uuid::Uuid;
 use validator::Validate;
@@ -214,7 +215,7 @@ pub async fn delete_user(
     }
 }
 
-/* #[api_v2_operation(
+#[api_v2_operation(
     summary = "Send message",
     description = "",
     operation_id = "users-management.send-message",
@@ -233,5 +234,39 @@ pub async fn send_message(
     }
 
     let body = body.into_inner();
+
+    if let Ok(token) = authorize_only_user(&biscuit, Action::UsersSendMessage) {
+        let user_lookup = query_as!(
+            UserLookup,
+            "SELECT user__id AS user_id, email, username, role, email_verified_at, password AS password_hash FROM iam.user WHERE user__id = $1",
+            &body.user_id,
+        )
+        .fetch_optional(&state.db)
+        .await
+        .map_err(MyProblem::from)?;
+
+        if let Some(user) = user_lookup {
+            let event_type = "send_message";
+            let event_data = json!({
+                "sender": &token.username,
+                "username": user.username,
+                "message": body.message,
+            });
+
+            let result = query!("INSERT INTO events.event (event_type, event_data) VALUES ($1, $2)", event_type, event_data)
+                .execute(&state.db)
+                .await
+                .map_err(MyProblem::from)?;
+
+            if result.rows_affected() > 0 {
+                Ok(NoContent)
+            } else {
+                Err(MyProblem::InternalServerError)
+            }
+        } else {
+            Err(MyProblem::NotFound)
+        }
+    } else {
+        Err(MyProblem::Forbidden)
     }
-} */
+}

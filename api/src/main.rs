@@ -291,6 +291,11 @@ async fn main() -> anyhow::Result<()> {
                                         .route(web::post().to(users::main::set_role)),
                                     )
                                     .service(
+                                        web::resource("/send-message")
+                                        .wrap(biscuit_auth.clone())
+                                        .route(web::post().to(users::main::send_message)),
+                                    )
+                                    .service(
                                         web::resource("/{user_id}")
                                         .wrap(biscuit_auth.clone())
                                         .route(web::delete().to(users::main::delete_user)),
