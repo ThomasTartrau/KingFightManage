@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { ColumnDef } from '@tanstack/vue-table'
+import type { ColumnDef } from "@tanstack/vue-table";
 import {
   FlexRender,
   getCoreRowModel,
   getPaginationRowModel,
   useVueTable,
-} from '@tanstack/vue-table'
-import { h } from 'vue'
+} from "@tanstack/vue-table";
+import { h } from "vue";
 
-import { Button } from '@/components/ui/button'
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -16,64 +16,64 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import DropdownAction from '@/components/custom/staffs/dropdown-action.vue'
-import type { components } from '@/types'
+} from "@/components/ui/table";
+import DropdownAction from "@/components/custom/staffs/dropdown-action.vue";
+import type { components } from "@/types";
 
-type definitions = components['schemas']
-type User = definitions['User']
+type definitions = components["schemas"];
+type User = definitions["User"];
 
 const props = defineProps<{
-  data: User[]
-}>()
+  data: User[];
+}>();
 
-const emit = defineEmits(['refreshDatatable'])
+const emit = defineEmits(["refreshDatatable"]);
 
 function emitRefresh() {
-  emit('refreshDatatable')
+  emit("refreshDatatable");
 }
 
 const columns: ColumnDef<User>[] = [
   {
-    accessorKey: 'user_id',
-    header: 'UUID',
+    accessorKey: "user_id",
+    header: "UUID",
     cell: ({ row }) => {
-      return h('div', { class: 'capitalize' }, row.getValue('user_id'))
+      return h("div", { class: "capitalize" }, row.getValue("user_id"));
     },
   },
   {
-    accessorKey: 'username',
-    header: 'Username',
+    accessorKey: "username",
+    header: "Username",
     cell: ({ row }) =>
-      h('div', { class: 'lowercase' }, row.getValue('username')),
+      h("div", { class: "lowercase" }, row.getValue("username")),
   },
   {
-    accessorKey: 'role',
-    header: 'Role',
+    accessorKey: "role",
+    header: "Role",
     cell: ({ row }) => {
-      return h('div', { class: 'capitalize' }, row.getValue('role'))
+      return h("div", { class: "capitalize" }, row.getValue("role"));
     },
   },
   {
-    id: 'actions',
+    id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const user = row.original
+      const user = row.original;
 
       return h(DropdownAction, {
-        user_id: user.user_id,
+        userId: user.user_id,
         username: user.username,
-      })
+      });
     },
   },
-]
+];
 
 const table = useVueTable({
   data: props.data,
   columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
-})
+});
 </script>
 
 <template>
@@ -142,7 +142,7 @@ const table = useVueTable({
           :disabled="!table.getCanPreviousPage()"
           @click="table.previousPage()"
         >
-          Previous
+          Précedente
         </Button>
         <Button
           variant="outline"
@@ -150,7 +150,7 @@ const table = useVueTable({
           :disabled="!table.getCanNextPage()"
           @click="table.nextPage()"
         >
-          Next
+          Suivante
         </Button>
       </div>
     </div>
