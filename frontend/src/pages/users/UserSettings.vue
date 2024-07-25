@@ -1,42 +1,42 @@
 <script setup lang="ts">
-import { onMounted, onUpdated, ref } from "vue";
-import { useRouter } from "vue-router";
+import { onMounted, onUpdated, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 const tabs = ref([
   {
-    name: "Paramètres généraux",
-    component: "general-settings",
-    path: "/settings",
+    name: 'Paramètres généraux',
+    component: 'general-settings',
+    path: '/settings',
   },
   {
-    name: "Sécurité",
-    component: "security-settings",
-    path: "/settings/security",
+    name: 'Sécurité',
+    component: 'security-settings',
+    path: '/settings/security',
   },
   {
-    name: "Supprimer mon compte",
-    component: "delete-account",
-    path: "/settings/delete-account",
+    name: 'Supprimer mon compte',
+    component: 'delete-account',
+    path: '/settings/delete-account',
   },
-]);
+])
 
-const route = useRouter();
-const currentTab = ref<string>("general-settings");
+const route = useRouter()
+const currentTab = ref<string>('general-settings')
 
 function _onLoad() {
   const tab = tabs.value.find(
-    (tab) => tab.path === route.currentRoute.value.path
-  );
+    tab => tab.path === route.currentRoute.value.path,
+  )
   if (tab) {
-    currentTab.value = tab.component;
+    currentTab.value = tab.component
   }
 }
 onMounted(() => {
-  _onLoad();
-});
+  _onLoad()
+})
 onUpdated(() => {
-  _onLoad();
-});
+  _onLoad()
+})
 </script>
 
 <template>

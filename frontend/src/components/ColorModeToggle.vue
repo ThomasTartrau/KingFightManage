@@ -1,17 +1,17 @@
 <script lang="ts" setup>
-import { useColorMode } from "@vueuse/core";
-import { Moon, Sun } from "lucide-vue-next";
+import { useColorMode } from '@vueuse/core'
+import { Moon, Sun } from 'lucide-vue-next'
 import {
   Tooltip,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import Button from "@/components/ui/button/Button.vue";
+} from '@/components/ui/tooltip'
+import Button from '@/components/ui/button/Button.vue'
 
-const mode = useColorMode();
+const mode = useColorMode()
 
 function handleThemeChange() {
-  mode.value = mode.value !== "light" ? "light" : "dark";
+  mode.value = mode.value !== 'light' ? 'light' : 'dark'
 }
 </script>
 

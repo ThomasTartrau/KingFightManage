@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { LayoutGrid, User } from "lucide-vue-next";
-import { onMounted, onUpdated, ref } from "vue";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { LayoutGrid, User } from 'lucide-vue-next'
+import { onMounted, onUpdated, ref } from 'vue'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,25 +11,25 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import type { UserInfo } from "@/iam";
-import { emptyUserInfo, getUserInfo, logout } from "@/iam";
-import CustomRouterLink from "@/components/CustomRouterLink.vue";
+} from '@/components/ui/dropdown-menu'
+import type { UserInfo } from '@/iam'
+import { emptyUserInfo, getUserInfo, logout } from '@/iam'
+import CustomRouterLink from '@/components/CustomRouterLink.vue'
 
-const userInfo: UserInfo = getUserInfo().value || emptyUserInfo;
+const userInfo: UserInfo = getUserInfo().value || emptyUserInfo
 
-const profile_picture = ref<string>("");
+const profile_picture = ref<string>('')
 
 function _load() {
-  profile_picture.value = `/profile-pictures/${userInfo.user_id}.jpeg`;
+  profile_picture.value = `/profile-pictures/${userInfo.user_id}.jpeg`
 }
 
 onMounted(() => {
-  _load();
-});
+  _load()
+})
 onUpdated(() => {
-  _load();
-});
+  _load()
+})
 </script>
 
 <template>

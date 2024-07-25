@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { useColorMode } from "@vueuse/core";
-import { computed } from "vue";
-import { Icon } from "@iconify/vue";
+import { useColorMode } from '@vueuse/core'
+import { computed } from 'vue'
+import { Icon } from '@iconify/vue'
 
-import { Button } from "@/components/ui/button";
-import { useSettingsStore } from "@/stores/settings";
+import { Button } from '@/components/ui/button'
+import { useSettingsStore } from '@/stores/settings'
 
-const settingsStore = useSettingsStore();
-const mode = useColorMode();
-const isDarkMode = computed(() => mode.value !== "light");
+const settingsStore = useSettingsStore()
+const mode = useColorMode()
+const isDarkMode = computed(() => mode.value !== 'light')
 
 function handleThemeChange() {
-  mode.value = mode.value !== "light" ? "light" : "dark";
-  settingsStore.setSetting<string>("theme", mode.value);
+  mode.value = mode.value !== 'light' ? 'light' : 'dark'
+  settingsStore.setSetting<string>('theme', mode.value)
 }
 </script>
 

@@ -1,23 +1,23 @@
 <script setup lang="ts">
-import { Ellipsis, LogOut } from "lucide-vue-next";
-import CustomRouterLink from "../CustomRouterLink.vue";
-import CollapseMenu from "./CollapseMenu.vue";
-import { cn } from "@/lib/utils";
-import { useMenu } from "@/utils/useMenu";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import TooltipProvider from "@/components/ui/tooltip/TooltipProvider.vue";
-import Tooltip from "@/components/ui/tooltip/Tooltip.vue";
-import TooltipTrigger from "@/components/ui/tooltip/TooltipTrigger.vue";
+import { Ellipsis, LogOut } from 'lucide-vue-next'
+import CustomRouterLink from '../CustomRouterLink.vue'
+import CollapseMenu from './CollapseMenu.vue'
+import { cn } from '@/lib/utils'
+import { useMenu } from '@/utils/useMenu'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import TooltipProvider from '@/components/ui/tooltip/TooltipProvider.vue'
+import Tooltip from '@/components/ui/tooltip/Tooltip.vue'
+import TooltipTrigger from '@/components/ui/tooltip/TooltipTrigger.vue'
 
-import Button from "@/components/ui/button/Button.vue";
-import TooltipContent from "@/components/ui/tooltip/TooltipContent.vue";
-import { logout } from "@/iam";
+import Button from '@/components/ui/button/Button.vue'
+import TooltipContent from '@/components/ui/tooltip/TooltipContent.vue'
+import { logout } from '@/iam'
 
 defineProps<{
-  isOpen: boolean;
-}>();
+  isOpen: boolean
+}>()
 
-const { menuList } = useMenu();
+const { menuList } = useMenu()
 </script>
 
 <template>
@@ -73,7 +73,7 @@ const { menuList } = useMenu();
                             :class="
                               cn(
                                 'flex justify-center items-center',
-                                !isOpen ? '' : 'mr-4'
+                                !isOpen ? '' : 'mr-4',
                               )
                             "
                           >
@@ -85,7 +85,7 @@ const { menuList } = useMenu();
                                 'max-w-[200px] flex justify-center items-center truncate',
                                 !isOpen
                                   ? '-translate-x-96 opacity-0'
-                                  : 'translate-x-0 opacity-100'
+                                  : 'translate-x-0 opacity-100',
                               )
                             "
                           >
@@ -126,7 +126,7 @@ const { menuList } = useMenu();
                     :class="
                       cn(
                         'flex justify-center items-center',
-                        isOpen === false ? '' : 'mr-4'
+                        isOpen === false ? '' : 'mr-4',
                       )
                     "
                   >
@@ -136,7 +136,7 @@ const { menuList } = useMenu();
                     :class="
                       cn(
                         'whitespace-nowrap',
-                        !isOpen ? 'opacity-0 hidden' : 'opacity-100'
+                        !isOpen ? 'opacity-0 hidden' : 'opacity-100',
                       )
                     "
                   >

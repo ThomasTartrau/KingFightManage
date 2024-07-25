@@ -1,14 +1,14 @@
 <script setup>
-import { Code } from "lucide-vue-next";
-import { cn } from "@/lib/utils";
-import { useAdminPanel } from "@/utils/useAdminPanel";
-import Menu from "@/components/panel/Menu.vue";
-import SidebarToggle from "@/components/panel/SidebarToggle.vue";
-import { Button } from "@/components/ui/button";
-import { routes } from "@/router/routes";
-import { config } from "@/lib/config";
+import { Code } from 'lucide-vue-next'
+import { cn } from '@/lib/utils'
+import { useAdminPanel } from '@/utils/useAdminPanel'
+import Menu from '@/components/panel/Menu.vue'
+import SidebarToggle from '@/components/panel/SidebarToggle.vue'
+import { Button } from '@/components/ui/button'
+import { routes } from '@/router/routes'
+import { config } from '@/lib/config'
 
-const { isOpen, setOpen } = useAdminPanel();
+const { isOpen, setOpen } = useAdminPanel()
 </script>
 
 <template>
@@ -16,7 +16,7 @@ const { isOpen, setOpen } = useAdminPanel();
     :class="
       cn(
         'fixed top-0 left-0 z-20 h-screen -translate-x-full lg:translate-x-0 transition-[width] ease-in-out duration-300',
-        isOpen ? 'w-72' : 'w-[90px]'
+        isOpen ? 'w-72' : 'w-[90px]',
       )
     "
   >
@@ -33,7 +33,7 @@ const { isOpen, setOpen } = useAdminPanel();
                 'font-bold text-lg whitespace-nowrap transition-[transform,opacity,display] ease-in-out duration-300',
                 isOpen
                   ? 'translate-x-0 opacity-100'
-                  : '-translate-x-96 opacity-0 hidden'
+                  : '-translate-x-96 opacity-0 hidden',
               )
             "
           >

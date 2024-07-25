@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { Ellipsis } from 'lucide-vue-next'
+import { defineProps, ref } from 'vue'
+import MessageDialog from './message-dialog.vue'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,52 +13,46 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { UUID } from "@/http";
-import { Ellipsis } from "lucide-vue-next";
-import { defineProps, ref } from "vue";
-import {
-  deleteUser,
-  sendMessage,
-  setRole,
-} from "@/components/custom/staffs/StaffsService";
-import { getRole } from "@/iam";
-import MessageDialog from "./message-dialog.vue";
-import { Dialog } from "@/components/ui/dialog";
+} from '@/components/ui/dropdown-menu'
+import type { UUID } from '@/http'
+import { deleteUser, setRole } from '@/components/custom/staffs/StaffsService'
+import { getRole } from '@/iam'
+import { Dialog } from '@/components/ui/dialog'
 
 const props = defineProps<{
-  user_id: UUID;
-  username: string;
-}>();
+  userId: UUID
+  username: string
+}>()
 
-const emit = defineEmits(["refreshDatatable"]);
-const role = getRole();
+const emit = defineEmits(['refreshDatatable'])
+const role = getRole()
 
-const isMessageDialogOpen = ref(false);
-const closeMessageDialog = () => {
-  isMessageDialogOpen.value = false;
-};
-const openMessageDialog = () => {
-  isMessageDialogOpen.value = true;
-};
-
-const ranks: String[] = ["Moderateur", "Administrateur", "Developpeur"];
-
-function handleSetRole(role: String) {
-  setRole(props.user_id, role).then(() => {
-    emit("refreshDatatable");
-  });
+const isMessageDialogOpen = ref(false)
+function closeMessageDialog() {
+  isMessageDialogOpen.value = false
+}
+function openMessageDialog() {
+  isMessageDialogOpen.value = true
 }
 
-function ifHasRole(roles: Array<String>): Boolean {
-  if (role.value === null) return false;
-  return roles.includes(role.value);
+const ranks: string[] = ['Moderateur', 'Administrateur', 'Developpeur']
+
+function handleSetRole(role: string) {
+  setRole(props.userId, role).then(() => {
+    emit('refreshDatatable')
+  })
+}
+
+function ifHasRole(roles: Array<string>): boolean {
+  if (role.value === null)
+    return false
+  return roles.includes(role.value)
 }
 
 function handleDelete() {
-  deleteUser(props.user_id).then(() => {
-    emit("refreshDatatable");
-  });
+  deleteUser(props.userId).then(() => {
+    emit('refreshDatatable')
+  })
 }
 </script>
 
@@ -65,9 +62,9 @@ function handleDelete() {
       <Ellipsis class="cursor-pointer text-right" />
     </DropdownMenuTrigger>
     <DropdownMenuContent class="w-56">
-      <DropdownMenuLabel v-if="ifHasRole(['developpeur'])"
-        >Manage</DropdownMenuLabel
-      >
+      <DropdownMenuLabel v-if="ifHasRole(['developpeur'])">
+        Manage
+      </DropdownMenuLabel>
       <DropdownMenuSeparator v-if="ifHasRole(['developpeur'])" />
       <DropdownMenuGroup>
         <DropdownMenuSub v-if="ifHasRole(['developpeur'])">
@@ -77,6 +74,7 @@ function handleDelete() {
           <DropdownMenuSubContent>
             <DropdownMenuItem
               v-for="rank in ranks"
+              :key="rank"
               @click="handleSetRole(rank)"
             >
               <span>{{ rank }}</span>
@@ -102,9 +100,9 @@ function handleDelete() {
 
   <Dialog v-model:open="isMessageDialogOpen">
     <MessageDialog
-      :user_id="props.user_id"
+      :user-id="props.userId"
       :username="props.username"
-      @closeMessageModal="closeMessageDialog"
+      @close-message-modal="closeMessageDialog"
     />
   </Dialog>
 </template>

@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { Menu as MenuIcon, Code } from "lucide-vue-next";
-import { routes } from "@/router/routes";
-import { Button } from "@/components/ui/button";
+import { Code, Menu as MenuIcon } from 'lucide-vue-next'
+import { routes } from '@/router/routes'
+import { Button } from '@/components/ui/button'
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import Menu from "@/components/panel/Menu.vue";
-import { config } from "@/lib/config";
+} from '@/components/ui/sheet'
+import Menu from '@/components/panel/Menu.vue'
+import { config } from '@/lib/config'
 </script>
 
 <template>
