@@ -1,6 +1,6 @@
 <mjml>
   <mj-head>
-    <mj-title>Verify your email</mj-title>
+    <mj-title>Vérifier votre email</mj-title>
     <mj-style inline="inline">
       body { margin: 0; padding: 0; width: 100% !important; background-color:
       #f0f0f0; } h1 { font-size: 24px; } h2 { font-size: 20px; } p { font-size:
@@ -12,11 +12,11 @@
       <mj-column>
         <mj-image src="{ $logo_url }" alt="Logo" width="150px" />
         <mj-text align="center">
-          <h1>Welcome to TemplateSiteName!</h1>
+          <h1>Bienvenue chez KingFight!</h1>
           <p>
-            An account was created with your email address. If this was you,
-            click the link below to verify your email address and activate you
-            account:
+            Un compte a été créé avec votre adresse email. Si vous êtes à
+            l'origine de cette action, veuillez cliquer sur le lien ci-dessous
+            pour vérifier votre email et activer votre compte:
           </p>
         </mj-text>
         <mj-button
@@ -33,10 +33,10 @@
           </p>
         </mj-text>
         <mj-text align="center">
-          <p>This link will expire within <strong>5 minutes</strong>.</p>
+          <p>Ce lien expirera dans <strong>5 minutes</strong>.</p>
           <p class="small">
-            If you didn't create an account, do not click on the link and ignore
-            this message.
+            Si vous n'êtes pas à l'origine de cette action, veuillez ignorer cet
+            email.
           </p>
         </mj-text>
       </mj-column>
