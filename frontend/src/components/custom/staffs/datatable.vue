@@ -4,9 +4,10 @@ import {
   FlexRender,
   getCoreRowModel,
   getPaginationRowModel,
+  TableOptions,
   useVueTable,
 } from "@tanstack/vue-table";
-import { h } from "vue";
+import { h, onUpdated, reactive, ref } from "vue";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +20,8 @@ import {
 } from "@/components/ui/table";
 import DropdownAction from "@/components/custom/staffs/dropdown-action.vue";
 import type { components } from "@/types";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-vue-next";
 
 type definitions = components["schemas"];
 type User = definitions["User"];
@@ -26,6 +29,7 @@ type User = definitions["User"];
 const props = defineProps<{
   data: User[];
 }>();
+const datas = ref<User[]>(props.data);
 
 const emit = defineEmits(["refreshDatatable"]);
 
@@ -68,24 +72,42 @@ const columns: ColumnDef<User>[] = [
   },
 ];
 
-const table = useVueTable({
-  data: props.data,
-  columns,
+function onSearch(username: string) {
+  datas.value = props.data.filter((user) =>
+    user.username.toLowerCase().includes(username.toLowerCase())
+  );
+}
+
+const tableOptions = reactive<TableOptions<User>>({
+  get data() {
+    return datas.value;
+  },
+  get columns() {
+    return columns;
+  },
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
 });
+
+const table = useVueTable(tableOptions);
 </script>
 
 <template>
   <div class="w-full">
-    <!-- <div class="flex items-center py-4">
+    <div class="relative w-full max-w-sm items-center mb-8">
       <Input
-        class="max-w-sm"
-        placeholder="Filter emails..."
-        :model-value="table.getColumn('email')?.getFilterValue() as string"
-        @update:model-value="table.getColumn('email')?.setFilterValue($event)"
+        id="search"
+        type="text"
+        placeholder="Rechercher un utilisateur"
+        class="pl-10"
+        @input="onSearch($event.target.value)"
       />
-    </div> -->
+      <span
+        class="absolute start-0 inset-y-0 flex items-center justify-center px-2"
+      >
+        <Search class="size-6 text-muted-foreground" />
+      </span>
+    </div>
     <div class="rounded-md border">
       <Table>
         <TableHeader>
@@ -124,7 +146,7 @@ const table = useVueTable({
 
           <TableRow v-else>
             <TableCell :colspan="columns.length" class="h-24 text-center">
-              No results.
+              Aucun résultat trouvé
             </TableCell>
           </TableRow>
         </TableBody>
