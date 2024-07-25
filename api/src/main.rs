@@ -13,8 +13,8 @@ use url::Url;
 use crate::auth::middleware_biscuit;
 
 mod auth;
-mod users_settings;
-mod users_management;
+mod user_settings;
+mod users;
 mod utils;
 
 const APP_TITLE: &str = "KingFightManage";
@@ -265,38 +265,38 @@ async fn main() -> anyhow::Result<()> {
                                         .service(
                                             web::resource("/profile-picture")
                                                 .wrap(biscuit_auth.clone())
-                                                .route(web::post().to(users_settings::main::change_profile_picture)),
+                                                .route(web::post().to(user_settings::main::change_profile_picture)),
                                         )
                                         .service(
                                             web::scope("/profile")
                                                 .service(
                                                     web::resource("/name")
                                                         .wrap(biscuit_auth.clone())
-                                                        .route(web::post().to(users_settings::main::change_name)),
+                                                        .route(web::post().to(user_settings::main::change_name)),
                                                 )
                                         )
                                     .wrap(biscuit_auth.clone())
-                                    .route("", web::delete().to(users_settings::main::delete_user)),
+                                    .route("", web::delete().to(user_settings::main::delete_user)),
                                 )
                                 .service(
                                     web::scope("/users")
                                     .service(
                                         web::resource("/generate-registration-token")
                                         .wrap(biscuit_auth.clone())
-                                        .route(web::get().to(users_management::main::generate_registration_token)),
+                                        .route(web::get().to(users::main::generate_registration_token)),
                                     )
                                     .service(
                                         web::resource("/set-role")
                                         .wrap(biscuit_auth.clone())
-                                        .route(web::post().to(users_management::main::set_role)),
+                                        .route(web::post().to(users::main::set_role)),
                                     )
                                     .service(
                                         web::resource("/{user_id}")
                                         .wrap(biscuit_auth.clone())
-                                        .route(web::delete().to(users_management::main::delete_user)),
+                                        .route(web::delete().to(users::main::delete_user)),
                                     )
                                     .wrap(biscuit_auth.clone())
-                                    .route("", web::get().to(users_management::main::get_users)),
+                                    .route("", web::get().to(users::main::get_users)),
                                 )
                                 
                         )
