@@ -8,7 +8,6 @@ import router from "./router/router";
 import { AuthPlugin } from "./iam";
 import { components } from "./utils/components";
 import Main from "./Main.vue";
-import i18n from "@/i18n";
 
 // Notivue
 import "notivue/notification.css"; // Only needed if using built-in notifications
@@ -34,7 +33,6 @@ const app = createApp(Main);
 
 app.use(pinia);
 app.use(router);
-app.use(i18n);
 app.use(AuthPlugin);
 app.use(notivue);
 
@@ -44,15 +42,4 @@ for (const [name, component] of Object.entries(components)) {
   app.component(name, component);
 }
 
-initSettings();
-
 app.mount("#app");
-
-function initSettings() {
-  const language = localStorage.getItem("language");
-  if (language) {
-    i18n.global.locale.value = language;
-  } else {
-    localStorage.setItem("language", i18n.global.locale.value);
-  }
-}

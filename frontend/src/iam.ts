@@ -19,8 +19,8 @@ interface State {
   refreshTokenExpiration: Date;
   user_id: UUID;
   email: string;
-  firstName: string;
-  lastName: string;
+  username: string;
+  role: string;
 }
 
 const localStorageKey = "auth";
@@ -39,8 +39,8 @@ function readStateFromStorage(): State | null {
       refreshTokenExpiration: string;
       user_id: UUID;
       email: string;
-      firstName: string;
-      lastName: string;
+      username: string;
+      role: string;
     } | null;
 
     if (parsed !== null) {
@@ -117,8 +117,8 @@ export async function login(email: string, password: string): Promise<void> {
     refreshTokenExpiration: new Date(res.data.refresh_token_expiration),
     user_id: res.data.user_id,
     email: res.data.email,
-    firstName: res.data.first_name,
-    lastName: res.data.last_name,
+    username: res.data.username,
+    role: res.data.role,
   };
   if (state.value) {
     writeStateToStorage(state.value);
@@ -128,15 +128,13 @@ export async function login(email: string, password: string): Promise<void> {
 
 export async function register(
   email: string,
-  firstName: string,
-  lastName: string,
+  username: string,
   password: string,
   registration_token: string
 ): Promise<void> {
   return http.unauthenticated.post("/auth/register", {
     email,
-    first_name: firstName,
-    last_name: lastName,
+    username,
     password,
     registration_token,
   });
@@ -153,8 +151,8 @@ export async function refresh(): Promise<void> {
       refreshTokenExpiration: new Date(res.data.refresh_token_expiration),
       user_id: res.data.user_id,
       email: res.data.email,
-      firstName: res.data.first_name,
-      lastName: res.data.last_name,
+      username: res.data.username,
+      role: res.data.role,
     };
     if (state.value) {
       writeStateToStorage(state.value);
@@ -175,15 +173,15 @@ export async function logout(): Promise<void> {
     state.value = null;
     removeStateFromStorage();
     push.success({
-      title: "Success",
-      message: "You have been logged out successfully",
+      title: "Déconnexion",
+      message: "Vous êtes déconnecté avec succès",
       duration: 5000,
     });
     await router.push({ name: routes.Login });
   } else {
     push.error({
-      title: "Logout failed",
-      message: "Failed to logout, your not logged in",
+      title: "Déconnexion",
+      message: "Echec de la déconnexion",
       duration: 5000,
     });
   }
@@ -200,17 +198,13 @@ export function getRefreshToken(): ComputedRef<null | string> {
 export interface UserInfo {
   user_id: UUID;
   email: string;
-  firstName: string;
-  lastName: string;
-  name: string;
+  username: string;
 }
 
 export const emptyUserInfo: UserInfo = {
   user_id: "",
   email: "",
-  firstName: "",
-  lastName: "",
-  name: "",
+  username: "",
 };
 
 export function getUserInfo(): ComputedRef<null | UserInfo> {
@@ -219,9 +213,7 @@ export function getUserInfo(): ComputedRef<null | UserInfo> {
       return {
         user_id: state.value.user_id,
         email: state.value.email,
-        firstName: state.value.firstName,
-        lastName: state.value.lastName,
-        name: `${state.value.firstName} ${state.value.lastName}`,
+        username: state.value.username,
       };
     } else {
       return null;

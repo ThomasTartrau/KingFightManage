@@ -6,7 +6,6 @@ import { vAutoAnimate } from "@formkit/auto-animate/vue";
 
 import { push } from "notivue";
 import type { AxiosError, AxiosResponse } from "axios";
-import { useI18n } from "vue-i18n";
 import { Button } from "@/components/ui/button";
 import {
   FormControl,
@@ -30,16 +29,14 @@ import type { Problem } from "@/http";
 import { displayError } from "@/http";
 import router from "@/router/router";
 
-const { t } = useI18n({ useScope: "global" });
 const formSchema = toTypedSchema(
   z.object({
-    firstName: z.string().min(1, t("sign_up_page.first_name.errors.too_short")),
-    lastName: z.string().min(1, t("sign_up_page.last_name.errors.too_short")),
-    email: z.string().email(t("sign_up_page.email.errors.type")),
-    password: z.string().min(12, t("sign_up_page.password.errors.too_short")),
-    registration_token: z
+    username: z.string().min(1, "Le nom d'utilisateur est requis"),
+    email: z.string().email("L'adresse e-mail n'est pas valide"),
+    password: z
       .string()
-      .min(1, t("sign_up_page.registration_token.errors.required")),
+      .min(12, "Votre mot de passe doit contenir au moins 12 caractères"),
+    registration_token: z.string().min(1, "Le token d'inscription est requis"),
   })
 );
 
@@ -52,23 +49,22 @@ const onSubmit = handleSubmit((values) => {
 });
 
 async function submit(values: {
-  firstName: string;
-  lastName: string;
+  username: string;
   email: string;
   password: string;
   registration_token: string;
 }) {
   await register(
     values.email,
-    values.firstName,
-    values.lastName,
+    values.username,
     values.password,
     values.registration_token
   )
     .then(() => {
       push.success({
-        title: t("sign_up_page.success_notification.title"),
-        message: t("sign_up_page.success_notification.message"),
+        title: "Inscription réussie",
+        message:
+          "Vous êtes inscrit avec succès. Veuillez vérifier votre e-mail pour activer votre compte.",
         duration: 5000,
       });
       return router.push({ name: routes.Login });
@@ -86,19 +82,15 @@ async function submit(values: {
   >
     <Card class="mx-auto max-w-sm">
       <CardHeader>
-        <CardTitle class="text-2xl">
-          {{ t("sign_up_page.card.title") }}
-        </CardTitle>
-        <CardDescription>
-          {{ t("sign_up_page.card.description") }}
-        </CardDescription>
+        <CardTitle class="text-2xl"> Inscription </CardTitle>
+        <CardDescription> Inscrivez-vous pour créer un compte </CardDescription>
       </CardHeader>
       <CardContent>
         <div class="grid gap-4">
           <div class="grid grid-cols-2 gap-4">
-            <FormField v-slot="{ componentField }" name="firstName">
+            <FormField v-slot="{ componentField }" name="username">
               <FormItem v-auto-animate>
-                <FormLabel>{{ t("sign_up_page.first_name.label") }}</FormLabel>
+                <FormLabel>Nom d'utilisateur</FormLabel>
                 <FormControl>
                   <Input
                     type="text"
@@ -109,23 +101,10 @@ async function submit(values: {
                 <FormMessage />
               </FormItem>
             </FormField>
-            <FormField v-slot="{ componentField }" name="lastName">
-              <FormItem v-auto-animate>
-                <FormLabel>{{ t("sign_up_page.last_name.label") }}</FormLabel>
-                <FormControl>
-                  <Input
-                    type="text"
-                    placeholder="Doe"
-                    v-bind="componentField"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            </FormField>
           </div>
           <FormField v-slot="{ componentField }" name="email">
             <FormItem v-auto-animate>
-              <FormLabel>{{ t("sign_up_page.email.label") }}</FormLabel>
+              <FormLabel>Adresse e-mail</FormLabel>
               <FormControl>
                 <Input
                   type="email"
@@ -138,7 +117,7 @@ async function submit(values: {
           </FormField>
           <FormField v-slot="{ componentField }" name="password">
             <FormItem v-auto-animate>
-              <FormLabel>{{ t("sign_up_page.password.label") }}</FormLabel>
+              <FormLabel>Mot de passe</FormLabel>
               <FormControl>
                 <Input
                   type="password"
@@ -151,9 +130,7 @@ async function submit(values: {
           </FormField>
           <FormField v-slot="{ componentField }" name="registration_token">
             <FormItem v-auto-animate>
-              <FormLabel>
-                {{ t("sign_up_page.registration_token.label") }}
-              </FormLabel>
+              <FormLabel>Token d'inscription</FormLabel>
               <FormControl>
                 <Input
                   type="password"
@@ -164,14 +141,12 @@ async function submit(values: {
               <FormMessage />
             </FormItem>
           </FormField>
-          <Button type="submit" class="w-full">
-            {{ t("sign_up_page.sign_up_button") }}
-          </Button>
+          <Button type="submit" class="w-full"> S'inscrire </Button>
         </div>
         <div class="mt-4 text-center text-sm">
-          {{ t("sign_up_page.sign_in.label") }}
+          Vous avez déjà un compte ?
           <router-link :to="{ name: routes.Login }" class="underline">
-            {{ t("sign_up_page.sign_in.button_label") }}
+            Connectez-vous
           </router-link>
         </div>
       </CardContent>

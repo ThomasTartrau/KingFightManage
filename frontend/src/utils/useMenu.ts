@@ -2,13 +2,11 @@ import { createSharedComposable } from "@vueuse/core";
 import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { LayoutGrid, Settings, Shield, Users } from "lucide-vue-next";
-import { useI18n } from "vue-i18n";
 import type { Group } from "@/lib/menu";
 import { useRoute } from "@/router/routes";
 
 function _useMenu() {
   const { currentRoute } = useRouter();
-  const { t } = useI18n({ useScope: "global" });
   const menuList = computed<Group[]>(() => {
     return [
       {
@@ -16,7 +14,7 @@ function _useMenu() {
         menus: [
           {
             route: "Home",
-            label: t("sidebar.dashboard_label"),
+            label: "Accueil",
             active: currentRoute.value.fullPath.includes("/dashboard"),
             icon: LayoutGrid,
             submenus: [],
@@ -61,18 +59,18 @@ function _useMenu() {
         ],
       }, */
       {
-        groupLabel: t("sidebar.settings_group_label.label"),
+        groupLabel: "Paramètres",
         menus: [
           {
             route: "Settings",
-            label: t("sidebar.settings_group_label.menus.personnal_label"),
+            label: "Paramètres personnels",
             active: currentRoute.value.fullPath.includes(useRoute("Settings")),
             icon: Users,
             submenus: [],
           },
           {
             route: "SecuritySettings",
-            label: t("sidebar.settings_group_label.menus.security_label"),
+            label: "Paramètres de sécurité",
             active:
               currentRoute.value.fullPath.includes(useRoute("Settings")) &&
               true,

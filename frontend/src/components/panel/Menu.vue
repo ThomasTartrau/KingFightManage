@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useI18n } from "vue-i18n";
 import { Ellipsis, LogOut } from "lucide-vue-next";
 import CustomRouterLink from "../CustomRouterLink.vue";
 import CollapseMenu from "./CollapseMenu.vue";
@@ -19,7 +18,6 @@ defineProps<{
 }>();
 
 const { menuList } = useMenu();
-const { t } = useI18n({ useScope: "global" });
 </script>
 
 <template>
@@ -75,7 +73,7 @@ const { t } = useI18n({ useScope: "global" });
                             :class="
                               cn(
                                 'flex justify-center items-center',
-                                !isOpen ? '' : 'mr-4',
+                                !isOpen ? '' : 'mr-4'
                               )
                             "
                           >
@@ -87,7 +85,7 @@ const { t } = useI18n({ useScope: "global" });
                                 'max-w-[200px] flex justify-center items-center truncate',
                                 !isOpen
                                   ? '-translate-x-96 opacity-0'
-                                  : 'translate-x-0 opacity-100',
+                                  : 'translate-x-0 opacity-100'
                               )
                             "
                           >
@@ -128,7 +126,7 @@ const { t } = useI18n({ useScope: "global" });
                     :class="
                       cn(
                         'flex justify-center items-center',
-                        isOpen === false ? '' : 'mr-4',
+                        isOpen === false ? '' : 'mr-4'
                       )
                     "
                   >
@@ -138,16 +136,16 @@ const { t } = useI18n({ useScope: "global" });
                     :class="
                       cn(
                         'whitespace-nowrap',
-                        !isOpen ? 'opacity-0 hidden' : 'opacity-100',
+                        !isOpen ? 'opacity-0 hidden' : 'opacity-100'
                       )
                     "
                   >
-                    {{ t("sidebar.sign_out_label") }}
+                    Déconnexion
                   </p>
                 </Button>
               </TooltipTrigger>
               <TooltipContent v-if="!isOpen" side="right">
-                {{ t("sidebar.sign_out_label") }}
+                Déconnexion
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

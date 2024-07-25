@@ -42,17 +42,10 @@ const columns: ColumnDef<User>[] = [
     },
   },
   {
-    accessorKey: "first_name",
-    header: "First name",
+    accessorKey: "username",
+    header: "Username",
     cell: ({ row }) =>
-      h("div", { class: "lowercase" }, row.getValue("first_name")),
-  },
-  {
-    accessorKey: "last_name",
-    header: "Last name",
-    cell: ({ row }) => {
-      return h("div", { class: "lowercase" }, row.getValue("last_name"));
-    },
+      h("div", { class: "lowercase" }, row.getValue("username")),
   },
   {
     accessorKey: "role",

@@ -92,7 +92,7 @@ impl From<MyProblem> for HttpApiProblem {
         let problem: Problem = my_problem.to_owned().into();
         HttpApiProblem::new(problem.status)
             .type_url(format!(
-                "https://hook0.com/documentation/errors/{my_problem}",
+                "https://admin.kingfight.eu/documentation/errors/{my_problem}",
             )) // rely on Display trait of MyProblem
             .value("id".to_owned(), &my_problem.to_string()) // also rely on Display trait of MyProblem
             .value("validation".to_owned(), &problem.validation)
@@ -142,15 +142,15 @@ impl From<MyProblem> for Problem {
             // Functionnal errors
             MyProblem::PasswordTooShort(min_length) => Problem {
                 id: MyProblem::PasswordTooShort(min_length),
-                title: "Password is too short",
-                detail: format!("Password must be at least {min_length} characters long.").into(),
+                title: "Le mot de passe est trop court",
+                detail: format!("Le mot de passe doit comporter au moins {min_length} caractères.").into(),
                 validation: None,
                 status: StatusCode::UNPROCESSABLE_ENTITY,
             },
             MyProblem::EmailNotVerified => Problem {
                 id: MyProblem::EmailNotVerified,
-                title: "Email not verified",
-                detail: "You must verify your email address before you can log in.".into(),
+                title: "Email non vérifié",
+                detail: "Vous devez vérifier votre adresse e-mail avant de pouvoir vous connecter.".into(),
                 validation: None,
                 status: StatusCode::FORBIDDEN,
             },
@@ -159,51 +159,51 @@ impl From<MyProblem> for Problem {
             // Auth errors
             MyProblem::AuthFailedLogin => Problem {
                 id: MyProblem::AuthFailedLogin,
-                title: "Authentication failed",
-                detail: "The provided credentials are invalid.".into(),
+                title: "Échec de l'authentification",
+                detail: "Les informations d'identification fournies ne sont pas valides.".into(),
                 validation: None,
                 status: StatusCode::FORBIDDEN,
             },
             MyProblem::AuthFailedRefresh => Problem {
                 id: MyProblem::AuthFailedRefresh,
-                title: "Refreshing access token failed",
-                detail: "The provided refresh token is probably invalid or expired.".into(),
+                title: "Échec de rafraîchissement du jeton d'accès",
+                detail: "Le jeton de rafraîchissement fourni est probablement invalide ou expiré.".into(),
                 validation: None,
                 status: StatusCode::UNAUTHORIZED,
             },
             MyProblem::AuthInvalidBiscuit => Problem {
                 id: MyProblem::AuthInvalidBiscuit,
-                title: "Invalid biscuit",
-                detail: "The provided authentication token (Biscuit) is not valid, was not created using the current private key or is expired.".into(),
+                title: "Biscuit invalide",
+                detail: "Le jeton d'authentification fourni (Biscuit) n'est pas valide, n'a pas été créé avec la clé privée actuelle ou a expiré.".into(),
                 validation: None,
                 status: StatusCode::FORBIDDEN,
             },
             MyProblem::AuthBiscuitLookupError => Problem {
                 id: MyProblem::AuthBiscuitLookupError,
-                title: "Could not check database to verify if the provided Biscuit was revoked",
-                detail: "This is likely to be caused by database unavailability.".into(),
+                title: "Impossible de vérifier dans la base de données si le Biscuit fourni a été révoqué",
+                detail: "Cela est probablement dû à l'indisponibilité de la base de données.".into(),
                 validation: None,
                 status: StatusCode::INTERNAL_SERVER_ERROR,
             },
             MyProblem::AuthInvalidAuthorizationHeader => Problem {
                 id: MyProblem::AuthInvalidAuthorizationHeader,
-                title: "`Authorization` header is invalid",
-                detail: "`Authorization` header value could not be decoded as a valid UTF-8 string containing `Bearer {UUID}`.".into(),
+                title: "En-tête `Authorization` invalide",
+                detail: "La valeur de l'en-tête `Authorization` n'a pas pu être décodée en tant que chaîne UTF-8 valide contenant `Bearer {UUID}`.".into(),
                 validation: None,
                 status: StatusCode::BAD_REQUEST,
             },
             MyProblem::AuthNoAuthorizationHeader => Problem {
                 id: MyProblem::AuthNoAuthorizationHeader,
-                title: "No `Authorization` header was found in the HTTP request",
-                detail: "`Authorization` header must be provided and must contain a bearer token.".into(),
+                title: "Aucun en-tête `Authorization` n'a été trouvé dans la requête HTTP",
+                detail: "L'en-tête `Authorization` doit être fourni et doit contenir un jeton d'authentification.".into(),
                 validation: None,
                 status: StatusCode::UNAUTHORIZED,
             },
             MyProblem::AuthEmailExpired => {
                 Problem {
                     id: MyProblem::AuthEmailExpired,
-                    title: "Could not verify your link",
-                    detail: "The link you clicked might be expired. Please retry the whole process or contact support.".into(),
+                    title: "Impossible de vérifier votre lien",
+                    detail: "Le lien sur lequel vous avez cliqué pourrait avoir expiré. Veuillez réessayer tout le processus ou contacter le support.".into(),
                     validation: None,
                     status: StatusCode::UNAUTHORIZED,
                 }
@@ -216,7 +216,7 @@ impl From<MyProblem> for Problem {
                 let errors_str = e.to_string();
                 Problem {
                     id: MyProblem::Validation(e.to_owned()),
-                    title: "Provided input is malformed",
+                    title: "L'entrée fournie est mal formée",
                     detail: errors_str.into(),
                     validation: to_value(e).ok(),
                     status: StatusCode::UNPROCESSABLE_ENTITY,
@@ -224,29 +224,29 @@ impl From<MyProblem> for Problem {
             },
             MyProblem::NotFound => Problem {
                 id: MyProblem::NotFound,
-                title: "Resource not found",
-                detail: "The requested resource could not be found.".into(),
+                title: "Ressource non trouvée",
+                detail: "La ressource demandée est introuvable.".into(),
                 validation: None,
                 status: StatusCode::NOT_FOUND,
             },
             MyProblem::InternalServerError => Problem {
                 id: MyProblem::InternalServerError,
-                title: "Internal server error",
-                detail: "An unexpected error occurred.".into(),
+                title: "Erreur interne du serveur",
+                detail: "Une erreur inattendue s'est produite.".into(),
                 validation: None,
                 status: StatusCode::INTERNAL_SERVER_ERROR,
             },
             MyProblem::Forbidden => Problem {
                 id: MyProblem::Forbidden,
-                title: "Forbidden",
-                detail: "You do not have permission to access this resource.".into(),
+                title: "Interdit",
+                detail: "Vous n'avez pas la permission d'accéder à cette ressource.".into(),
                 validation: None,
                 status: StatusCode::FORBIDDEN,
             },
             MyProblem::BadRequest => Problem {
                 id: MyProblem::BadRequest,
-                title: "Bad request",
-                detail: "The request could not be understood by the server.".into(),
+                title: "Mauvaise requête",
+                detail: "La requête n'a pas pu être comprise par le serveur.".into(),
                 validation: None,
                 status: StatusCode::BAD_REQUEST,
             },

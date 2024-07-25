@@ -6,6 +6,7 @@ use paperclip::actix::{api_v2_operation, Apiv2Schema, CreatedJson, NoContent};
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as};
 use uuid::Uuid;
+use validator::Validate;
 
 use crate::{auth::auth::UserLookup, auth::iam::{authorize_only_user, create_registration_token, Action, Role}, utils::{openapi::OaBiscuitUserAccess, problems::MyProblem}};
 
@@ -17,8 +18,7 @@ pub struct GenerateRegistrationTokenResponse {
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 struct User {
     user_id: Uuid,
-    first_name: String,
-    last_name: String,
+    username: String,
     role: String,
 }
 
@@ -36,6 +36,13 @@ pub struct SetRolePost {
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct DeleteUserPost {
     user_id: Uuid,
+}
+
+#[derive(Debug, Serialize, Deserialize, Apiv2Schema, Validate)]
+pub struct SendMessagePost {
+    user_id: Uuid,
+    #[validate(non_control_character, length(min = 1, max = 1000))]
+    message: String,
 }
 
 #[api_v2_operation(
@@ -83,7 +90,7 @@ pub async fn get_users(
     if let Ok(_token) = authorize_only_user(&biscuit, Action::UsersGetUsers) {
         let users = query_as!(
             User,
-            "SELECT user__id as user_id, first_name, last_name, role FROM iam.user"
+            "SELECT user__id as user_id, username, role FROM iam.user"
         )
         .fetch_all(&state.db)
         .await
@@ -171,7 +178,7 @@ pub async fn delete_user(
         let user_lookup = query_as!(
             UserLookup,
             "
-                SELECT user__id AS user_id, email, first_name, last_name, role, email_verified_at, password AS password_hash
+                SELECT user__id AS user_id, email, username, role, email_verified_at, password AS password_hash
                 FROM iam.user
                 WHERE user__id = $1
             ",
@@ -206,3 +213,25 @@ pub async fn delete_user(
         Err(MyProblem::Forbidden)
     }
 }
+
+/* #[api_v2_operation(
+    summary = "Send message",
+    description = "",
+    operation_id = "users-management.send-message",
+    consumes = "application/json",
+    produces = "application/json",
+    tags("Users Management")
+)]
+pub async fn send_message(
+    state: Data<crate::State>,
+    _: OaBiscuitUserAccess,
+    biscuit: ReqData<Biscuit>,
+    body: Json<SendMessagePost>,
+) -> Result<NoContent, MyProblem> {
+    if let Err(e) = body.validate() {
+        return Err(MyProblem::Validation(e));
+    }
+
+    let body = body.into_inner();
+    }
+} */

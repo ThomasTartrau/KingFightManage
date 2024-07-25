@@ -28,8 +28,8 @@ async function submit() {
     .then(() => {
       removeStateFromStorage();
       push.success({
-        title: "Account deleted",
-        message: "Your account has been successfully deleted",
+        title: "Compte supprimé",
+        message: "Votre compte a été supprimé avec succès",
         duration: 5000,
       });
       setTimeout(() => {
@@ -43,29 +43,31 @@ async function submit() {
 <template>
   <Card class="shadow-2xl shadow-slate-900">
     <CardHeader>
-      <CardTitle> Delete account </CardTitle>
+      <CardTitle> Supprimer mon compte </CardTitle>
     </CardHeader>
     <CardContent>
       <CardDescription>
-        By deleting your account, you will lose access to all of our services
-        and data. You will not be able to recover your account.
+        En supprimant votre compte, vous perdrez l'accès à tous nos services et
+        données. Vous ne pourrez pas récupérer votre compte.
       </CardDescription>
       <div class="flex justify-end mt-6">
         <AlertDialog>
           <AlertDialogTrigger as-child>
-            <Button variant="destructive"> Delete account </Button>
+            <Button variant="destructive"> Supprimer mon compte </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogTitle
+                >Êtes-vous absolument certain ?</AlertDialogTitle
+              >
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete your
-                account and remove your data from our servers.
+                Cette action est irréversible. Cela supprimera définitivement
+                votre compte et supprimera vos données de nos serveurs.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction @click="submit"> Delete </AlertDialogAction>
+              <AlertDialogCancel>Annuler</AlertDialogCancel>
+              <AlertDialogAction @click="submit"> Supprimer </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

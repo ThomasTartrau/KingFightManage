@@ -32,8 +32,8 @@ const confirm_password = ref<string>("");
 async function submit() {
   if (new_password.value !== confirm_password.value) {
     return push.error({
-      title: "Invalid password",
-      message: "Passwords do not match",
+      title: "Mot de passe invalide",
+      message: "Les mots de passe ne correspondent pas",
       duration: 5000,
     });
   }
@@ -41,8 +41,8 @@ async function submit() {
   await changePassword(new_password.value)
     .then(() => {
       push.success({
-        title: "Password changed",
-        message: "Your password has been changed successfully",
+        title: "Mot de passe changé",
+        message: "Votre mot de passe a été changé avec succès",
         duration: 5000,
       });
     })
@@ -53,32 +53,35 @@ async function submit() {
 <template>
   <Card class="shadow-2xl shadow-slate-900">
     <CardHeader>
-      <CardTitle> Security settings </CardTitle>
+      <CardTitle> Paramètres de sécurité </CardTitle>
     </CardHeader>
     <CardContent>
       <CardDescription>
-        Change your password here. Please enter your new password and confirm
-        it. You need to use an secure password with minimum 12 characters.
+        Changez votre mot de passe ici. Veuillez entrer votre nouveau mot de
+        passe et le confirmer. Vous devez utiliser un mot de passe sécurisé avec
+        au moins 12 caractères.
       </CardDescription>
       <div class="flex justify-end">
         <Dialog v-model:open="isPasswordDialogOpen">
           <form>
             <DialogTrigger as-child>
-              <Button variant="outline" class="mt-8"> Change password </Button>
+              <Button variant="outline" class="mt-8">
+                Changer le mot de passe
+              </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Change password</DialogTitle>
+                <DialogTitle>Changer le mot de passe</DialogTitle>
                 <DialogDescription>
-                  Change your password here. Please enter your new password and
-                  confirm it. You need to use an secure password with minimum 12
-                  characters.
+                  Changez votre mot de passe ici. Veuillez entrer votre nouveau
+                  mot de passe et le confirmer. Vous devez utiliser un mot de
+                  passe sécurisé avec au moins 12 caractères.
                 </DialogDescription>
               </DialogHeader>
               <div class="grid gap-4 py-4">
                 <div class="grid grid-cols-4 items-center gap-4">
                   <Label for="newPassword" class="text-right">
-                    New password
+                    Nouveau mot de passe
                   </Label>
                   <Input
                     id="newPassword"
@@ -89,7 +92,7 @@ async function submit() {
                 </div>
                 <div class="grid grid-cols-4 items-center gap-4">
                   <Label for="confirmPassword" class="text-right">
-                    Confirm password
+                    Confirmer le mot de passe
                   </Label>
                   <Input
                     id="confirmPassword"
@@ -101,9 +104,9 @@ async function submit() {
               </div>
               <DialogFooter>
                 <Button variant="secondary" @click="closePasswordDialog">
-                  Cancel
+                  Annuler
                 </Button>
-                <Button @click="submit"> Change password </Button>
+                <Button @click="submit"> Modifier </Button>
               </DialogFooter>
             </DialogContent>
           </form>

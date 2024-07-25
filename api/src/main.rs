@@ -13,9 +13,9 @@ use url::Url;
 use crate::auth::middleware_biscuit;
 
 mod auth;
+mod utils;
 mod user_settings;
 mod users;
-mod utils;
 
 const APP_TITLE: &str = "KingFightManage";
 const WEBAPP_INDEX_FILE: &str = "index.html";
@@ -57,7 +57,7 @@ struct Config {
     email_sender_address: Address,
 
     /// Sender name
-    #[clap(long, env, default_value = "Hook0")]
+    #[clap(long, env, default_value = "KingFight")]
     email_sender_name: String,
 
     /// Connection URL to SMTP server; for example: `smtp://localhost:1025`, `smtps://user:password@provider.com:465` (SMTP over TLS) or `smtp://user:password@provider.com:465?tls=required` (SMTP with STARTTLS)
@@ -69,7 +69,7 @@ struct Config {
     smtp_timeout_in_s: u64,
 
     /// URL of the Hook0 logo
-    #[clap(long, env, default_value = "https://hook0.com/256x256.png")]
+    #[clap(long, env, default_value = "https://cdn.discordapp.com/icons/1196515381620260986/a30a00c4d936c8c30854cb3381e44981.webp?size=128")]
     email_logo_url: Url,
 
     /// Frontend application URL (used for building links in emails)
@@ -270,9 +270,9 @@ async fn main() -> anyhow::Result<()> {
                                         .service(
                                             web::scope("/profile")
                                                 .service(
-                                                    web::resource("/name")
+                                                    web::resource("/username")
                                                         .wrap(biscuit_auth.clone())
-                                                        .route(web::post().to(user_settings::main::change_name)),
+                                                        .route(web::post().to(user_settings::main::change_username)),
                                                 )
                                         )
                                     .wrap(biscuit_auth.clone())

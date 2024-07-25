@@ -20,15 +20,17 @@ function back_to_home() {
   <div class="flex items-center justify-center min-h-screen">
     <Card class="mx-auto max-w-sm">
       <CardHeader>
-        <CardTitle>Error 404</CardTitle>
+        <CardTitle>Erreur 404</CardTitle>
         <CardDescription>
-          The page you are looking for does not exist.
+          La page que vous cherchez n'existe pas.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Separator class="my-4" />
-        <p>Oops! I think you are lost.</p>
-        <Button class="mt-4" @click="back_to_home"> Go to Home </Button>
+        <p>Oops! Je pense que vous êtes perdu.</p>
+        <Button class="mt-4" @click="back_to_home">
+          Revenir en lieu sûr
+        </Button>
       </CardContent>
     </Card>
   </div>

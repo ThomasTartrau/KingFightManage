@@ -1,23 +1,20 @@
 <script setup lang="ts">
 import { onMounted, onUpdated, ref } from "vue";
-import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
-
-const { t } = useI18n({ useScope: "global" });
 
 const tabs = ref([
   {
-    name: t("user_settings_pages.main.tabs.general"),
+    name: "Paramètres généraux",
     component: "general-settings",
     path: "/settings",
   },
   {
-    name: t("user_settings_pages.main.tabs.security"),
+    name: "Sécurité",
     component: "security-settings",
     path: "/settings/security",
   },
   {
-    name: t("user_settings_pages.main.tabs.delete_account"),
+    name: "Supprimer mon compte",
     component: "delete-account",
     path: "/settings/delete-account",
   },
@@ -28,7 +25,7 @@ const currentTab = ref<string>("general-settings");
 
 function _onLoad() {
   const tab = tabs.value.find(
-    (tab) => tab.path === route.currentRoute.value.path,
+    (tab) => tab.path === route.currentRoute.value.path
   );
   if (tab) {
     currentTab.value = tab.component;

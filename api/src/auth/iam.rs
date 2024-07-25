@@ -25,8 +25,7 @@ pub struct AuthorizedUserToken {
     pub session_id: Uuid,
     pub user_id: Uuid,
     pub email: String,
-    pub first_name: String,
-    pub last_name: String,
+    pub username: String,
     pub role: String,
 }
 
@@ -119,6 +118,7 @@ pub enum Action {
     UsersGetUsers,
     UsersSetRank,
     UsersDeleteUser,
+    UsersSendMessage,
 }
 
 impl<'a> Action {
@@ -133,6 +133,7 @@ impl<'a> Action {
             Action::UsersGetUsers => "users-management:get-users",
             Action::UsersSetRank => "users-management:set-role",
             Action::UsersDeleteUser => "users-management:delete-user",
+            Action::UsersSendMessage => "users-management:send-message",
         }
     }
 
@@ -149,6 +150,7 @@ impl<'a> Action {
             Self::UsersGetUsers => vec![Role::Administrateur, Role::Moderateur],
             Self::UsersSetRank => vec![],
             Self::UsersDeleteUser => vec![],
+            Self::UsersSendMessage => vec![Role::Administrateur, Role::Moderateur],
         };
 
         roles.append(&mut per_action_roles);
@@ -166,6 +168,7 @@ impl<'a> Action {
             Self::UsersGetUsers => vec![],
             Self::UsersSetRank => vec![],
             Self::UsersDeleteUser => vec![],
+            Self::UsersSendMessage => vec![],
         };
 
         facts.push(fact!("action({action})", action = self.action_name()));
@@ -187,8 +190,7 @@ pub fn create_user_access_token(
     session_id: Uuid,
     user_id: Uuid,
     email: &str,
-    first_name: &str,
-    last_name: &str,
+    username: &str,
     role: &str,
 ) -> Result<RootToken, biscuit_auth::error::Token> {
     let keypair = KeyPair::from(private_key);
@@ -205,8 +207,7 @@ pub fn create_user_access_token(
                 created_at({created_at});
                 user_id({user_id});
                 email({email});
-                first_name({first_name});
-                last_name({last_name});
+                username({username});
                 role({role});
 
                 check if time($t), $t < {expired_at};
@@ -451,7 +452,6 @@ pub fn authorize(
     });
     authorizer.add_token(biscuit)?;
     let result = authorizer.authorize();
-    warn!("Authorizer state:\n{}", authorizer.print_world());
     trace!("Authorizer state:\n{}", authorizer.print_world());
     result?;
 
@@ -482,15 +482,8 @@ pub fn authorize(
                 .0
                 .to_owned();
 
-            let raw_first_name: Vec<(String,)> = authorizer.query(rule!("data($first_name) <- first_name($first_name)"))?;
-            let first_name = raw_first_name
-                .first()
-                .ok_or(biscuit_auth::error::Token::InternalError)?
-                .0
-                .to_owned();
-
-            let raw_last_name: Vec<(String,)> = authorizer.query(rule!("data($last_name) <- last_name($last_name)"))?;
-            let last_name = raw_last_name
+            let raw_username: Vec<(String,)> = authorizer.query(rule!("data($username) <- username($username)"))?;
+            let username = raw_username
                 .first()
                 .ok_or(biscuit_auth::error::Token::InternalError)?
                 .0
@@ -507,8 +500,7 @@ pub fn authorize(
                 session_id,
                 user_id,
                 email,
-                first_name,
-                last_name,
+                username,
                 role,
             }))
         },

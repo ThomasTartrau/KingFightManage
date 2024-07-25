@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import FlagComponent from "@/components/panel/FlagComponent.vue";
 import ColorModeToggle from "@/components/ColorModeToggle.vue";
 import UserDropdown from "@/components/panel/UserDropdown.vue";
 import SheetMenu from "@/components/panel/SheetMenu.vue";
@@ -18,7 +17,6 @@ import { config } from "@/lib/config";
         </h1>
       </div>
       <div class="flex flex-1 items-center space-x-2 justify-end">
-        <FlagComponent />
         <ColorModeToggle />
         <UserDropdown />
       </div>

@@ -3,7 +3,6 @@ import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
 import { z } from "zod";
 import { push } from "notivue";
-import { useI18n } from "vue-i18n";
 import { beginResetPassword } from "./UserServices";
 import Button from "@/components/ui/button/Button.vue";
 import {
@@ -24,11 +23,10 @@ import { Input } from "@/components/ui/input";
 import { displayError } from "@/http";
 import router from "@/router/router";
 
-const { t } = useI18n({ useScope: "global" });
 const formSchema = toTypedSchema(
   z.object({
-    email: z.string().email(t("begin_reset_password_page.email.errors.type")),
-  }),
+    email: z.string().email("Email invalide"),
+  })
 );
 
 const { handleSubmit } = useForm({
@@ -43,8 +41,9 @@ async function submit(values: { email: string }) {
   await beginResetPassword(values.email)
     .then(() => {
       push.success({
-        title: t("begin_reset_password_page.success_notification.title"),
-        message: t("begin_reset_password_page.success_notification.message"),
+        title: "Réinitialisation du mot de passe",
+        message:
+          "Un email vous a été envoyé avec les instructions pour réinitialiser votre mot de passe",
         duration: 5000,
       });
     })
@@ -56,18 +55,16 @@ async function submit(values: { email: string }) {
   <div class="flex items-center justify-center min-h-screen">
     <Card class="mx-auto">
       <CardHeader>
-        <CardTitle>{{ t("begin_reset_password_page.card.title") }}</CardTitle>
+        <CardTitle>Réinitialisation du mot de passe</CardTitle>
         <CardDescription>
-          {{ t("begin_reset_password_page.card.description") }}
+          Veuillez entrer votre email pour réinitialiser votre mot de passe
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form @submit.prevent="onSubmit">
           <FormField v-slot="{ componentField }" name="email">
             <FormItem v-auto-animate>
-              <FormLabel>{{
-                t("begin_reset_password_page.email.label")
-              }}</FormLabel>
+              <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input
                   type="email"
@@ -80,11 +77,9 @@ async function submit(values: { email: string }) {
           </FormField>
           <div class="flex justify-end mt-4 space-x-4">
             <Button type="button" variant="secondary" @click="router.back">
-              {{ t("begin_reset_password_page.back_button_label") }}
+              Retour
             </Button>
-            <Button type="submit">
-              {{ t("begin_reset_password_page.reset_password_button_label") }}
-            </Button>
+            <Button type="submit">Réinitialiser le mot de passe</Button>
           </div>
         </form>
       </CardContent>

@@ -7,7 +7,6 @@ import { useRouter } from "vue-router";
 import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import { z } from "zod";
-import { useI18n } from "vue-i18n";
 import { Button } from "@/components/ui/button";
 import {
   FormControl,
@@ -31,13 +30,12 @@ import type { Problem } from "@/http";
 import { displayError } from "@/http";
 
 const router = useRouter();
-const { t } = useI18n({ useScope: "global" });
 
 const formSchema = toTypedSchema(
   z.object({
-    email: z.string().email(t("login_page.email.errors.type")),
-    password: z.string().min(1, t("login_page.password.errors.to_short")),
-  }),
+    email: z.string().email("L'adresse e-mail n'est pas valide"),
+    password: z.string().min(1, "Le mot de passe est requis"),
+  })
 );
 
 const { handleSubmit } = useForm({
@@ -52,8 +50,8 @@ async function submit(values: { email: string; password: string }) {
   await login(values.email, values.password)
     .then(() => {
       push.success({
-        title: t("login_page.success_notification.title"),
-        message: t("login_page.success_notification.message"),
+        title: "Connexion réussie",
+        message: "Vous êtes connecté avec succès",
         duration: 5000,
       });
       return router.push({ name: routes.Home });
@@ -71,18 +69,14 @@ async function submit(values: { email: string; password: string }) {
   >
     <Card class="mx-auto max-w-sm">
       <CardHeader>
-        <CardTitle class="text-2xl">
-          {{ t("login_page.card.title") }}
-        </CardTitle>
-        <CardDescription>
-          {{ t("login_page.card.description") }}
-        </CardDescription>
+        <CardTitle class="text-2xl"> Connexion </CardTitle>
+        <CardDescription> Connectez-vous pour continuer </CardDescription>
       </CardHeader>
       <CardContent>
         <div class="grid gap-4">
           <FormField v-slot="{ componentField }" name="email">
             <FormItem v-auto-animate>
-              <FormLabel>{{ t("login_page.email.label") }}</FormLabel>
+              <FormLabel>Adresse e-mail</FormLabel>
               <FormControl>
                 <Input
                   type="email"
@@ -96,15 +90,13 @@ async function submit(values: { email: string; password: string }) {
           <FormField v-slot="{ componentField }" name="password">
             <FormItem v-auto-animate>
               <FormLabel>
-                <div class="text-left">
-                  {{ t("login_page.password.label") }}
-                </div>
+                <div class="text-left">Mot de passe</div>
                 <div class="text-right text-xs">
                   <router-link
                     :to="{ name: routes.BeginResetpassword }"
                     class="underline"
                   >
-                    {{ t("login_page.forgot_password_label") }}
+                    Mot de passe oublié ?
                   </router-link>
                 </div>
               </FormLabel>
@@ -118,17 +110,15 @@ async function submit(values: { email: string; password: string }) {
               <FormMessage />
             </FormItem>
           </FormField>
-          <Button type="submit" class="w-full">
-            {{ t("login_page.login_button") }}
-          </Button>
+          <Button type="submit" class="w-full"> Se connecter </Button>
           <!-- <Button variant="outline" class="w-full">
             Login with Google
           </Button> -->
         </div>
         <div class="mt-4 text-center text-sm">
-          {{ t("login_page.sign_up.label") }}
+          Vous n'avez pas de compte ?
           <router-link :to="{ name: routes.Register }" class="underline">
-            {{ t("login_page.sign_up.button_label") }}
+            S'inscrire
           </router-link>
         </div>
       </CardContent>

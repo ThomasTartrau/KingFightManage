@@ -17,11 +17,9 @@ use crate::auth::iam::{authorize_only_user, Action};
 use crate::utils::openapi::OaBiscuitUserAccess;
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema, Validate)]
-pub struct ChangeNamePost {
+pub struct ChangeUsernamePost {
     #[validate(non_control_character, length(min = 1, max = 20))]
-    first_name: String,
-    #[validate(non_control_character, length(min = 1, max = 20))]
-    last_name: String,
+    username: String,
 }
 
 const MAX_FILE_COUNT: usize = 1;
@@ -94,20 +92,19 @@ pub async fn change_profile_picture(
     produces = "application/json",
     tags("UserSettings")
 )]
-pub async fn change_name(
+pub async fn change_username(
     state: Data<crate::State>,
     _: OaBiscuitUserAccess,
     biscuit: ReqData<Biscuit>,
-    body: Json<ChangeNamePost>,
+    body: Json<ChangeUsernamePost>,
 ) -> Result<NoContent, MyProblem> {
     if let Ok(token) = authorize_only_user(
         &biscuit,
         Action::UserSettingsChangeName,
     ) {
         query!(
-            "UPDATE iam.user SET first_name = $1, last_name = $2 WHERE user__id = $3",
-            body.first_name,
-            body.last_name,
+            "UPDATE iam.user SET username = $1 WHERE user__id = $2",
+            body.username,
             token.user_id
         )
         .execute(&state.db)

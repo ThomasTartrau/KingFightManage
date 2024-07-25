@@ -27,9 +27,7 @@ pub struct Registration {
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema, Validate)]
 pub struct RegistrationPost {
     #[validate(non_control_character, length(min = 1, max = 50))]
-    first_name: String,
-    #[validate(non_control_character, length(min = 1, max = 50))]
-    last_name: String,
+    username: String,
     #[validate(non_control_character, email, length(max = 100))]
     email: String,
     #[validate(non_control_character, length(min = 10, max = 100))]
@@ -88,14 +86,13 @@ pub async fn register(
             .serialize();
         query!(
             "
-                INSERT INTO iam.user (user__id, email, password, first_name, last_name, role)
-                VALUES ($1, $2, $3, $4, $5, $6)
+                INSERT INTO iam.user (user__id, email, password, username, role)
+                VALUES ($1, $2, $3, $4, $5)
             ",
             &user_id,
             &body.email,
             password_hash.as_str(),
-            &body.first_name,
-            &body.last_name,
+            &body.username,
             state.default_role
         )
         .execute(&mut *tx)
@@ -107,7 +104,7 @@ pub async fn register(
                 MyProblem::InternalServerError
             })?;
         let recipient = Mailbox::new(
-            Some(format!("{} {}", body.first_name, body.last_name)),
+            Some(format!("{}", body.username)),
             recipient_address,
         );
         state

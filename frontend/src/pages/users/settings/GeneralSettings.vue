@@ -36,32 +36,27 @@ const closeNameDialog = () => (isNameDialogOpen.value = false);
 
 const user_info = ref<UserInfo | null>(null);
 
-const first_name = ref<string>("");
-const last_name = ref<string>("");
+const username = ref<string>("");
 const image_link = ref<string>("");
 
 async function changeName() {
-  if (
-    first_name.value !== user_info.value?.firstName ||
-    last_name.value !== user_info.value?.lastName
-  ) {
-    if (first_name.value.length < 2 || last_name.value.length < 2) {
+  if (username.value !== user_info.value?.username) {
+    if (username.value.length < 2) {
       push.error({
-        title: "Invalid name",
-        message: "First and last name must be at least 2 characters long",
+        title: "Nom invalide",
+        message: "Le nom doit contenir au moins 2 caractères",
         duration: 5000,
       });
     }
 
     await http
-      .post("/user/profile/name", {
-        first_name: first_name.value,
-        last_name: last_name.value,
+      .post("/user/profile/username", {
+        username: username.value,
       })
       .then(() => {
         push.success({
-          title: "Profile updated",
-          message: "Your profile has been updated successfully",
+          title: "Profil mis à jour",
+          message: "Votre profil a été mis à jour avec succès",
           duration: 5000,
         });
         closeNameDialog();
@@ -72,8 +67,8 @@ async function changeName() {
       .catch(displayError);
   } else {
     push.error({
-      title: "No changes",
-      message: "No changes have been made to your profile",
+      title: "Aucun changement",
+      message: "Aucun changement n'a été apporté à votre profil",
       duration: 5000,
     });
   }
@@ -81,8 +76,7 @@ async function changeName() {
 
 function _load() {
   user_info.value = getUserInfo().value;
-  first_name.value = user_info.value?.firstName || "";
-  last_name.value = user_info.value?.lastName || "";
+  username.value = user_info.value?.username || "";
   image_link.value = `/profile-pictures/${user_info.value?.user_id}.jpeg` || "";
 }
 
@@ -103,21 +97,21 @@ onUpdated(_load);
             <Avatar size="base" class="mb-6">
               <AvatarImage :src="image_link" />
               <AvatarFallback>
-                {{ user_info?.firstName.charAt(0).toUpperCase()
-                }}{{ user_info?.lastName.charAt(0).toUpperCase() }}
+                {{ user_info?.username.charAt(0).toUpperCase() }}
+                {{ user_info?.username.charAt(1).toUpperCase() }}
               </AvatarFallback>
             </Avatar>
             <Dialog v-model:open="isProfileDialogOpen">
               <DialogTrigger>
                 <Button class="ml-8">
                   <Upload class="mr-2" />
-                  Change profile picture
+                  Changer la photo de profil
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle class="text-center">
-                    Upload your profile picture
+                    Charger votre photo de profil
                   </DialogTitle>
                 </DialogHeader>
                 <div class="grid gap-4 py-4">
@@ -141,8 +135,8 @@ onUpdated(_load);
               />
             </FormControl>
             <FormDescription>
-              This is the email address associated with your account.
-              Unfortuntely, you cannot change this.
+              Cet email est associé à votre compte. Malheuresement, vous ne
+              pouvez pas le changer.
             </FormDescription>
           </FormItem>
         </FormField>
@@ -151,36 +145,18 @@ onUpdated(_load);
       <div class="mb-6">
         <FormField name="First name">
           <FormItem>
-            <FormLabel>First name</FormLabel>
+            <FormLabel>Nom d'utilisateur</FormLabel>
             <FormControl>
               <Input
                 disabled
                 type="text"
-                placeholder="First name"
-                :model-value="user_info?.firstName"
+                placeholder="Nom d'utilisateur"
+                :model-value="user_info?.username"
               />
             </FormControl>
             <FormDescription>
-              That's the first name you've used to register.
-            </FormDescription>
-          </FormItem>
-        </FormField>
-      </div>
-
-      <div class="mb-6">
-        <FormField name="Last name">
-          <FormItem>
-            <FormLabel>Last name</FormLabel>
-            <FormControl>
-              <Input
-                disabled
-                type="text"
-                placeholder="Last name"
-                :model-value="user_info?.lastName"
-              />
-            </FormControl>
-            <FormDescription>
-              That's the last name you've used to register.
+              C'est le nom d'utilisateur que vous avez utilisé pour vous
+              inscrire.
             </FormDescription>
           </FormItem>
         </FormField>
@@ -190,35 +166,29 @@ onUpdated(_load);
         <Dialog v-model:open="isNameDialogOpen">
           <form>
             <DialogTrigger as-child>
-              <Button variant="outline"> Edit profile </Button>
+              <Button variant="outline"> Changer le nom d'utilisateur </Button>
             </DialogTrigger>
             <DialogContent class="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Edit profile</DialogTitle>
+                <DialogTitle>Changer le nom d'utilisateur</DialogTitle>
                 <DialogDescription>
-                  Make changes to your profile here. Click save when you're
-                  done.
+                  Vous pouvez changer votre nom d'utilisateur ici. Cliquez sur
+                  enregistrer lorsque vous aurez fini.
                 </DialogDescription>
               </DialogHeader>
               <div class="grid gap-4 py-4">
                 <div class="grid grid-cols-4 items-center gap-4">
-                  <Label for="firstName" class="text-right"> First name </Label>
-                  <Input
-                    id="firstName"
-                    v-model="first_name"
-                    class="col-span-3"
-                  />
-                </div>
-                <div class="grid grid-cols-4 items-center gap-4">
-                  <Label for="lastName" class="text-right"> Last name </Label>
-                  <Input id="lastName" v-model="last_name" class="col-span-3" />
+                  <Label for="username" class="text-right">
+                    Nom d'utilisateur
+                  </Label>
+                  <Input id="username" v-model="username" class="col-span-3" />
                 </div>
               </div>
               <DialogFooter>
                 <Button variant="secondary" @click="closeNameDialog">
-                  Cancel
+                  Annuler
                 </Button>
-                <Button @click="changeName"> Save changes </Button>
+                <Button @click="changeName"> Enregistrer </Button>
               </DialogFooter>
             </DialogContent>
           </form>

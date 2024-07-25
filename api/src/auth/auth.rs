@@ -36,8 +36,7 @@ pub struct UserLookup {
     pub user_id: Uuid,
     pub password_hash: String,
     pub email: String,
-    pub first_name: String,
-    pub last_name: String,
+    pub username: String,
     pub email_verified_at: Option<DateTime<Utc>>,
     pub role: String,
 }
@@ -50,8 +49,7 @@ pub struct LoginResponse {
     refresh_token_expiration: DateTime<Utc>,
     user_id: Uuid,
     email: String,
-    first_name: String,
-    last_name: String,
+    username: String,
     role: String,
 }
 
@@ -106,7 +104,7 @@ pub async fn login(
     let user_lookup = query_as!(
         UserLookup,
         "
-            SELECT user__id AS user_id, password AS password_hash, email, first_name, last_name, role, email_verified_at
+            SELECT user__id AS user_id, password AS password_hash, email, username, role, email_verified_at
             FROM iam.user
             WHERE email = $1
         ",
@@ -158,8 +156,7 @@ async fn do_login<'a, A: Acquire<'a, Database = Postgres>>(
         session_id,
         user.user_id,
         &user.email,
-        &user.first_name,
-        &user.last_name,
+        &user.username,
         &user.role,
     )
     .and_then(|rt| {
@@ -230,8 +227,7 @@ async fn do_login<'a, A: Acquire<'a, Database = Postgres>>(
         refresh_token_expiration,
         user_id: user.user_id,
         email: user.email,
-        first_name: user.first_name,
-        last_name: user.last_name,
+        username: user.username,
         role: user.role,
     }))
 }
@@ -268,7 +264,7 @@ pub async fn refresh(
         let user = query_as!(
             UserLookup,
             "
-                SELECT user__id AS user_id, password AS password_hash, email, first_name, last_name, role, email_verified_at
+                SELECT user__id AS user_id, password AS password_hash, email, username, role, email_verified_at
                 FROM iam.user
                 WHERE user__id = $1
             ",
@@ -407,7 +403,7 @@ pub async fn resend_email_verification(
         let user_lookup = query_as!(
             UserLookup,
             "
-                SELECT user__id AS user_id, email, first_name, last_name, role, email_verified_at, password AS password_hash
+                SELECT user__id AS user_id, email, username, role, email_verified_at, password AS password_hash
                 FROM iam.user
                 WHERE user__id = $1 AND email_verified_at IS NULL
             ",
@@ -429,7 +425,7 @@ pub async fn resend_email_verification(
                 MyProblem::InternalServerError
             })?;
             let recipient = Mailbox::new(
-                Some(format!("{} {}", &user.first_name, &user.last_name)),
+                Some(format!("{}", &user.username)),
                 address,
             );
             state
@@ -482,13 +478,12 @@ pub async fn begin_reset_password(
     struct UserLookup {
         user_id: Uuid,
         email: String,
-        first_name: String,
-        last_name: String,
+        username: String,
     }
     let user_lookup = query_as!(
         UserLookup,
         "
-            SELECT user__id AS user_id, email, first_name, last_name
+            SELECT user__id AS user_id, email, username
             FROM iam.user
             WHERE email = $1
         ",
@@ -510,7 +505,7 @@ pub async fn begin_reset_password(
             MyProblem::InternalServerError
         })?;
         let recipient = Mailbox::new(
-            Some(format!("{} {}", user.first_name, user.last_name)),
+            Some(format!("{}", &user.username)),
             address,
         );
 
@@ -534,7 +529,7 @@ pub async fn begin_reset_password(
             }
         }
     } else {
-        Err(MyProblem::AuthEmailExpired)
+        Err(MyProblem::NotFound)
     }
 }
 

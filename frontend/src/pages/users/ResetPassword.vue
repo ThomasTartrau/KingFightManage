@@ -4,8 +4,7 @@ import { useForm } from "vee-validate";
 import { z } from "zod";
 import { push } from "notivue";
 import { onMounted, ref } from "vue";
-import { useI18n } from "vue-i18n";
-import Error404 from "../others/Error404.vue";
+import Error404 from "@/pages/others/Error404.vue";
 import { resetPassword } from "./UserServices";
 import {
   Card,
@@ -30,16 +29,11 @@ import { Button } from "@/components/ui/button";
 
 const token = ref<string>("");
 
-const { t } = useI18n({ useScope: "global" });
 const formSchema = toTypedSchema(
   z.object({
-    new_password: z
-      .string()
-      .min(1, t("reset_password_page.new_password.errors.too_short")),
-    confirm_password: z
-      .string()
-      .min(1, t("reset_password_page.confirm_password.errors.too_short")),
-  }),
+    new_password: z.string().min(1, "Le mot de passe est requis"),
+    confirm_password: z.string().min(1, "Le mot de passe est requis"),
+  })
 );
 
 const { handleSubmit } = useForm({
@@ -56,24 +50,24 @@ async function submit(values: {
 }) {
   if (!values.new_password || !values.confirm_password) {
     return push.warning({
-      title: t("reset_password_page.errors.missing_fields.title"),
-      message: t("reset_password_page.errors.missing_fields.message"),
+      title: "Champs manquant",
+      message: "Tous les champs sont requis",
       duration: 5000,
     });
   }
 
   if (values.new_password !== values.confirm_password) {
     return push.warning({
-      title: t("reset_password_page.errors.not_match.title"),
-      message: t("reset_password_page.errors.not_match.message"),
+      title: "Mot de passe non correspondant",
+      message: "Les mots de passe ne correspondent pas",
       duration: 5000,
     });
   }
 
   if (!token.value) {
     return push.error({
-      title: t("reset_password_page.errors.required_token.title"),
-      message: t("reset_password_page.errors.required_token.message"),
+      title: "Token manquant",
+      message: "Le token est requis",
       duration: 5000,
     });
   }
@@ -81,8 +75,8 @@ async function submit(values: {
   await resetPassword(token.value, values.new_password)
     .then(() => {
       push.success({
-        title: t("reset_password_page.success_notification.title"),
-        message: t("reset_password_page.success_notification.message"),
+        title: "Mot de passe réinitialisé avec succès",
+        message: "Vous pouvez vous connecter avec votre nouveau mot de passe",
         duration: 5000,
       });
       return router.push({ name: routes.Login });
@@ -96,8 +90,8 @@ function _load() {
   token.value = router.currentRoute.value.query.token as string;
   if (!token.value) {
     push.error({
-      title: t("reset_password_page.errors.required_token.title"),
-      message: t("reset_password_page.errors.required_token.message"),
+      title: "Token manquant",
+      message: "Le token est requis",
       duration: 5000,
     });
   }
@@ -112,19 +106,18 @@ onMounted(() => {
   <div v-if="token" class="flex items-center justify-center min-h-screen">
     <Card class="mx-auto">
       <CardHeader>
-        <CardTitle>{{ t("reset_password_page.card.title") }}</CardTitle>
-        <CardDescription>{{
-          t("reset_password_page.card.description")
-        }}</CardDescription>
+        <CardTitle>Réinitialisation du mot de passe</CardTitle>
+        <CardDescription>
+          Réinitialisez votre mot de passe en saisissant un nouveau mot de passe
+          et en confirmant celui-ci.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form @submit.prevent="onSubmit">
           <div class="mb-4">
             <FormField v-slot="{ componentField }" name="new_password">
               <FormItem v-auto-animate>
-                <FormLabel>{{
-                  t("reset_password_page.new_password.label")
-                }}</FormLabel>
+                <FormLabel>Nouveau mot de passe</FormLabel>
                 <FormControl>
                   <Input
                     type="password"
@@ -144,9 +137,7 @@ onMounted(() => {
               class="mb-6"
             >
               <FormItem v-auto-animate>
-                <FormLabel>{{
-                  t("reset_password_page.confirm_password.label")
-                }}</FormLabel>
+                <FormLabel>Confirmation du mot de passe</FormLabel>
                 <FormControl>
                   <Input
                     type="password"
@@ -159,18 +150,16 @@ onMounted(() => {
             </FormField>
           </div>
 
-          <Button type="submit" class="w-full">
-            {{ t("reset_password_page.reset_password_button") }}
-          </Button>
+          <Button type="submit" class="w-full"> Réinitialiser </Button>
         </form>
 
         <div class="mt-4 text-center text-sm">
-          {{ t("reset_password_page.begin_reset_password.label") }}
+          Une erreur ?
           <router-link
             :to="{ name: routes.BeginResetpassword }"
             class="underline"
           >
-            {{ t("reset_password_page.begin_reset_password.button_label") }}
+            Réessayer
           </router-link>
         </div>
       </CardContent>

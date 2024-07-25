@@ -17,8 +17,8 @@ const token = ref<string>("");
 async function _load() {
   if (!route.query.token) {
     return push.error({
-      title: "Missing field",
-      message: "Token is missing, please check your email link",
+      title: "Token manquant",
+      message: "Le token est manquant, veuillez vérifier votre lien email",
       duration: 5000,
     });
   }
@@ -28,8 +28,9 @@ async function _load() {
   await verifyEmail(token.value)
     .then(() => {
       push.success({
-        title: "Email verified",
-        message: "Your email has been verified successfully",
+        title: "Email vérifié",
+        message:
+          "Votre email a été vérifié avec succès. Vous pouvez vous connecter",
         duration: 5000,
       });
       return router.push({ name: routes.Login });
@@ -41,8 +42,9 @@ async function submit() {
   await resendVerificationEmail(token.value)
     .then(() => {
       push.success({
-        title: "Email sent",
-        message: "Email has been sent successfully. Please check your inbox",
+        title: "Email envoyé",
+        message:
+          "Email envoyé avec succès. Veuillez vérifier votre boite email",
         duration: 5000,
       });
     })
@@ -58,16 +60,16 @@ onMounted(() => {
   <div class="flex items-center justify-center min-h-screen">
     <Card>
       <CardHeader>
-        <CardTitle> Verify your email </CardTitle>
+        <CardTitle> Vérifier votre email </CardTitle>
       </CardHeader>
       <CardContent>
         <div class="flex flex-col gap-2 mb-4">
           <div class="flex flex-col gap-1">
             <div class="text-sm">
-              Please check your email to verify your account
+              Veuillez vérifier votre email pour vérifier votre compte
             </div>
             <div class="text-sm">
-              If you didn't receive an email, click here to resend it
+              Si vous n'avez pas reçu un email, cliquez ici pour l'envoyer
             </div>
           </div>
         </div>
@@ -75,7 +77,7 @@ onMounted(() => {
         <Separator class="my-4" />
 
         <div class="flex flex-col gap-2 mt-4">
-          <Button variant="outline" @click="submit"> Resend email </Button>
+          <Button variant="outline" @click="submit"> Renvoyer l'email </Button>
         </div>
       </CardContent>
     </Card>

@@ -19,8 +19,8 @@ export interface components {
       access_token_expiration: string;
       user_id: UUID;
       email: string;
-      first_name: string;
-      last_name: string;
+      username: string;
+      role: string;
       refresh_token: string;
       /** Format: date-time */
       refresh_token_expiration: string;
@@ -29,16 +29,14 @@ export interface components {
       users: [
         {
           user_id: UUID;
-          first_name: string;
-          last_name: string;
+          username: string;
           role: string;
         },
       ];
     };
     User: {
       user_id: UUID;
-      first_name: string;
-      last_name: string;
+      username: string;
       role: string;
     };
   };

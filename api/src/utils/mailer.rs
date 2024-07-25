@@ -1,7 +1,7 @@
 use html2text::from_read;
 use lettre::message::{Mailbox, MultiPart};
 use lettre::{Address, AsyncSmtpTransport, AsyncTransport, Message, Tokio1Executor};
-use log::{info, warn};
+use log::{info, trace, warn};
 use std::string::String;
 use std::time::Duration;
 use url::Url;
@@ -76,6 +76,8 @@ impl Mailer {
         for (key, value) in mail.variables() {
             mjml = mjml.replace(&format!("{{ ${key} }}"), &value);
         }
+
+        trace!("Logo: {:?}", self.logo_url);
 
         // Replace the logo_url variable with the actual logo_url value if { $logo_url } is present in the template
         mjml = mjml.replace("{ $logo_url }", self.logo_url.as_str());
