@@ -62,6 +62,7 @@ const columns: ColumnDef<User>[] = [
 
       return h(DropdownAction, {
         user_id: user.user_id,
+        username: user.username,
       });
     },
   },

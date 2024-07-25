@@ -221,6 +221,10 @@ export function getUserInfo(): ComputedRef<null | UserInfo> {
   });
 }
 
+export function getRole(): ComputedRef<null | string> {
+  return computed(() => state.value?.role ?? null);
+}
+
 export const AuthPlugin: Plugin = {
   install(_app: App, _options: unknown) {
     const storedState = readStateFromStorage();

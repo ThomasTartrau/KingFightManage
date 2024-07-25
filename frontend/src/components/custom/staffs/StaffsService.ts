@@ -9,8 +9,8 @@ export async function setRole(user_id: UUID, role: String) {
     })
     .then(() => {
       push.success({
-        title: "Role updated",
-        message: "The role of the user has been updated",
+        title: "Role mis à jour",
+        message: "Le rôle de l'utilisateur a été mis à jour",
       });
     })
     .catch(displayError);
@@ -21,8 +21,20 @@ export async function deleteUser(user_id: UUID) {
     .delete(`/users/${user_id}`)
     .then(() => {
       push.success({
-        title: "User deleted",
-        message: "The user has been deleted",
+        title: "Utilisateur supprimé",
+        message: "L'utilisateur a été supprimé",
+      });
+    })
+    .catch(displayError);
+}
+
+export async function sendMessage(user_id: UUID, message: string) {
+  await http
+    .post("/users/send-message", { user_id, message })
+    .then(() => {
+      push.success({
+        title: "Message envoyé",
+        message: "Le message a été envoyé",
       });
     })
     .catch(displayError);
