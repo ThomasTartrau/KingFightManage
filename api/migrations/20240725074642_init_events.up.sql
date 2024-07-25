@@ -8,5 +8,5 @@ CREATE TABLE events.event (
     event_data jsonb NOT NULL,
     created_at timestamptz not null default now(),
     dispatched_at timestamptz,
-    status text not null default 'pending',
+    status text not null default 'pending'
 );
