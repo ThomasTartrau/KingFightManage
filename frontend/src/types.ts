@@ -1,4 +1,3 @@
-import { Users } from "lucide-vue-next";
 import type { UUID } from "@/http";
 
 export interface components {
@@ -25,6 +24,16 @@ export interface components {
       refresh_token: string;
       /** Format: date-time */
       refresh_token_expiration: string;
+    };
+    GetStaffsResponse: {
+      users: [
+        {
+          user_id: UUID;
+          first_name: string;
+          last_name: string;
+          role: string;
+        },
+      ];
     };
     User: {
       user_id: UUID;

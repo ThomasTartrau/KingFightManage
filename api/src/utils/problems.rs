@@ -31,6 +31,7 @@ pub enum MyProblem {
     NotFound,
     InternalServerError,
     Forbidden,
+    BadRequest,
 }
 
 impl From<sqlx::Error> for MyProblem {
@@ -241,6 +242,13 @@ impl From<MyProblem> for Problem {
                 detail: "You do not have permission to access this resource.".into(),
                 validation: None,
                 status: StatusCode::FORBIDDEN,
+            },
+            MyProblem::BadRequest => Problem {
+                id: MyProblem::BadRequest,
+                title: "Bad request",
+                detail: "The request could not be understood by the server.".into(),
+                validation: None,
+                status: StatusCode::BAD_REQUEST,
             },
         }
     }

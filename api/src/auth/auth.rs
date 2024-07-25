@@ -32,14 +32,14 @@ pub struct LoginPost {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-struct UserLookup {
-    user_id: Uuid,
-    password_hash: String,
-    email: String,
-    first_name: String,
-    last_name: String,
-    email_verified_at: Option<DateTime<Utc>>,
-    role: String,
+pub struct UserLookup {
+    pub user_id: Uuid,
+    pub password_hash: String,
+    pub email: String,
+    pub first_name: String,
+    pub last_name: String,
+    pub email_verified_at: Option<DateTime<Utc>>,
+    pub role: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
@@ -416,7 +416,6 @@ pub async fn resend_email_verification(
         .fetch_optional(&state.db)
         .await
         .map_err(MyProblem::from)?;
-        info!("User lookup: {:?}", user_lookup);
 
         if let Some(user) = user_lookup {
             let verification_token =

@@ -285,6 +285,16 @@ async fn main() -> anyhow::Result<()> {
                                         .wrap(biscuit_auth.clone())
                                         .route(web::get().to(users_management::main::generate_registration_token)),
                                     )
+                                    .service(
+                                        web::resource("/set-role")
+                                        .wrap(biscuit_auth.clone())
+                                        .route(web::post().to(users_management::main::set_role)),
+                                    )
+                                    .service(
+                                        web::resource("/{user_id}")
+                                        .wrap(biscuit_auth.clone())
+                                        .route(web::delete().to(users_management::main::delete_user)),
+                                    )
                                     .wrap(biscuit_auth.clone())
                                     .route("", web::get().to(users_management::main::get_users)),
                                 )

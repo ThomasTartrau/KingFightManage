@@ -4,7 +4,7 @@ use chrono::{DateTime, Utc};
 use log::{error, trace, warn};
 use paperclip::v2::schema::TypedData;
 use serde::Serialize;
-use strum::{AsRefStr, EnumIter, EnumString, VariantNames};
+use strum::{AsRefStr, EnumIter, EnumString, IntoEnumIterator, VariantNames};
 use uuid::Uuid;
 
 #[derive(Debug, Clone)]
@@ -27,6 +27,7 @@ pub struct AuthorizedUserToken {
     pub email: String,
     pub first_name: String,
     pub last_name: String,
+    pub role: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -66,6 +67,28 @@ impl Default for Role {
     }
 }
 
+impl Role {
+    pub fn values() -> Vec<String> {
+        Role::iter().map(|r| r.to_string().to_lowercase()).collect()
+    }
+
+    pub fn get_order(&self) -> i32 {
+        match self {
+            Role::Moderateur => 1,
+            Role::Administrateur => 2,
+            Role::Developpeur => 3,
+        }
+    }
+
+    pub fn to_role(role: &str) -> Role {
+        match role {
+            "moderateur" => Role::Moderateur,
+            "administrateur" => Role::Administrateur,
+            "developpeur" => Role::Developpeur,
+            _ => Role::Moderateur,
+        }
+    }
+}
 impl TypedData for Role {
     fn data_type() -> paperclip::v2::models::DataType {
         paperclip::v2::models::DataType::String
@@ -94,6 +117,8 @@ pub enum Action {
     UserSettingsDeleteUser,
     UsersGenerateRegistrationToken,
     UsersGetUsers,
+    UsersSetRank,
+    UsersDeleteUser,
 }
 
 impl<'a> Action {
@@ -105,7 +130,9 @@ impl<'a> Action {
             Action::UserSettingsChangeName => "users-settings:change_name",
             Action::UserSettingsDeleteUser => "users-settings:delete_user",
             Action::UsersGenerateRegistrationToken => "users-management:generate_registration_token",
-            Action::UsersGetUsers => "users-management:get_users",
+            Action::UsersGetUsers => "users-management:get-users",
+            Action::UsersSetRank => "users-management:set-role",
+            Action::UsersDeleteUser => "users-management:delete-user",
         }
     }
 
@@ -120,6 +147,8 @@ impl<'a> Action {
             Self::UserSettingsDeleteUser => vec![Role::Administrateur, Role::Moderateur],
             Self::UsersGenerateRegistrationToken => vec![],
             Self::UsersGetUsers => vec![Role::Administrateur, Role::Moderateur],
+            Self::UsersSetRank => vec![],
+            Self::UsersDeleteUser => vec![],
         };
 
         roles.append(&mut per_action_roles);
@@ -135,6 +164,8 @@ impl<'a> Action {
             Self::UserSettingsDeleteUser => vec![],
             Self::UsersGenerateRegistrationToken => vec![],
             Self::UsersGetUsers => vec![],
+            Self::UsersSetRank => vec![],
+            Self::UsersDeleteUser => vec![],
         };
 
         facts.push(fact!("action({action})", action = self.action_name()));
@@ -465,12 +496,20 @@ pub fn authorize(
                 .0
                 .to_owned();
 
+            let raw_role: Vec<(String,)> = authorizer.query(rule!("data($role) <- role($role)"))?;
+            let role = raw_role
+                .first()
+                .ok_or(biscuit_auth::error::Token::InternalError)?
+                .0
+                .to_owned();
+
             Ok(AuthorizedToken::User(AuthorizedUserToken {
                 session_id,
                 user_id,
                 email,
                 first_name,
                 last_name,
+                role,
             }))
         },
         _ => {
