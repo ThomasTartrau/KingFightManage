@@ -84,13 +84,24 @@ pub async fn get_events(
 ) -> Result<CreatedJson<GetEventsResponse>, MyProblem> {
     if let Ok(_token) = authorize_only_user(&biscuit, Action::EventsGetAll) {
        
-        let events = query_as!(Event, "SELECT event__id AS event_id, event_type, event_data, created_at, dispatched_at, status FROM events.event")
+        let events = query_as!(Event, "SELECT event__id AS event_id, event_type, event_data, created_at, dispatched_at, status FROM events.event WHERE status = 'pending' AND dispatched_at IS NULL ORDER BY created_at ASC")
             .fetch_all(&state.db)
             .await
             .map_err(|e| {
                 debug!("{e}");
                 MyProblem::InternalServerError
             })?;
+
+        for event in &events {
+            let event_id = event.event_id;
+            query!("UPDATE events.event SET status = 'received', dispatched_at = NOW() WHERE event__id = $1", event_id)
+                .execute(&state.db)
+                .await
+                .map_err(|e| {
+                    debug!("{e}");
+                    MyProblem::InternalServerError
+                })?;
+        }
 
         Ok(CreatedJson(GetEventsResponse { events }))
     } else {
