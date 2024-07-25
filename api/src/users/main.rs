@@ -1,6 +1,6 @@
 use actix_web::web::ReqData;
 use biscuit_auth::Biscuit;
-use log::{debug, trace};
+use log::{debug};
 use paperclip::actix::web::{Data, Json, Path};
 use paperclip::actix::{api_v2_operation, Apiv2Schema, CreatedJson, NoContent};
 use serde::{Deserialize, Serialize};
@@ -44,6 +44,8 @@ pub struct SendMessagePost {
     user_id: Uuid,
     #[validate(non_control_character, length(min = 1, max = 1000))]
     message: String,
+    #[validate(non_control_character, length(min = 1, max = 100))]
+    username: String,
 }
 
 #[api_v2_operation(
@@ -236,20 +238,10 @@ pub async fn send_message(
     let body = body.into_inner();
 
     if let Ok(token) = authorize_only_user(&biscuit, Action::UsersSendMessage) {
-        let user_lookup = query_as!(
-            UserLookup,
-            "SELECT user__id AS user_id, email, username, role, email_verified_at, password AS password_hash FROM iam.user WHERE user__id = $1",
-            &body.user_id,
-        )
-        .fetch_optional(&state.db)
-        .await
-        .map_err(MyProblem::from)?;
-
-        if let Some(user) = user_lookup {
-            let event_type = "send_message";
+        let event_type = "send_message";
             let event_data = json!({
                 "sender": &token.username,
-                "username": user.username,
+                "username": body.username,
                 "message": body.message,
             });
 
@@ -263,9 +255,6 @@ pub async fn send_message(
             } else {
                 Err(MyProblem::InternalServerError)
             }
-        } else {
-            Err(MyProblem::NotFound)
-        }
     } else {
         Err(MyProblem::Forbidden)
     }

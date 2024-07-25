@@ -1,7 +1,7 @@
 use std::{str::FromStr, time::Duration};
 use actix_cors::Cors;
 use actix_files::{Files, NamedFile};
-use actix_web::{middleware::{self, Logger, NormalizePath}, App, web, HttpServer};
+use actix_web::{middleware::{self, Logger, NormalizePath}, web::{self, route}, App, HttpServer};
 use biscuit_auth::{KeyPair, PrivateKey};
 
 use clap::{crate_name, Parser};
@@ -16,6 +16,7 @@ mod auth;
 mod utils;
 mod user_settings;
 mod users;
+mod events;
 
 const APP_TITLE: &str = "KingFightManage";
 const WEBAPP_INDEX_FILE: &str = "index.html";
@@ -302,6 +303,12 @@ async fn main() -> anyhow::Result<()> {
                                     )
                                     .wrap(biscuit_auth.clone())
                                     .route("", web::get().to(users::main::get_users)),
+                                )
+                                .service(
+                                    web::scope("/events")
+                                    .wrap(biscuit_auth.clone())
+                                    .route("", web::post().to(events::main::ingest_event))
+                                    .route("", web::get().to(events::main::get_events)),
                                 )
                                 
                         )

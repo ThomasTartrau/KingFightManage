@@ -119,6 +119,8 @@ pub enum Action {
     UsersSetRank,
     UsersDeleteUser,
     UsersSendMessage,
+    EventsIngest,
+    EventsGetAll,
 }
 
 impl<'a> Action {
@@ -134,6 +136,8 @@ impl<'a> Action {
             Action::UsersSetRank => "users-management:set-role",
             Action::UsersDeleteUser => "users-management:delete-user",
             Action::UsersSendMessage => "users-management:send-message",
+            Action::EventsIngest => "events:ingest",
+            Action::EventsGetAll => "events:get_all",
         }
     }
 
@@ -151,6 +155,8 @@ impl<'a> Action {
             Self::UsersSetRank => vec![],
             Self::UsersDeleteUser => vec![],
             Self::UsersSendMessage => vec![Role::Administrateur, Role::Moderateur],
+            Self::EventsIngest => vec![],
+            Self::EventsGetAll => vec![],
         };
 
         roles.append(&mut per_action_roles);
@@ -169,6 +175,8 @@ impl<'a> Action {
             Self::UsersSetRank => vec![],
             Self::UsersDeleteUser => vec![],
             Self::UsersSendMessage => vec![],
+            Self::EventsIngest => vec![],
+            Self::EventsGetAll => vec![],
         };
 
         facts.push(fact!("action({action})", action = self.action_name()));

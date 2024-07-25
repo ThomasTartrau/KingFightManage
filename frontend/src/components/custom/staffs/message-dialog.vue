@@ -50,7 +50,7 @@ const onSubmit = handleSubmit((values) => {
 });
 
 function submit(values: { message: string }) {
-  sendMessage(props.user_id, values.message);
+  sendMessage(props.user_id, props.username, values.message);
   emit("closeMessageModal");
 }
 </script>

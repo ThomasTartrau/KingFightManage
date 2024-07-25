@@ -28,9 +28,13 @@ export async function deleteUser(user_id: UUID) {
     .catch(displayError);
 }
 
-export async function sendMessage(user_id: UUID, message: string) {
+export async function sendMessage(
+  user_id: UUID,
+  username: string,
+  message: string
+) {
   await http
-    .post("/users/send-message", { user_id, message })
+    .post("/users/send-message", { user_id, username, message })
     .then(() => {
       push.success({
         title: "Message envoyé",

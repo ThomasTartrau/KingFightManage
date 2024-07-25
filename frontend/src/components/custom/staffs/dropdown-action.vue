@@ -57,12 +57,6 @@ function handleDelete() {
     emit("refreshDatatable");
   });
 }
-
-function handleSendMessage(message: string) {
-  sendMessage(props.user_id, message).then(() => {
-    emit("refreshDatatable");
-  });
-}
 </script>
 
 <template>
@@ -101,7 +95,7 @@ function handleSendMessage(message: string) {
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuItem @click="openMessageDialog">
-        <span>Send message</span>
+        <span>Envoyer un message</span>
       </DropdownMenuItem>
     </DropdownMenuContent>
   </DropdownMenu>
