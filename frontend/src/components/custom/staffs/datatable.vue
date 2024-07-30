@@ -7,7 +7,7 @@ import {
   TableOptions,
   useVueTable,
 } from "@tanstack/vue-table";
-import { h, onUpdated, reactive, ref } from "vue";
+import { h, reactive, ref } from "vue";
 
 import { Button } from "@/components/ui/button";
 import {
