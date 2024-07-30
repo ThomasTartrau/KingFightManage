@@ -1,6 +1,6 @@
-use actix_web::web::ReqData;
+use actix_web::web::{trace, ReqData};
 use biscuit_auth::Biscuit;
-use log::{debug};
+use log::{debug, trace, warn};
 use paperclip::actix::web::{Data, Json, Path};
 use paperclip::actix::{api_v2_operation, Apiv2Schema, CreatedJson, NoContent};
 use serde::{Deserialize, Serialize};
@@ -21,6 +21,7 @@ struct User {
     user_id: Uuid,
     username: String,
     role: String,
+    is_online: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
@@ -93,14 +94,17 @@ pub async fn get_users(
     if let Ok(_token) = authorize_only_user(&biscuit, Action::UsersGetUsers) {
         let users = query_as!(
             User,
-            "SELECT user__id as user_id, username, role FROM iam.user"
+            "SELECT iam.user.user__id as user_id, username, role, players.is_logged_in(iam.user.user__id) as is_online FROM iam.user"
         )
         .fetch_all(&state.db)
         .await
         .map_err(|e| {
+            warn!("{e}");
             debug!("{e}");
             MyProblem::InternalServerError
         })?;
+
+        trace!("{:?}", users);
 
         Ok(CreatedJson(GetUsersResponse { users }))
     } else {

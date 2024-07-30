@@ -19,6 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import DropdownAction from "@/components/custom/staffs/dropdown-action.vue";
+import OnlineIcons from "@/components/custom/staffs/online_icons.vue";
 import type { components } from "@/types";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-vue-next";
@@ -56,6 +57,15 @@ const columns: ColumnDef<User>[] = [
     header: "Role",
     cell: ({ row }) => {
       return h("div", { class: "capitalize" }, row.getValue("role"));
+    },
+  },
+  {
+    accessorKey: "is_online",
+    header: "Online",
+    cell: ({ row }) => {
+      const user = row.original;
+
+      return h(OnlineIcons, { isOnline: user.is_online });
     },
   },
   {
