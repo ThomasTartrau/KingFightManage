@@ -15,8 +15,8 @@ use crate::auth::middleware_biscuit;
 mod auth;
 mod utils;
 mod user_settings;
-mod users;
 mod events;
+mod staffs;
 
 const APP_TITLE: &str = "KingFightManage";
 const WEBAPP_INDEX_FILE: &str = "index.html";
@@ -280,32 +280,32 @@ async fn main() -> anyhow::Result<()> {
                                     .route("", web::delete().to(user_settings::main::delete_user)),
                                 )
                                 .service(
-                                    web::scope("/users")
+                                    web::scope("/staffs")
                                     .service(
                                         web::resource("/generate-registration-token")
                                         .wrap(biscuit_auth.clone())
-                                        .route(web::get().to(users::main::generate_registration_token)),
+                                        .route(web::get().to(staffs::main::generate_registration_token)),
                                     )
                                     .service(
                                         web::resource("/set-role")
                                         .wrap(biscuit_auth.clone())
-                                        .route(web::post().to(users::main::set_role)),
-                                    )
-                                    .service(
-                                        web::resource("/send-message")
-                                        .wrap(biscuit_auth.clone())
-                                        .route(web::post().to(users::main::send_message)),
+                                        .route(web::post().to(staffs::main::set_role)),
                                     )
                                     .service(
                                         web::resource("/{user_id}")
                                         .wrap(biscuit_auth.clone())
-                                        .route(web::delete().to(users::main::delete_user)),
+                                        .route(web::delete().to(staffs::main::delete_user)),
                                     )
                                     .wrap(biscuit_auth.clone())
-                                    .route("", web::get().to(users::main::get_users)),
+                                    .route("", web::get().to(staffs::main::get_users)),
                                 )
                                 .service(
                                     web::scope("/events")
+                                    .service(
+                                        web::resource("/send-message")
+                                        .wrap(biscuit_auth.clone())
+                                        .route(web::post().to(events::main::send_message)),
+                                    )
                                     .wrap(biscuit_auth.clone())
                                     .route("", web::post().to(events::main::ingest_event))
                                     .route("", web::get().to(events::main::get_events)),

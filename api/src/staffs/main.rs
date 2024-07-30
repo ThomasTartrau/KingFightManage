@@ -40,19 +40,10 @@ pub struct DeleteUserPost {
     user_id: Uuid,
 }
 
-#[derive(Debug, Serialize, Deserialize, Apiv2Schema, Validate)]
-pub struct SendMessagePost {
-    user_id: Uuid,
-    #[validate(non_control_character, length(min = 1, max = 1000))]
-    message: String,
-    #[validate(non_control_character, length(min = 1, max = 100))]
-    username: String,
-}
-
 #[api_v2_operation(
     summary = "Generate a new registration token",
     description = "",
-    operation_id = "users-management.generate-registration-token",
+    operation_id = "staffs.generate-registration-token",
     consumes = "application/json",
     produces = "application/json",
     tags("Users Management")
@@ -63,7 +54,7 @@ pub async fn generate_registration_token(
     biscuit: ReqData<Biscuit>,
 ) -> Result<CreatedJson<GenerateRegistrationTokenResponse>, MyProblem> {
 
-    if let Ok(_token) = authorize_only_user(&biscuit, Action::UsersGenerateRegistrationToken) {
+    if let Ok(_token) = authorize_only_user(&biscuit, Action::StaffsGenerateRegistrationToken) {
         let token = create_registration_token(&state.biscuit_private_key).map_err(|e| {
             debug!("{e}");
             MyProblem::Forbidden
@@ -80,7 +71,7 @@ pub async fn generate_registration_token(
 #[api_v2_operation(
     summary = "Get users",
     description = "",
-    operation_id = "users-management.get-users",
+    operation_id = "staffs.get-users",
     consumes = "application/json",
     produces = "application/json",
     tags("Users Management")
@@ -91,10 +82,13 @@ pub async fn get_users(
     biscuit: ReqData<Biscuit>,
 ) -> Result<CreatedJson<GetUsersResponse>, MyProblem> {
 
-    if let Ok(_token) = authorize_only_user(&biscuit, Action::UsersGetUsers) {
+    if let Ok(_token) = authorize_only_user(&biscuit, Action::StaffsGetUsers) {
         let users = query_as!(
             User,
-            "SELECT iam.user.user__id as user_id, username, role, players.is_logged_in(iam.user.user__id) as is_online FROM iam.user"
+            "SELECT iam.user.user__id as user_id, username, role, players.is_logged_in(players.player.player__id) as is_online
+            FROM iam.user
+            JOIN players.player ON iam.user.username = players.player.name;
+            "
         )
         .fetch_all(&state.db)
         .await
@@ -115,7 +109,7 @@ pub async fn get_users(
 #[api_v2_operation(
     summary = "Set role",
     description = "",
-    operation_id = "users-management.set-role",
+    operation_id = "staffs.set-role",
     consumes = "application/json",
     produces = "application/json",
     tags("Users Management")
@@ -129,7 +123,7 @@ pub async fn set_role(
 
     let body = body.into_inner();
     
-    if let Ok(token) = authorize_only_user(&biscuit, Action::UsersSetRank) {
+    if let Ok(token) = authorize_only_user(&biscuit, Action::StaffsSetRank) {
 
         let roles = Role::values();
         if !roles.contains(&body.role) {
@@ -168,7 +162,7 @@ pub async fn set_role(
 #[api_v2_operation(
     summary = "Delete user",
     description = "",
-    operation_id = "users-management.delete-user",
+    operation_id = "staffs.delete-user",
     consumes = "application/json",
     produces = "application/json",
     tags("Users Management")
@@ -181,7 +175,7 @@ pub async fn delete_user(
 ) -> Result<NoContent, MyProblem> {
     let user_id = user_id.into_inner();
 
-    if let Ok(token) = authorize_only_user(&biscuit, Action::UsersDeleteUser) {
+    if let Ok(token) = authorize_only_user(&biscuit, Action::StaffsDeleteUser) {
         let user_lookup = query_as!(
             UserLookup,
             "
@@ -216,49 +210,6 @@ pub async fn delete_user(
         } else {
             return Err(MyProblem::NotFound);
         }
-    } else {
-        Err(MyProblem::Forbidden)
-    }
-}
-
-#[api_v2_operation(
-    summary = "Send message",
-    description = "",
-    operation_id = "users-management.send-message",
-    consumes = "application/json",
-    produces = "application/json",
-    tags("Users Management")
-)]
-pub async fn send_message(
-    state: Data<crate::State>,
-    _: OaBiscuitUserAccess,
-    biscuit: ReqData<Biscuit>,
-    body: Json<SendMessagePost>,
-) -> Result<NoContent, MyProblem> {
-    if let Err(e) = body.validate() {
-        return Err(MyProblem::Validation(e));
-    }
-
-    let body = body.into_inner();
-
-    if let Ok(token) = authorize_only_user(&biscuit, Action::UsersSendMessage) {
-        let event_type = "send_message";
-            let event_data = json!({
-                "sender": &token.username,
-                "username": body.username,
-                "message": body.message,
-            });
-
-            let result = query!("INSERT INTO events.event (event_type, event_data) VALUES ($1, $2)", event_type, event_data)
-                .execute(&state.db)
-                .await
-                .map_err(MyProblem::from)?;
-
-            if result.rows_affected() > 0 {
-                Ok(NoContent)
-            } else {
-                Err(MyProblem::InternalServerError)
-            }
     } else {
         Err(MyProblem::Forbidden)
     }

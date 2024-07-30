@@ -5,9 +5,10 @@ use log::debug;
 use paperclip::actix::web::{Data, Json};
 use paperclip::actix::{api_v2_operation, Apiv2Schema, CreatedJson, NoContent};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use serde_json::{json, Value};
 use sqlx::{query, query_as};
 use uuid::Uuid;
+use validator::Validate;
 
 use crate::auth::iam::{authorize_only_user, Action};
 use crate::utils::{openapi::OaBiscuitUserAccess, problems::MyProblem};
@@ -31,6 +32,15 @@ pub struct IngestEventPost {
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct GetEventsResponse {
     events: Vec<Event>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Apiv2Schema, Validate)]
+pub struct SendMessagePost {
+    user_id: Uuid,
+    #[validate(non_control_character, length(min = 1, max = 1000))]
+    message: String,
+    #[validate(non_control_character, length(min = 1, max = 100))]
+    username: String,
 }
 
 #[api_v2_operation(
@@ -104,6 +114,49 @@ pub async fn get_events(
         }
 
         Ok(CreatedJson(GetEventsResponse { events }))
+    } else {
+        Err(MyProblem::Forbidden)
+    }
+}
+
+#[api_v2_operation(
+    summary = "Send message",
+    description = "",
+    operation_id = "events.send-message",
+    consumes = "application/json",
+    produces = "application/json",
+    tags("Users Management")
+)]
+pub async fn send_message(
+    state: Data<crate::State>,
+    _: OaBiscuitUserAccess,
+    biscuit: ReqData<Biscuit>,
+    body: Json<SendMessagePost>,
+) -> Result<NoContent, MyProblem> {
+    if let Err(e) = body.validate() {
+        return Err(MyProblem::Validation(e));
+    }
+
+    let body = body.into_inner();
+
+    if let Ok(token) = authorize_only_user(&biscuit, Action::EventsSendMessage) {
+        let event_type = "send_message";
+            let event_data = json!({
+                "sender": &token.username,
+                "username": body.username,
+                "message": body.message,
+            });
+
+            let result = query!("INSERT INTO events.event (event_type, event_data) VALUES ($1, $2)", event_type, event_data)
+                .execute(&state.db)
+                .await
+                .map_err(MyProblem::from)?;
+
+            if result.rows_affected() > 0 {
+                Ok(NoContent)
+            } else {
+                Err(MyProblem::InternalServerError)
+            }
     } else {
         Err(MyProblem::Forbidden)
     }
