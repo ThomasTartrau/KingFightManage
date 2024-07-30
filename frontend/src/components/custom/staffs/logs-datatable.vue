@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import type { ColumnDef, TableOptions } from '@tanstack/vue-table'
+import type { ColumnDef, TableOptions } from "@tanstack/vue-table";
 import {
   FlexRender,
   getCoreRowModel,
   getPaginationRowModel,
   useVueTable,
-} from '@tanstack/vue-table'
-import { h, reactive, ref } from 'vue'
+} from "@tanstack/vue-table";
+import { h, reactive, ref } from "vue";
 
-import { Search } from 'lucide-vue-next'
-import { Button } from '@/components/ui/button'
+import { Search } from "lucide-vue-next";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -17,75 +17,77 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import type { components } from '@/types'
-import { Input } from '@/components/ui/input'
+} from "@/components/ui/table";
+import type { components } from "@/types";
+import { Input } from "@/components/ui/input";
+import dateConverter from "@/utils/dateConverter";
 
-type definitions = components['schemas']
-type Log = definitions['Log']
+type definitions = components["schemas"];
+type Log = definitions["Log"];
 
 const props = defineProps<{
-  data: Log[]
-}>()
-const emit = defineEmits(['refreshDatatable'])
+  data: Log[];
+}>();
+const emitRefresh = defineEmits(["refreshDatatable"]);
 
-const datas = ref<Log[]>(props.data)
-
-function emitRefresh() {
-  emit('refreshDatatable')
-}
+const datas = ref<Log[]>(props.data);
 
 const columns: ColumnDef<Log>[] = [
   {
-    accessorKey: 'log_id',
-    header: 'Log ID',
+    accessorKey: "log_id",
+    header: "Log ID",
     cell: ({ row }) => {
-      return h('div', { class: 'capitalize' }, row.getValue('log_id'))
+      return h("div", { class: "capitalize" }, row.getValue("log_id"));
     },
   },
   {
-    accessorKey: 'username',
-    header: 'Username',
+    accessorKey: "username",
+    header: "Username",
     cell: ({ row }) =>
-      h('div', { class: 'lowercase' }, row.getValue('username')),
+      h("div", { class: "lowercase" }, row.getValue("username")),
   },
   {
-    accessorKey: 'action',
-    header: 'Action',
+    accessorKey: "action",
+    header: "Action",
     cell: ({ row }) => {
-      return h('div', { class: 'capitalize' }, row.getValue('action'))
+      return h("div", { class: "capitalize" }, row.getValue("action"));
     },
   },
   {
-    accessorKey: 'created_at',
-    header: 'Date',
+    accessorKey: "created_at",
+    header: "Date",
     cell: ({ row }) => {
-      return h('div', { class: 'capitalize' }, row.getValue('created_at'))
+      return h(
+        "div",
+        { class: "capitalize" },
+        dateConverter.timestampToDate(row.getValue("created_at"))
+      );
     },
   },
-]
+];
 
 function onSearch(search: string) {
   datas.value = props.data.filter(
-    log =>
-      log.log_id.toLowerCase().includes(search.toLowerCase())
-      || log.username.toLowerCase().includes(search.toLowerCase())
-      || log.action.toLowerCase().includes(search.toLowerCase()),
-  )
+    (log) =>
+      log.log_id.toLowerCase().includes(search.toLowerCase()) ||
+      log.username.toLowerCase().includes(search.toLowerCase()) ||
+      log.action.toLowerCase().includes(search.toLowerCase())
+  );
 }
 
 const tableOptions = reactive<TableOptions<Log>>({
   get data() {
-    return datas.value
+    return datas.value;
   },
   get columns() {
-    return columns
+    return columns;
   },
   getCoreRowModel: getCoreRowModel(),
+  rowCount: datas.value.length,
   getPaginationRowModel: getPaginationRowModel(),
-})
+});
 
-const table = useVueTable(tableOptions)
+const table = useVueTable(tableOptions);
 </script>
 
 <template>
@@ -104,6 +106,7 @@ const table = useVueTable(tableOptions)
         <Search class="size-6 text-muted-foreground" />
       </span>
     </div>
+
     <div class="rounded-md border">
       <Table>
         <TableHeader>
@@ -151,7 +154,12 @@ const table = useVueTable(tableOptions)
 
     <div class="flex items-center justify-end space-x-2 py-4">
       <div class="flex-1 text-sm text-muted-foreground">
-        {{ table.getFilteredRowModel().rows.length }} row(s).
+        Affichage de
+        {{
+          (table.getState().pagination.pageIndex + 1) *
+          table.getState().pagination.pageSize
+        }}
+        sur {{ table.getFilteredRowModel().rows.length }} donnée(s).
       </div>
       <div class="space-x-2">
         <Button
