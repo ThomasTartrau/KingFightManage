@@ -46,3 +46,9 @@ BEGIN
     END IF;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE FUNCTION get_online_players() RETURNS TABLE (player__id uuid, name text) AS $$
+    SELECT player__id, name
+    FROM players.player
+    WHERE is_logged_in(player__id) = TRUE;
+$$ LANGUAGE sql;
