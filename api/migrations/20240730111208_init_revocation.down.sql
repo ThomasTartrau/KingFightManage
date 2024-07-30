@@ -1,0 +1,1 @@
+ALTER TABLE iam.token DROP COLUMN IF EXISTS revoked_at;

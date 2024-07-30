@@ -3,10 +3,11 @@ use actix_web::dev::{Service, ServiceRequest, ServiceResponse, Transform};
 use actix_web::{Error, HttpMessage};
 use anyhow::anyhow;
 use biscuit_auth::{Biscuit, PrivateKey};
+use chrono::{DateTime, Utc};
 use futures_util::future::{ok, ready, Ready};
 use futures_util::Future;
-use log::{debug, error, trace};
-use sqlx::{query_scalar, PgPool};
+use log::{debug, error, trace, warn};
+use sqlx::{query, query_as, query_scalar, PgPool};
 use std::pin::Pin;
 use std::rc::Rc;
 use std::task::{Context, Poll};
@@ -95,6 +96,7 @@ where
                                             FROM iam.token
                                             WHERE revocation_id = $1
                                                 AND (expired_at IS NULL OR expired_at > statement_timestamp())
+                                                AND (revoked_at IS NULL OR revoked_at > statement_timestamp())
                                             LIMIT 1
                                         ",
                                         &revocation_id

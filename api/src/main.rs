@@ -95,7 +95,7 @@ struct Config {
 
 
     /// Default role for new users
-    #[clap(long, env, default_value = "Moderateur")]
+    #[clap(long, env, default_value = "Support")]
     default_role: String,
 }
 
@@ -297,7 +297,7 @@ async fn main() -> anyhow::Result<()> {
                                         .route(web::delete().to(staffs::main::delete_user)),
                                     )
                                     .wrap(biscuit_auth.clone())
-                                    .route("", web::get().to(staffs::main::get_users)),
+                                    .route("", web::get().to(staffs::main::get_staffs)),
                                 )
                                 .service(
                                     web::scope("/events")

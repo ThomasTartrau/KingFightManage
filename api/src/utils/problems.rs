@@ -25,6 +25,7 @@ pub enum MyProblem {
     AuthInvalidAuthorizationHeader,
     AuthNoAuthorizationHeader,
     AuthEmailExpired,
+    AuthBiscuitRevoked,
 
     // Generics errors
     Validation(validator::ValidationErrors),
@@ -174,7 +175,7 @@ impl From<MyProblem> for Problem {
             MyProblem::AuthInvalidBiscuit => Problem {
                 id: MyProblem::AuthInvalidBiscuit,
                 title: "Biscuit invalide",
-                detail: "Le jeton d'authentification fourni (Biscuit) n'est pas valide, n'a pas été créé avec la clé privée actuelle ou a expiré.".into(),
+                detail: "Le jeton d'authentification fourni (Biscuit) n'est pas valide, n'a pas été créé avec la clé privée actuelle, a expiré ou a été révoqué. Merci de vous reconnecter.".into(),
                 validation: None,
                 status: StatusCode::FORBIDDEN,
             },
@@ -206,6 +207,15 @@ impl From<MyProblem> for Problem {
                     detail: "Le lien sur lequel vous avez cliqué pourrait avoir expiré. Veuillez réessayer tout le processus ou contacter le support.".into(),
                     validation: None,
                     status: StatusCode::UNAUTHORIZED,
+                }
+            },
+            MyProblem::AuthBiscuitRevoked => {
+                Problem {
+                    id: MyProblem::AuthBiscuitRevoked,
+                    title: "Biscuit révoqué",
+                    detail: "Le jeton d'authentification fourni (Biscuit) a été révoqué.".into(),
+                    validation: None,
+                    status: StatusCode::FORBIDDEN,
                 }
             },
 

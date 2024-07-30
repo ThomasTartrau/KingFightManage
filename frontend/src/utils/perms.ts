@@ -13,39 +13,31 @@ export enum Actions {
   StaffsGetLogs,
 }
 
+const HeadRoles = [Roles.ADMINISTRATEUR, Roles.DEVELOPPEUR, Roles.RESPONSABLE];
+const AllRoles = [...HeadRoles, Roles.MODERATEUR, Roles.SUPPORT];
+
 const allowed = {
-  [Roles.SUPPORT]: [Actions.StaffsSendMessage, Actions.StaffsGetLogs],
-  [Roles.MODERATEUR]: [Actions.StaffsSendMessage, Actions.StaffsGetLogs],
-  [Roles.RESPONSABLE]: [Actions.StaffsSendMessage, Actions.StaffsGetLogs],
-  [Roles.DEVELOPPEUR]: [
-    Actions.StaffsSendMessage,
-    Actions.StaffsGetLogs,
-    Actions.StaffsSetRank,
-  ],
-  [Roles.ADMINISTRATEUR]: [
-    Actions.StaffsSetRank,
-    Actions.StaffsDeleteUser,
-    Actions.StaffsSendMessage,
-    Actions.StaffsGetLogs,
-  ],
-}
+  [Actions.StaffsSetRank]: HeadRoles,
+  [Actions.StaffsDeleteUser]: HeadRoles,
+  [Actions.StaffsSendMessage]: AllRoles,
+  [Actions.StaffsGetLogs]: AllRoles,
+};
 
 function getRole(roleName: string): Roles {
-  return Roles[roleName.toUpperCase() as keyof typeof Roles]
+  return Roles[roleName.toUpperCase() as keyof typeof Roles];
 }
 
 function hasPermission(role: Roles | null, action: Actions) {
-  if (role === null || role === undefined)
-    return false
-  return allowed[role].includes(action)
+  if (role === null || role === undefined) return false;
+  return allowed[action].includes(role);
 }
 
 function getStringRoles() {
-  return Object.keys(Roles).filter(key => Number.isNaN(Number(key)))
+  return Object.keys(Roles).filter((key) => Number.isNaN(Number(key)));
 }
 
 export default {
   getRole,
   hasPermission,
   getStringRoles,
-}
+};

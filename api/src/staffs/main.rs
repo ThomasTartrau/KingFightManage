@@ -1,13 +1,12 @@
-use actix_web::web::{trace, ReqData};
+use actix_web::web::ReqData;
 use biscuit_auth::Biscuit;
-use log::{debug, trace, warn};
+use chrono::{DateTime, Utc};
+use log::{debug, trace};
 use paperclip::actix::web::{Data, Json, Path};
 use paperclip::actix::{api_v2_operation, Apiv2Schema, CreatedJson, NoContent};
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use sqlx::{query, query_as};
 use uuid::Uuid;
-use validator::Validate;
 
 use crate::{auth::auth::UserLookup, auth::iam::{authorize_only_user, create_registration_token, Action, Role}, utils::{openapi::OaBiscuitUserAccess, problems::MyProblem}};
 
@@ -30,6 +29,19 @@ pub struct GetUsersResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
+pub struct Log {
+    log_id: Uuid,
+    username: String,
+    action: String,
+    created_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
+pub struct GetLogsResponse {
+    logs: Vec<Log>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct SetRolePost {
     user_id: Uuid,
     role: String,
@@ -46,7 +58,7 @@ pub struct DeleteUserPost {
     operation_id = "staffs.generate-registration-token",
     consumes = "application/json",
     produces = "application/json",
-    tags("Users Management")
+    tags("Staffs")
 )]
 pub async fn generate_registration_token(
     state: Data<crate::State>,
@@ -69,14 +81,14 @@ pub async fn generate_registration_token(
 }
 
 #[api_v2_operation(
-    summary = "Get users",
+    summary = "Get staffs",
     description = "",
     operation_id = "staffs.get-users",
     consumes = "application/json",
     produces = "application/json",
-    tags("Users Management")
+    tags("Staffs")
 )]
-pub async fn get_users(
+pub async fn get_staffs(
     state: Data<crate::State>,
     _: OaBiscuitUserAccess,
     biscuit: ReqData<Biscuit>,
@@ -87,18 +99,14 @@ pub async fn get_users(
             User,
             "SELECT iam.user.user__id as user_id, username, role, players.is_logged_in(players.player.player__id) as is_online
             FROM iam.user
-            JOIN players.player ON iam.user.username = players.player.name;
-            "
+            JOIN players.player ON iam.user.username = players.player.name;"
         )
         .fetch_all(&state.db)
         .await
         .map_err(|e| {
-            warn!("{e}");
             debug!("{e}");
             MyProblem::InternalServerError
         })?;
-
-        trace!("{:?}", users);
 
         Ok(CreatedJson(GetUsersResponse { users }))
     } else {
@@ -112,7 +120,7 @@ pub async fn get_users(
     operation_id = "staffs.set-role",
     consumes = "application/json",
     produces = "application/json",
-    tags("Users Management")
+    tags("Staffs")
 )]
 pub async fn set_role(
     state: Data<crate::State>,
@@ -133,6 +141,8 @@ pub async fn set_role(
         if Role::to_role(&body.role).get_order() >= Role::to_role(&token.role).get_order() {
             return Err(MyProblem::Forbidden);
         }
+
+        let mut tx = state.db.begin().await?;
     
 
         let set_role = query!(
@@ -145,13 +155,29 @@ pub async fn set_role(
             &body.role,
             &body.user_id,
         )
-        .fetch_optional(&state.db)
+        .fetch_optional(&mut *tx)
         .await?
         .is_some();
 
-        if set_role {
+        let tokens_revoked = query!(
+            "
+                UPDATE iam.token
+                SET revoked_at = statement_timestamp()
+                WHERE user__id = $1 
+                AND revoked_at IS NULL
+                AND (expired_at IS NULL OR expired_at > statement_timestamp())
+            ",
+            &body.user_id,
+        )
+        .execute(&mut *tx)
+        .await?
+        .rows_affected() > 0;
+
+        if set_role && tokens_revoked {
+            tx.commit().await?;
             Ok(NoContent)
         } else {
+            tx.rollback().await?;
             Err(MyProblem::InternalServerError)
         }
     } else {
@@ -165,7 +191,7 @@ pub async fn set_role(
     operation_id = "staffs.delete-user",
     consumes = "application/json",
     produces = "application/json",
-    tags("Users Management")
+    tags("Staffs")
 )]
 pub async fn delete_user(
     state: Data<crate::State>,
@@ -187,7 +213,10 @@ pub async fn delete_user(
         )
         .fetch_optional(&state.db)
         .await
-        .map_err(MyProblem::from)?;
+        .map_err(|e| {
+            debug!("{e}");
+            MyProblem::InternalServerError
+        })?;
 
         if let Some(user) = user_lookup {
             if Role::to_role(&user.role).get_order() >= Role::to_role(&token.role).get_order() {
@@ -200,9 +229,27 @@ pub async fn delete_user(
             )
             .execute(&state.db)
             .await
-            .map_err(MyProblem::from)?;
+            .map_err(|e| {
+                debug!("{e}");
+                MyProblem::InternalServerError
+            })?
+            .rows_affected() > 0;
 
-            if delete_user.rows_affected() > 0 {
+            let revoke_tokens = query!(
+                "
+                    UPDATE iam.token
+                    SET revoked_at = statement_timestamp()
+                    WHERE user__id = $1
+                    AND revoked_at IS NULL
+                    AND (expired_at IS NULL OR expired_at > statement_timestamp())
+                ",
+                &user_id,
+            )
+            .execute(&state.db)
+            .await?
+            .rows_affected() > 0;
+
+            if delete_user && revoke_tokens {
                 Ok(NoContent)
             } else {
                 Err(MyProblem::NotFound)
@@ -210,6 +257,37 @@ pub async fn delete_user(
         } else {
             return Err(MyProblem::NotFound);
         }
+    } else {
+        Err(MyProblem::Forbidden)
+    }
+}
+
+#[api_v2_operation(
+    summary = "Get logs",
+    description = "",
+    operation_id = "staffs.get-logs",
+    consumes = "application/json",
+    produces = "application/json",
+    tags("Staffs")
+)]
+pub async fn get_logs(
+    state: Data<crate::State>,
+    _: OaBiscuitUserAccess,
+    biscuit: ReqData<Biscuit>,
+) -> Result<CreatedJson<GetLogsResponse>, MyProblem> {
+    if let Ok(_token) = authorize_only_user(&biscuit, Action::StaffsGetLogs) {
+        let logs = query_as!(
+            Log,
+            "SELECT staff_log__id as log_id, username, action, created_at FROM logs.staffs",
+        )
+        .fetch_all(&state.db)
+        .await
+        .map_err(|e| {
+            debug!("{e}");
+            MyProblem::InternalServerError
+        })?;
+
+        Ok(CreatedJson(GetLogsResponse { logs }))
     } else {
         Err(MyProblem::Forbidden)
     }

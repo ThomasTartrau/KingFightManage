@@ -55,14 +55,16 @@ pub struct AuthorizedResetPasswordToken {
 )]
 #[strum(serialize_all = "snake_case")]
 pub enum Role {
+    Support,
     Moderateur,
-    Administrateur,
+    Responsable,
     Developpeur,
+    Administrateur,
 }
 
 impl Default for Role {
     fn default() -> Self {
-        Self::Moderateur
+        Self::Support
     }
 }
 
@@ -73,17 +75,21 @@ impl Role {
 
     pub fn get_order(&self) -> i32 {
         match self {
-            Role::Moderateur => 1,
-            Role::Administrateur => 2,
-            Role::Developpeur => 3,
+            Role::Support => 1,
+            Role::Moderateur => 2,
+            Role::Responsable => 3,
+            Role::Developpeur => 4,
+            Role::Administrateur => 5,
         }
     }
 
     pub fn to_role(role: &str) -> Role {
         match role {
+            "support" => Role::Support,
             "moderateur" => Role::Moderateur,
-            "administrateur" => Role::Administrateur,
+            "responsable" => Role::Responsable,
             "developpeur" => Role::Developpeur,
+            "administrateur" => Role::Administrateur,
             _ => Role::Moderateur,
         }
     }
@@ -118,6 +124,7 @@ pub enum Action {
     StaffsGetUsers,
     StaffsSetRank,
     StaffsDeleteUser,
+    StaffsGetLogs,
     EventsSendMessage,
     EventsIngest,
     EventsGetAll,
@@ -135,6 +142,7 @@ impl<'a> Action {
             Action::StaffsGetUsers => "users-management:get-users",
             Action::StaffsSetRank => "users-management:set-role",
             Action::StaffsDeleteUser => "users-management:delete-user",
+            Action::StaffsGetLogs => "users-management:get-logs",
             Action::EventsSendMessage => "users-management:send-message",
             Action::EventsIngest => "events:ingest",
             Action::EventsGetAll => "events:get_all",
@@ -142,19 +150,21 @@ impl<'a> Action {
     }
 
     fn allowed_roles(&self) -> Vec<Role> {
-        let mut roles = vec![Role::Developpeur];
+        let mut roles = vec![Role::Administrateur];
+        let all_roles: Vec<Role> = vec![Role::Support, Role::Moderateur, Role::Responsable, Role::Developpeur];
 
         let mut per_action_roles = match self {
-            Self::AuthLogout => vec![Role::Administrateur, Role::Moderateur],
-            Self::AuthChangePassword => vec![Role::Administrateur, Role::Moderateur],
-            Self::UserSettingsChangeProfilePicture => vec![Role::Administrateur, Role::Moderateur],
-            Self::UserSettingsChangeName => vec![Role::Administrateur, Role::Moderateur],
-            Self::UserSettingsDeleteUser => vec![Role::Administrateur, Role::Moderateur],
+            Self::AuthLogout => all_roles,
+            Self::AuthChangePassword => all_roles,
+            Self::UserSettingsChangeProfilePicture => all_roles,
+            Self::UserSettingsChangeName => all_roles,
+            Self::UserSettingsDeleteUser => all_roles,
             Self::StaffsGenerateRegistrationToken => vec![],
-            Self::StaffsGetUsers => vec![Role::Administrateur, Role::Moderateur],
-            Self::StaffsSetRank => vec![],
-            Self::StaffsDeleteUser => vec![],
-            Self::EventsSendMessage => vec![Role::Administrateur, Role::Moderateur],
+            Self::StaffsGetUsers => all_roles,
+            Self::StaffsSetRank => vec![Role::Responsable, Role::Developpeur],
+            Self::StaffsDeleteUser => vec![Role::Responsable, Role::Developpeur],
+            Self::StaffsGetLogs => all_roles,
+            Self::EventsSendMessage => all_roles,
             Self::EventsIngest => vec![],
             Self::EventsGetAll => vec![],
         };
@@ -174,6 +184,7 @@ impl<'a> Action {
             Self::StaffsGetUsers => vec![],
             Self::StaffsSetRank => vec![],
             Self::StaffsDeleteUser => vec![],
+            Self::StaffsGetLogs => vec![],
             Self::EventsSendMessage => vec![],
             Self::EventsIngest => vec![],
             Self::EventsGetAll => vec![],
