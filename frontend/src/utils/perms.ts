@@ -11,6 +11,9 @@ export enum Actions {
   StaffsDeleteUser,
   StaffsSendMessage,
   StaffsGetLogs,
+
+  SidebarStaffs,
+  SidebarLogsStaffs,
 }
 
 const HeadRoles = [Roles.ADMINISTRATEUR, Roles.DEVELOPPEUR, Roles.RESPONSABLE];
@@ -21,6 +24,9 @@ const allowed = {
   [Actions.StaffsDeleteUser]: HeadRoles,
   [Actions.StaffsSendMessage]: AllRoles,
   [Actions.StaffsGetLogs]: AllRoles,
+
+  [Actions.SidebarStaffs]: AllRoles,
+  [Actions.SidebarLogsStaffs]: AllRoles,
 };
 
 function getRole(roleName: string): Roles {

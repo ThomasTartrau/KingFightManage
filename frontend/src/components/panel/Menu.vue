@@ -1,23 +1,32 @@
 <script setup lang="ts">
-import { Ellipsis, LogOut } from 'lucide-vue-next'
-import CustomRouterLink from '../CustomRouterLink.vue'
-import CollapseMenu from './CollapseMenu.vue'
-import { cn } from '@/lib/utils'
-import { useMenu } from '@/utils/useMenu'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import TooltipProvider from '@/components/ui/tooltip/TooltipProvider.vue'
-import Tooltip from '@/components/ui/tooltip/Tooltip.vue'
-import TooltipTrigger from '@/components/ui/tooltip/TooltipTrigger.vue'
+import { Ellipsis, LogOut } from "lucide-vue-next";
+import CustomRouterLink from "../CustomRouterLink.vue";
+import CollapseMenu from "./CollapseMenu.vue";
+import { cn } from "@/lib/utils";
+import { useMenu } from "@/utils/useMenu";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import TooltipProvider from "@/components/ui/tooltip/TooltipProvider.vue";
+import Tooltip from "@/components/ui/tooltip/Tooltip.vue";
+import TooltipTrigger from "@/components/ui/tooltip/TooltipTrigger.vue";
 
-import Button from '@/components/ui/button/Button.vue'
-import TooltipContent from '@/components/ui/tooltip/TooltipContent.vue'
-import { logout } from '@/iam'
+import Button from "@/components/ui/button/Button.vue";
+import TooltipContent from "@/components/ui/tooltip/TooltipContent.vue";
+import { getRole, logout } from "@/iam";
+import { onMounted, ref } from "vue";
+import perms, { Roles } from "@/utils/perms";
 
 defineProps<{
-  isOpen: boolean
-}>()
+  isOpen: boolean;
+}>();
 
-const { menuList } = useMenu()
+const role = ref<null | Roles>();
+const { menuList } = useMenu();
+
+function _onLoad() {
+  role.value = getRole().value;
+}
+
+onMounted(_onLoad);
 </script>
 
 <template>
@@ -56,10 +65,16 @@ const { menuList } = useMenu()
             <p class="pb-2" />
           </template>
           <template
-            v-for="({ route, label, icon, active, submenus }, m_index) in menus"
+            v-for="(
+              { route, label, action, icon, active, submenus }, m_index
+            ) in menus"
           >
             <template v-if="submenus.length === 0">
-              <div :key="m_index" class="w-full">
+              <div
+                :key="m_index"
+                v-if="!action || (role && perms.hasPermission(role, action))"
+                class="w-full"
+              >
                 <TooltipProvider disable-hoverable-content>
                   <Tooltip :delay-duration="100">
                     <TooltipTrigger as-child>
@@ -73,7 +88,7 @@ const { menuList } = useMenu()
                             :class="
                               cn(
                                 'flex justify-center items-center',
-                                !isOpen ? '' : 'mr-4',
+                                !isOpen ? '' : 'mr-4'
                               )
                             "
                           >
@@ -85,7 +100,7 @@ const { menuList } = useMenu()
                                 'max-w-[200px] flex justify-center items-center truncate',
                                 !isOpen
                                   ? '-translate-x-96 opacity-0'
-                                  : 'translate-x-0 opacity-100',
+                                  : 'translate-x-0 opacity-100'
                               )
                             "
                           >
@@ -102,7 +117,11 @@ const { menuList } = useMenu()
               </div>
             </template>
             <template v-else>
-              <div :key="m_index" class="w-full">
+              <div
+                :key="m_index"
+                v-if="!action || (role && perms.hasPermission(role, action))"
+                class="w-full"
+              >
                 <CollapseMenu
                   :icon="icon"
                   :label="label"
@@ -126,7 +145,7 @@ const { menuList } = useMenu()
                     :class="
                       cn(
                         'flex justify-center items-center',
-                        isOpen === false ? '' : 'mr-4',
+                        isOpen === false ? '' : 'mr-4'
                       )
                     "
                   >
@@ -136,7 +155,7 @@ const { menuList } = useMenu()
                     :class="
                       cn(
                         'whitespace-nowrap',
-                        !isOpen ? 'opacity-0 hidden' : 'opacity-100',
+                        !isOpen ? 'opacity-0 hidden' : 'opacity-100'
                       )
                     "
                   >
