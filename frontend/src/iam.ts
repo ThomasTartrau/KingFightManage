@@ -5,6 +5,8 @@ import { differenceInMilliseconds, subMinutes } from 'date-fns'
 import { push } from 'notivue'
 import type { UUID } from '@/http'
 import http from '@/http'
+import type { Roles } from '@/utils/perms'
+import perms from '@/utils/perms'
 import type { components } from '@/types'
 import router from '@/router/router'
 import { routes } from '@/router/routes.ts'
@@ -229,8 +231,15 @@ export function getUserInfo(): ComputedRef<null | UserInfo> {
   })
 }
 
-export function getRole(): ComputedRef<null | string> {
-  return computed(() => state.value?.role ?? null)
+export function getRole(): ComputedRef<null | Roles> {
+  return computed(() => {
+    if (state.value) {
+      return perms.getRole(state.value.role)
+    }
+    else {
+      return null
+    }
+  })
 }
 
 export const AuthPlugin: Plugin = {

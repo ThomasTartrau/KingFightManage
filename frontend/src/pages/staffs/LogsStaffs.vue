@@ -1,26 +1,27 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import { Logs, getLogs } from "./StaffsService";
-import Loader from "@/components/custom/loader.vue";
-import LogsDatatable from "@/components/custom/staffs/logs-datatable.vue";
-import { displayProblem } from "@/http";
+import { onMounted, ref } from 'vue'
+import type { Logs } from './StaffsService'
+import { getLogs } from './StaffsService'
+import Loader from '@/components/custom/loader.vue'
+import LogsDatatable from '@/components/custom/staffs/logs-datatable.vue'
+import { displayProblem } from '@/http'
 
-const logs$ = ref<Promise<Logs>>();
+const logs$ = ref<Promise<Logs>>()
 
 async function get() {
   logs$.value = getLogs().catch((problem) => {
-    displayProblem(problem);
-    return [];
-  });
+    displayProblem(problem)
+    return []
+  })
 }
 
 async function _onLoad() {
-  await get();
+  await get()
 }
 
 onMounted(async () => {
-  await _onLoad();
-});
+  await _onLoad()
+})
 </script>
 
 <template>

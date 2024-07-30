@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import type { ColumnDef } from "@tanstack/vue-table";
+import type { ColumnDef, TableOptions } from '@tanstack/vue-table'
 import {
   FlexRender,
   getCoreRowModel,
   getPaginationRowModel,
-  TableOptions,
   useVueTable,
-} from "@tanstack/vue-table";
-import { h, reactive, ref } from "vue";
+} from '@tanstack/vue-table'
+import { h, reactive, ref } from 'vue'
 
-import { Button } from "@/components/ui/button";
+import { Search } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button'
 import {
   Table,
   TableBody,
@@ -17,76 +17,75 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import type { components } from "@/types";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-vue-next";
+} from '@/components/ui/table'
+import type { components } from '@/types'
+import { Input } from '@/components/ui/input'
 
-type definitions = components["schemas"];
-type Log = definitions["Log"];
+type definitions = components['schemas']
+type Log = definitions['Log']
 
 const props = defineProps<{
-  data: Log[];
-}>();
-const datas = ref<Log[]>(props.data);
+  data: Log[]
+}>()
+const emit = defineEmits(['refreshDatatable'])
 
-const emit = defineEmits(["refreshDatatable"]);
+const datas = ref<Log[]>(props.data)
 
 function emitRefresh() {
-  emit("refreshDatatable");
+  emit('refreshDatatable')
 }
 
 const columns: ColumnDef<Log>[] = [
   {
-    accessorKey: "log_id",
-    header: "Log ID",
+    accessorKey: 'log_id',
+    header: 'Log ID',
     cell: ({ row }) => {
-      return h("div", { class: "capitalize" }, row.getValue("log_id"));
+      return h('div', { class: 'capitalize' }, row.getValue('log_id'))
     },
   },
   {
-    accessorKey: "username",
-    header: "Username",
+    accessorKey: 'username',
+    header: 'Username',
     cell: ({ row }) =>
-      h("div", { class: "lowercase" }, row.getValue("username")),
+      h('div', { class: 'lowercase' }, row.getValue('username')),
   },
   {
-    accessorKey: "action",
-    header: "Action",
+    accessorKey: 'action',
+    header: 'Action',
     cell: ({ row }) => {
-      return h("div", { class: "capitalize" }, row.getValue("action"));
+      return h('div', { class: 'capitalize' }, row.getValue('action'))
     },
   },
   {
-    accessorKey: "created_at",
-    header: "Date",
+    accessorKey: 'created_at',
+    header: 'Date',
     cell: ({ row }) => {
-      return h("div", { class: "capitalize" }, row.getValue("created_at"));
+      return h('div', { class: 'capitalize' }, row.getValue('created_at'))
     },
   },
-];
+]
 
 function onSearch(search: string) {
   datas.value = props.data.filter(
-    (log) =>
-      log.log_id.toLowerCase().includes(search.toLowerCase()) ||
-      log.username.toLowerCase().includes(search.toLowerCase()) ||
-      log.action.toLowerCase().includes(search.toLowerCase())
-  );
+    log =>
+      log.log_id.toLowerCase().includes(search.toLowerCase())
+      || log.username.toLowerCase().includes(search.toLowerCase())
+      || log.action.toLowerCase().includes(search.toLowerCase()),
+  )
 }
 
 const tableOptions = reactive<TableOptions<Log>>({
   get data() {
-    return datas.value;
+    return datas.value
   },
   get columns() {
-    return columns;
+    return columns
   },
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
-});
+})
 
-const table = useVueTable(tableOptions);
+const table = useVueTable(tableOptions)
 </script>
 
 <template>

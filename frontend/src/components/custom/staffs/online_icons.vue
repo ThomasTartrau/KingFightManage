@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { Check, X } from "lucide-vue-next";
+import { Check, X } from 'lucide-vue-next'
 
 const props = defineProps<{
-  isOnline: boolean;
-}>();
+  isOnline: boolean
+}>()
 </script>
 
 <template>
   <div>
-    <Check color="green" v-if="props.isOnline" />
-    <X color="red" v-else />
+    <Check v-if="props.isOnline" color="green" />
+    <X v-else color="red" />
   </div>
 </template>
