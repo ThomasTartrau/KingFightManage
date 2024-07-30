@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import type { Staffs } from "./StaffsService";
-import { getStaffs } from "./StaffsService";
+import { Logs, getLogs } from "./StaffsService";
 import Loader from "@/components/custom/loader.vue";
-import StaffsDatatable from "@/components/custom/staffs/datatable.vue";
+import LogsDatatable from "@/components/custom/staffs/logs-datatable.vue";
 import { displayProblem } from "@/http";
 
-const staffs$ = ref<Promise<Staffs>>();
+const logs$ = ref<Promise<Logs>>();
 
 async function get() {
-  staffs$.value = getStaffs().catch((problem) => {
+  logs$.value = getLogs().catch((problem) => {
     displayProblem(problem);
     return [];
   });
@@ -25,13 +24,13 @@ onMounted(async () => {
 </script>
 
 <template>
-  <Loader v-if="!staffs$" :size="36" />
-  <Promised :promise="staffs$">
+  <Loader v-if="!logs$" :size="36" />
+  <Promised :promise="logs$">
     <template #pending>
       <Loader :size="36" />
     </template>
-    <template #default="staffs">
-      <StaffsDatatable :data="staffs" @refresh-datatable="_onLoad" />
+    <template #default="logs">
+      <LogsDatatable :data="logs" @refresh-datatable="_onLoad" />
     </template>
   </Promised>
 </template>

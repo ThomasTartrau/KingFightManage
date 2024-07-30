@@ -41,5 +41,23 @@ export interface components {
       role: string;
       is_online: boolean;
     };
+    Log: {
+      log_id: UUID;
+      username: string;
+      action: string;
+      /** Format: date-time */
+      created_at: string;
+    };
+    GetLogsResponse: {
+      logs: [
+        {
+          log_id: UUID;
+          username: string;
+          action: string;
+          /** Format: date-time */
+          created_at: string;
+        },
+      ];
+    };
   };
 }
