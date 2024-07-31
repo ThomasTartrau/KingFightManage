@@ -8,6 +8,7 @@ import BeginResetpassword from '@/pages/users/BeginResetpassword.vue'
 import ResetPassword from '@/pages/users/ResetPassword.vue'
 import GetStaffs from '@/pages/staffs/GetStaffs.vue'
 import LogsStaffs from '@/pages/staffs/LogsStaffs.vue'
+import LogsBoutique from '@/pages/boutique/LogsBoutique.vue'
 
 export type TemplateRoutes = string
 
@@ -23,6 +24,8 @@ export const routes: Record<TemplateRoutes, string> = {
   Settings: 'Settings',
   SecuritySettings: 'SecuritySettings',
   DeleteAccountSettings: 'DeleteAccountSettings',
+
+  BoutiqueLogs: 'BoutiqueLogs',
 
   Staffs: 'Staffs',
   LogsStaffs: 'LogsStaffs',
@@ -90,6 +93,12 @@ export default [
     name: routes.DeleteAccountSettings,
     path: '/settings/delete-account',
     component: UserSettings,
+  },
+
+  {
+    name: routes.BoutiqueLogs,
+    path: '/boutique/logs',
+    component: LogsBoutique,
   },
 
   {

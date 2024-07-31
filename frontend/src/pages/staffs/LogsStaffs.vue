@@ -5,14 +5,19 @@ import { getLogs } from './StaffsService'
 import Loader from '@/components/custom/loader.vue'
 import LogsDatatable from '@/components/custom/staffs/logs-datatable.vue'
 import { displayProblem } from '@/http'
+import PromisedError from '@/components/custom/promised-error.vue'
 
 const logs$ = ref<Promise<Logs>>()
 
 async function get() {
-  logs$.value = getLogs().catch((problem) => {
-    displayProblem(problem)
-    return []
-  })
+  getLogs()
+    .then((logs) => {
+      logs$.value = Promise.resolve(logs)
+    })
+    .catch((problem) => {
+      logs$.value = Promise.reject(problem)
+      displayProblem(problem)
+    })
 }
 
 async function _onLoad() {
@@ -32,6 +37,9 @@ onMounted(async () => {
     </template>
     <template #default="logs">
       <LogsDatatable :data="logs" @refresh-datatable="_onLoad" />
+    </template>
+    <template #rejected="error">
+      <PromisedError :content="error" @reload="_onLoad" />
     </template>
   </Promised>
 </template>

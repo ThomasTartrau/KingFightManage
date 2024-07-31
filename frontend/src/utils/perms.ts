@@ -14,10 +14,11 @@ export enum Actions {
 
   SidebarStaffs,
   SidebarLogsStaffs,
+  SidebarBoutiqueLogs,
 }
 
-const HeadRoles = [Roles.ADMINISTRATEUR, Roles.DEVELOPPEUR, Roles.RESPONSABLE];
-const AllRoles = [...HeadRoles, Roles.MODERATEUR, Roles.SUPPORT];
+const HeadRoles = [Roles.ADMINISTRATEUR, Roles.DEVELOPPEUR, Roles.RESPONSABLE]
+const AllRoles = [...HeadRoles, Roles.MODERATEUR, Roles.SUPPORT]
 
 const allowed = {
   [Actions.StaffsSetRank]: HeadRoles,
@@ -27,23 +28,25 @@ const allowed = {
 
   [Actions.SidebarStaffs]: AllRoles,
   [Actions.SidebarLogsStaffs]: AllRoles,
-};
+  [Actions.SidebarBoutiqueLogs]: AllRoles,
+}
 
 function getRole(roleName: string): Roles {
-  return Roles[roleName.toUpperCase() as keyof typeof Roles];
+  return Roles[roleName.toUpperCase() as keyof typeof Roles]
 }
 
 function hasPermission(role: Roles | null, action: Actions) {
-  if (role === null || role === undefined) return false;
-  return allowed[action].includes(role);
+  if (role === null || role === undefined)
+    return false
+  return allowed[action].includes(role)
 }
 
 function getStringRoles() {
-  return Object.keys(Roles).filter((key) => Number.isNaN(Number(key)));
+  return Object.keys(Roles).filter(key => Number.isNaN(Number(key)))
 }
 
 export default {
   getRole,
   hasPermission,
   getStringRoles,
-};
+}

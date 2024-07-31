@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import type { UserInfo } from '@/iam'
 import { emptyUserInfo, getUserInfo, logout } from '@/iam'
-import CustomRouterLink from '@/components/CustomRouterLink.vue'
+import CustomRouterLink from '@/components/custom-router-link.vue'
 
 const userInfo: UserInfo = getUserInfo().value || emptyUserInfo
 

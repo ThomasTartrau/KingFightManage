@@ -7,7 +7,7 @@ interface Config {
 
 export const config: Config = {
   API_ENDPOINT: 'http://localhost:8080/api/v1',
-  API_TIMEOUT: 1000, // 1 second
+  API_TIMEOUT: 3000, // 3 seconds
   FRONTEND_DEV_MODE: true,
   SITE_NAME: 'KingFightManage',
 }

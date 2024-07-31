@@ -1,22 +1,22 @@
-import { createSharedComposable } from "@vueuse/core";
-import { computed } from "vue";
-import { useRouter } from "vue-router";
-import { Book, LayoutGrid, Settings, Shield, Users } from "lucide-vue-next";
-import type { Group } from "@/lib/menu";
-import { useRoute } from "@/router/routes";
-import { Actions } from "./perms";
+import { createSharedComposable } from '@vueuse/core'
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { Book, LayoutGrid, Shield } from 'lucide-vue-next'
+import { Actions } from './perms'
+import type { Group } from '@/lib/menu'
+import { useRoute } from '@/router/routes'
 
 function _useMenu() {
-  const { currentRoute } = useRouter();
+  const { currentRoute } = useRouter()
   const menuList = computed<Group[]>(() => {
     return [
       {
-        groupLabel: "",
+        groupLabel: '',
         menus: [
           {
-            route: "Home",
-            label: "Accueil",
-            active: currentRoute.value.fullPath.includes("/dashboard"),
+            route: 'Home',
+            label: 'Accueil',
+            active: currentRoute.value.fullPath.includes('/dashboard'),
             icon: LayoutGrid,
             submenus: [],
           },
@@ -60,42 +60,36 @@ function _useMenu() {
         ],
       }, */
       {
-        groupLabel: "Paramètres",
+        groupLabel: 'Boutique',
         menus: [
           {
-            route: "Settings",
-            label: "Paramètres personnels",
-            active: currentRoute.value.fullPath.includes(useRoute("Settings")),
-            icon: Users,
-            submenus: [],
-          },
-          {
-            route: "SecuritySettings",
-            label: "Paramètres de sécurité",
-            active:
-              currentRoute.value.fullPath.includes(useRoute("Settings")) &&
-              true,
-            icon: Settings,
+            route: 'BoutiqueLogs',
+            label: 'Logs',
+            active: currentRoute.value.fullPath.includes(
+              useRoute('BoutiqueLogs'),
+            ),
+            action: Actions.SidebarBoutiqueLogs,
+            icon: Book,
             submenus: [],
           },
         ],
       },
       {
-        groupLabel: "Admin",
+        groupLabel: 'Admin',
         menus: [
           {
-            route: "Staffs",
-            label: "Staffs",
-            active: currentRoute.value.fullPath.includes(useRoute("Staffs")),
+            route: 'Staffs',
+            label: 'Staffs',
+            active: currentRoute.value.fullPath.includes(useRoute('Staffs')),
             action: Actions.SidebarStaffs,
             icon: Shield,
             submenus: [],
           },
           {
-            route: "LogsStaffs",
-            label: "Logs",
+            route: 'LogsStaffs',
+            label: 'Logs',
             active: currentRoute.value.fullPath.includes(
-              useRoute("LogsStaffs")
+              useRoute('LogsStaffs'),
             ),
             action: Actions.SidebarLogsStaffs,
             icon: Book,
@@ -103,12 +97,12 @@ function _useMenu() {
           },
         ],
       },
-    ];
-  });
+    ]
+  })
 
   return {
     menuList,
-  };
+  }
 }
 
-export const useMenu = createSharedComposable(_useMenu);
+export const useMenu = createSharedComposable(_useMenu)

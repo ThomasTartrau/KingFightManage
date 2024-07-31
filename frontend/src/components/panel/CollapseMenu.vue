@@ -2,7 +2,7 @@
 import { DropdownMenuArrow } from 'radix-vue'
 import { ref } from 'vue'
 import { ChevronDown, Dot } from 'lucide-vue-next'
-import CustomRouterLink from '../CustomRouterLink.vue'
+import CustomRouterLink from '../custom-router-link.vue'
 import { cn } from '@/lib/utils'
 import type { CollapseMenuButtonProps } from '@/lib/menu'
 import { useAdminPanel } from '@/utils/useAdminPanel'

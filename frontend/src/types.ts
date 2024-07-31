@@ -48,7 +48,18 @@ export interface components {
       /** Format: date-time */
       created_at: string
     }
-    GetLogsResponse: {
+    GetStaffLogsResponse: {
+      logs: [
+        {
+          log_id: UUID
+          username: string
+          action: string
+          /** Format: date-time */
+          created_at: string
+        },
+      ]
+    }
+    GetBoutiqueLogsResponse: {
       logs: [
         {
           log_id: UUID

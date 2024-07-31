@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ColorModeToggle from '@/components/ColorModeToggle.vue'
+import ColorModeToggle from '@/components/color-mode-toggle.vue'
 import UserDropdown from '@/components/panel/UserDropdown.vue'
 import SheetMenu from '@/components/panel/SheetMenu.vue'
 import { config } from '@/lib/config'

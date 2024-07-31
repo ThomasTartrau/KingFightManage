@@ -7,7 +7,7 @@ type definitions = components['schemas']
 type User = definitions['User']
 type Log = definitions['Log']
 type GetStaffsResponse = definitions['GetStaffsResponse']
-type GetLogsResponse = definitions['GetLogsResponse']
+type GetStaffLogsResponse = definitions['GetStaffLogsResponse']
 
 export type Staffs = User[]
 export type Logs = Log[]
@@ -26,7 +26,7 @@ export async function getStaffs(): Promise<Staffs> {
 
 export async function getLogs(): Promise<Logs> {
   const res = await http.get('/staffs/logs').then(
-    (res: AxiosResponse<GetLogsResponse>) => {
+    (res: AxiosResponse<GetStaffLogsResponse>) => {
       return res.data
     },
     (err: AxiosError<AxiosResponse<Problem>>) =>
