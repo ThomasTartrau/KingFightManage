@@ -23,7 +23,7 @@ pub struct PbLog {
     log_id: Uuid,
     username: String,
     action: String,
-    amount: usize,
+    amount: i16,
     created_at: DateTime<Utc>,
 }
 
@@ -95,7 +95,7 @@ pub async fn get_pb_logs(
             MyProblem::InternalServerError
         })?;
 
-        Ok(CreatedJson(GetLogsResponse { logs }))
+        Ok(CreatedJson(GetPbLogsResponse { logs }))
     } else {
         Err(MyProblem::Forbidden)
     }

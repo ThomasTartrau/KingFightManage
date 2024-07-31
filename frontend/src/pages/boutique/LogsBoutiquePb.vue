@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import type { Logs } from "./BoutiqueService";
+import type { PbLogs } from "./BoutiqueService";
 import { getPbLogs } from "./BoutiqueService";
 import Loader from "@/components/custom/loader.vue";
-import LogsDatatable from "@/components/custom/boutique/logs-datatable.vue";
+import LogsPbDatatable from "@/components/custom/boutique/logs-pb-datatable.vue";
 import PromisedError from "@/components/custom/promised-error.vue";
 
-const logs$ = ref<Promise<Logs>>();
+const logs$ = ref<Promise<PbLogs>>();
 
 async function get() {
   getPbLogs()
@@ -34,7 +34,7 @@ onMounted(async () => {
       <Loader :size="36" />
     </template>
     <template #default="logs">
-      <LogsDatatable :data="logs" @refresh-datatable="_onLoad" />
+      <LogsPbDatatable :data="logs" @refresh-datatable="_onLoad" />
     </template>
     <template #rejected="error">
       <PromisedError :content="error" @reload="_onLoad" />

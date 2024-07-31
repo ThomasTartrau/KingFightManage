@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import type { Logs } from "./BoutiqueService";
+import type { Logs, PbLogs } from "./BoutiqueService";
 import { getLogs, getPbLogs } from "./BoutiqueService";
 import Loader from "@/components/custom/loader.vue";
 import PromisedError from "@/components/custom/promised-error.vue";
@@ -8,7 +8,7 @@ import { config } from "@/lib/config";
 
 type GraphsLogs = {
   boutiqueLogs: Logs;
-  pbLogs: Logs;
+  pbLogs: PbLogs;
   objective: number;
 };
 
