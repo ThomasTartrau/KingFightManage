@@ -19,8 +19,22 @@ pub struct Log {
 }
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
+pub struct PbLog {
+    log_id: Uuid,
+    username: String,
+    action: String,
+    amount: usize,
+    created_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct GetLogsResponse {
     logs: Vec<Log>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
+pub struct GetPbLogsResponse {
+    logs: Vec<PbLog>,
 }
 
 #[api_v2_operation(
@@ -68,11 +82,11 @@ pub async fn get_pb_logs(
     state: Data<crate::State>,
     _: OaBiscuitUserAccess,
     biscuit: ReqData<Biscuit>,
-) -> Result<CreatedJson<GetLogsResponse>, MyProblem> {
+) -> Result<CreatedJson<GetPbLogsResponse>, MyProblem> {
     if let Ok(_token) = authorize_only_user(&biscuit, Action::GetBoutiquePbLogs) {
         let logs = query_as!(
-            Log,
-            "SELECT pb_log__id as log_id, username, action, created_at FROM logs.pb",
+            PbLog,
+            "SELECT pb_log__id as log_id, username, action, amount, created_at FROM logs.pb",
         )
         .fetch_all(&state.db)
         .await
