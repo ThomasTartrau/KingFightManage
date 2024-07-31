@@ -1,7 +1,13 @@
 import { createSharedComposable } from "@vueuse/core";
 import { computed } from "vue";
 import { useRouter } from "vue-router";
-import { Book, CircleDollarSign, LayoutGrid, Shield } from "lucide-vue-next";
+import {
+  Book,
+  CircleDollarSign,
+  LayoutGrid,
+  LineChart,
+  Shield,
+} from "lucide-vue-next";
 import { Actions } from "./perms";
 import type { Group } from "@/lib/menu";
 import { useRoute } from "@/router/routes";
@@ -61,6 +67,7 @@ function _useMenu() {
       }, */
       {
         groupLabel: "Boutique",
+        action: Actions.SidebarCategoryBoutique,
         menus: [
           {
             route: "BoutiqueLogs",
@@ -82,10 +89,21 @@ function _useMenu() {
             icon: CircleDollarSign,
             submenus: [],
           },
+          {
+            route: "BoutiqueGraphs",
+            label: "Graphiques",
+            active: currentRoute.value.fullPath.includes(
+              useRoute("BoutiqueGraphs")
+            ),
+            action: Actions.SidebarBoutiqueGraphs,
+            icon: LineChart,
+            submenus: [],
+          },
         ],
       },
       {
         groupLabel: "Admin",
+        action: Actions.SidebarCategoryAdmin,
         menus: [
           {
             route: "Staffs",

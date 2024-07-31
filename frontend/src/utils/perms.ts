@@ -16,6 +16,10 @@ export enum Actions {
   SidebarLogsStaffs,
   SidebarBoutiqueLogs,
   SidebarBoutiquePbLogs,
+  SidebarBoutiqueGraphs,
+
+  SidebarCategoryAdmin,
+  SidebarCategoryBoutique,
 }
 
 const HeadRoles = [Roles.ADMINISTRATEUR, Roles.DEVELOPPEUR, Roles.RESPONSABLE];
@@ -31,6 +35,10 @@ const allowed = {
   [Actions.SidebarLogsStaffs]: AllRoles,
   [Actions.SidebarBoutiqueLogs]: [Roles.ADMINISTRATEUR],
   [Actions.SidebarBoutiquePbLogs]: [Roles.ADMINISTRATEUR],
+  [Actions.SidebarBoutiqueGraphs]: [Roles.ADMINISTRATEUR],
+
+  [Actions.SidebarCategoryAdmin]: AllRoles,
+  [Actions.SidebarCategoryBoutique]: [Roles.ADMINISTRATEUR],
 };
 
 function getRole(roleName: string): Roles {
