@@ -5,7 +5,7 @@ use biscuit_auth::{Biscuit, PrivateKey};
 use chrono::{DateTime, Utc};
 use lettre::message::Mailbox;
 use lettre::Address;
-use log::{debug, error, info, warn};
+use log::{debug, error, warn};
 use paperclip::actix::web::{Data, Json};
 use paperclip::actix::{api_v2_operation, Apiv2Schema, CreatedJson, NoContent};
 use serde::{Deserialize, Serialize};

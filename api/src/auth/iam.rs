@@ -1,7 +1,7 @@
 use std::time::{Duration, SystemTime};
 use biscuit_auth::{builder::Fact, builder_ext::AuthorizerExt, error, macros::*, AuthorizerLimits, Biscuit, KeyPair, PrivateKey};
 use chrono::{DateTime, Utc};
-use log::{error, trace, warn};
+use log::{error, trace};
 use paperclip::v2::schema::TypedData;
 use serde::Serialize;
 use strum::{AsRefStr, EnumIter, EnumString, IntoEnumIterator, VariantNames};
@@ -128,6 +128,8 @@ pub enum Action {
     EventsSendMessage,
     EventsIngest,
     EventsGetAll,
+    GetBoutiqueLogs,
+    GetBoutiquePbLogs,
 }
 
 impl<'a> Action {
@@ -146,6 +148,8 @@ impl<'a> Action {
             Action::EventsSendMessage => "users-management:send-message",
             Action::EventsIngest => "events:ingest",
             Action::EventsGetAll => "events:get_all",
+            Action::GetBoutiqueLogs => "boutique:get-logs",
+            Action::GetBoutiquePbLogs => "boutique:get-pb-logs",
         }
     }
 
@@ -167,6 +171,8 @@ impl<'a> Action {
             Self::EventsSendMessage => all_roles,
             Self::EventsIngest => vec![],
             Self::EventsGetAll => vec![],
+            Self::GetBoutiqueLogs => vec![],
+            Self::GetBoutiquePbLogs => vec![],
         };
 
         roles.append(&mut per_action_roles);
@@ -188,6 +194,8 @@ impl<'a> Action {
             Self::EventsSendMessage => vec![],
             Self::EventsIngest => vec![],
             Self::EventsGetAll => vec![],
+            Self::GetBoutiqueLogs => vec![],
+            Self::GetBoutiquePbLogs => vec![],
         };
 
         facts.push(fact!("action({action})", action = self.action_name()));

@@ -17,6 +17,7 @@ mod utils;
 mod user_settings;
 mod events;
 mod staffs;
+mod boutique;
 
 const APP_TITLE: &str = "KingFightManage";
 const WEBAPP_INDEX_FILE: &str = "index.html";
@@ -314,6 +315,19 @@ async fn main() -> anyhow::Result<()> {
                                     .wrap(biscuit_auth.clone())
                                     .route("", web::post().to(events::main::ingest_event))
                                     .route("", web::get().to(events::main::get_events)),
+                                )
+                                .service(
+                                    web::scope("/boutique")
+                                    .service(
+                                        web::resource("/logs")
+                                        .wrap(biscuit_auth.clone())
+                                        .route(web::get().to(boutique::main::get_logs)),
+                                    )
+                                    .service(
+                                        web::resource("/logs/pb")
+                                        .wrap(biscuit_auth.clone())
+                                        .route(web::get().to(boutique::main::get_pb_logs)),
+                                    )
                                 )
                                 
                         )
