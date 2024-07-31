@@ -25,5 +25,6 @@ CREATE TABLE logs.pb (
     pb_log__id uuid primary key default public.gen_random_uuid(),
     username text not null,
     action text not null,
+    amount numeric not null,
     created_at timestamptz not null default now()
 );
