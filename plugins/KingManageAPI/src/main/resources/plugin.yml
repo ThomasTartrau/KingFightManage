@@ -1,0 +1,3 @@
+name: KingManageAPI
+version: '1.0'
+main: fr.kingfight.kingManageAPI.KingManageAPI
