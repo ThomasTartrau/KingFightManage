@@ -1,7 +1,7 @@
 use actix_web::web::ReqData;
 use biscuit_auth::Biscuit;
 use chrono::{DateTime, Utc};
-use log::debug;
+use log::{debug, trace};
 use paperclip::actix::web::Data;
 use paperclip::actix::{api_v2_operation, Apiv2Schema, CreatedJson};
 use serde::{Deserialize, Serialize};
@@ -47,6 +47,8 @@ pub async fn get_logs(
             debug!("{e}");
             MyProblem::InternalServerError
         })?;
+
+        trace!("logs: {logs:?}");
 
         Ok(CreatedJson(GetLogsResponse { logs }))
     } else {

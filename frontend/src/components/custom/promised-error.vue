@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Code from './code.vue'
-import CustomButton from '@/components/custom-button.vue'
+import Code from "./code.vue";
+import CustomButton from "@/components/custom-button.vue";
 import {
   Card,
   CardContent,
@@ -8,12 +8,15 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from "@/components/ui/card";
+import ProblemFactory from "@/utils/problemFactory";
 
 const props = defineProps<{
-  onReload: () => void
-  content: string
-}>()
+  onReload: () => void;
+  content: ProblemFactory;
+}>();
+
+const error = JSON.stringify(props.content, null, 2);
 </script>
 
 <template>
@@ -31,7 +34,7 @@ const props = defineProps<{
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Code :content="props.content" />
+        <Code :content="error" />
       </CardContent>
       <CardFooter class="flex justify-end">
         <CustomButton variant="ringHover" size="lg" @click="props.onReload">

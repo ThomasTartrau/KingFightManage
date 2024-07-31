@@ -1,22 +1,22 @@
-import { createSharedComposable } from '@vueuse/core'
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { Book, LayoutGrid, Shield } from 'lucide-vue-next'
-import { Actions } from './perms'
-import type { Group } from '@/lib/menu'
-import { useRoute } from '@/router/routes'
+import { createSharedComposable } from "@vueuse/core";
+import { computed } from "vue";
+import { useRouter } from "vue-router";
+import { Book, CircleDollarSign, LayoutGrid, Shield } from "lucide-vue-next";
+import { Actions } from "./perms";
+import type { Group } from "@/lib/menu";
+import { useRoute } from "@/router/routes";
 
 function _useMenu() {
-  const { currentRoute } = useRouter()
+  const { currentRoute } = useRouter();
   const menuList = computed<Group[]>(() => {
     return [
       {
-        groupLabel: '',
+        groupLabel: "",
         menus: [
           {
-            route: 'Home',
-            label: 'Accueil',
-            active: currentRoute.value.fullPath.includes('/dashboard'),
+            route: "Home",
+            label: "Accueil",
+            active: currentRoute.value.fullPath.includes("/dashboard"),
             icon: LayoutGrid,
             submenus: [],
           },
@@ -60,36 +60,46 @@ function _useMenu() {
         ],
       }, */
       {
-        groupLabel: 'Boutique',
+        groupLabel: "Boutique",
         menus: [
           {
-            route: 'BoutiqueLogs',
-            label: 'Logs',
+            route: "BoutiqueLogs",
+            label: "Logs",
             active: currentRoute.value.fullPath.includes(
-              useRoute('BoutiqueLogs'),
+              useRoute("BoutiqueLogs")
             ),
             action: Actions.SidebarBoutiqueLogs,
             icon: Book,
             submenus: [],
           },
+          {
+            route: "BoutiqueLogsPb",
+            label: "Achats",
+            active: currentRoute.value.fullPath.includes(
+              useRoute("BoutiqueLogsPb")
+            ),
+            action: Actions.SidebarBoutiquePbLogs,
+            icon: CircleDollarSign,
+            submenus: [],
+          },
         ],
       },
       {
-        groupLabel: 'Admin',
+        groupLabel: "Admin",
         menus: [
           {
-            route: 'Staffs',
-            label: 'Staffs',
-            active: currentRoute.value.fullPath.includes(useRoute('Staffs')),
+            route: "Staffs",
+            label: "Staffs",
+            active: currentRoute.value.fullPath.includes(useRoute("Staffs")),
             action: Actions.SidebarStaffs,
             icon: Shield,
             submenus: [],
           },
           {
-            route: 'LogsStaffs',
-            label: 'Logs',
+            route: "LogsStaffs",
+            label: "Logs",
             active: currentRoute.value.fullPath.includes(
-              useRoute('LogsStaffs'),
+              useRoute("LogsStaffs")
             ),
             action: Actions.SidebarLogsStaffs,
             icon: Book,
@@ -97,12 +107,12 @@ function _useMenu() {
           },
         ],
       },
-    ]
-  })
+    ];
+  });
 
   return {
     menuList,
-  }
+  };
 }
 
-export const useMenu = createSharedComposable(_useMenu)
+export const useMenu = createSharedComposable(_useMenu);

@@ -1,7 +1,7 @@
 use std::{str::FromStr, time::Duration};
 use actix_cors::Cors;
 use actix_files::{Files, NamedFile};
-use actix_web::{middleware::{self, Logger, NormalizePath}, web::{self, route}, App, HttpServer};
+use actix_web::{middleware::{self, Logger, NormalizePath}, web::{self}, App, HttpServer};
 use biscuit_auth::{KeyPair, PrivateKey};
 
 use clap::{crate_name, Parser};
@@ -263,6 +263,19 @@ async fn main() -> anyhow::Result<()> {
                                         ),
                                 )
                                 .service(
+                                    web::scope("/logs")
+                                        .service(
+                                            web::resource("/boutique")
+                                                .wrap(biscuit_auth.clone())
+                                                .route(web::get().to(boutique::main::get_logs)),
+                                        )
+                                        .service(
+                                            web::resource("/pb")
+                                                .wrap(biscuit_auth.clone())
+                                                .route(web::get().to(boutique::main::get_pb_logs)),
+                                        )
+                                )
+                                .service(
                                     web::scope("/user")
                                         .service(
                                             web::resource("/profile-picture")
@@ -309,25 +322,12 @@ async fn main() -> anyhow::Result<()> {
                                     web::scope("/events")
                                     .service(
                                         web::resource("/send-message")
-                                        .wrap(biscuit_auth.clone())
-                                        .route(web::post().to(events::main::send_message)),
+                                            .wrap(biscuit_auth.clone())
+                                            .route(web::post().to(events::main::send_message)),
                                     )
                                     .wrap(biscuit_auth.clone())
                                     .route("", web::post().to(events::main::ingest_event))
                                     .route("", web::get().to(events::main::get_events)),
-                                )
-                                .service(
-                                    web::scope("/boutique")
-                                    .service(
-                                        web::resource("/logs")
-                                        .wrap(biscuit_auth.clone())
-                                        .route(web::get().to(boutique::main::get_logs)),
-                                    )
-                                    .service(
-                                        web::resource("/logs/pb")
-                                        .wrap(biscuit_auth.clone())
-                                        .route(web::get().to(boutique::main::get_pb_logs)),
-                                    )
                                 )
                                 
                         )

@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import type { ColumnDef, TableOptions } from '@tanstack/vue-table'
+import type { ColumnDef, TableOptions } from "@tanstack/vue-table";
 import {
   FlexRender,
   getCoreRowModel,
   getPaginationRowModel,
   useVueTable,
-} from '@tanstack/vue-table'
-import { h, reactive, ref } from 'vue'
+} from "@tanstack/vue-table";
+import { h, reactive, ref } from "vue";
 
-import { Search } from 'lucide-vue-next'
-import { Button } from '@/components/ui/button'
+import { Search } from "lucide-vue-next";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -17,88 +17,88 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import DropdownAction from '@/components/custom/staffs/dropdown-action.vue'
-import OnlineIcons from '@/components/custom/staffs/online_icons.vue'
-import type { components } from '@/types'
-import { Input } from '@/components/ui/input'
+} from "@/components/ui/table";
+import DropdownAction from "@/components/custom/staffs/dropdown-action.vue";
+import OnlineIcons from "@/components/custom/staffs/online_icons.vue";
+import type { components } from "@/types";
+import { Input } from "@/components/ui/input";
 
-type definitions = components['schemas']
-type User = definitions['User']
+type definitions = components["schemas"];
+type User = definitions["User"];
 
 const props = defineProps<{
-  data: User[]
-}>()
-const emit = defineEmits(['refreshDatatable'])
+  data: User[];
+}>();
+const emit = defineEmits(["refreshDatatable"]);
 
-const datas = ref<User[]>(props.data || [])
+const datas = ref<User[]>(props.data || []);
 
 function emitRefresh() {
-  emit('refreshDatatable')
+  emit("refreshDatatable");
 }
 
 const columns: ColumnDef<User>[] = [
   {
-    accessorKey: 'user_id',
-    header: 'UUID',
+    accessorKey: "user_id",
+    header: "UUID",
     cell: ({ row }) => {
-      return h('div', { class: 'capitalize' }, row.getValue('user_id'))
+      return h("div", { class: "capitalize" }, row.getValue("user_id"));
     },
   },
   {
-    accessorKey: 'username',
-    header: 'Username',
+    accessorKey: "username",
+    header: "Username",
     cell: ({ row }) =>
-      h('div', { class: 'lowercase' }, row.getValue('username')),
+      h("div", { class: "lowercase" }, row.getValue("username")),
   },
   {
-    accessorKey: 'role',
-    header: 'Role',
+    accessorKey: "role",
+    header: "Role",
     cell: ({ row }) => {
-      return h('div', { class: 'capitalize' }, row.getValue('role'))
+      return h("div", { class: "capitalize" }, row.getValue("role"));
     },
   },
   {
-    accessorKey: 'is_online',
-    header: 'Online',
+    accessorKey: "is_online",
+    header: "Online",
     cell: ({ row }) => {
-      const user = row.original
+      const user = row.original;
 
-      return h(OnlineIcons, { isOnline: user.is_online })
+      return h(OnlineIcons, { isOnline: user.is_online });
     },
   },
   {
-    id: 'actions',
+    id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const user = row.original
+      const user = row.original;
 
       return h(DropdownAction, {
         userId: user.user_id,
         username: user.username,
-      })
+      });
     },
   },
-]
+];
 
 function onSearch(username: string) {
-  datas.value = props.data.filter(user =>
-    user.username.toLowerCase().includes(username.toLowerCase()),
-  )
+  datas.value = props.data.filter((user) =>
+    user.username.toLowerCase().includes(username.toLowerCase())
+  );
 }
 
 const tableOptions = reactive<TableOptions<User>>({
   get data() {
-    return datas.value
+    return datas.value;
   },
   get columns() {
-    return columns
+    return columns;
   },
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
-})
+});
 
-const table = useVueTable(tableOptions)
+const table = useVueTable(tableOptions);
 </script>
 
 <template>
@@ -166,8 +166,12 @@ const table = useVueTable(tableOptions)
       <div class="flex-1 text-sm text-muted-foreground">
         Affichage de
         {{
-          (table.getState().pagination.pageIndex + 1)
-            * table.getState().pagination.pageSize
+          table.getFilteredRowModel().rows.length <
+          (table.getState().pagination.pageIndex + 1) *
+            table.getState().pagination.pageSize
+            ? table.getFilteredRowModel().rows.length
+            : (table.getState().pagination.pageIndex + 1) *
+              table.getState().pagination.pageSize
         }}
         sur {{ table.getFilteredRowModel().rows.length }} donnée(s).
       </div>
