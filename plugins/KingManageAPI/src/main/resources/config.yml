@@ -1,0 +1,36 @@
+# API key (generated from the website)
+api_key: "EqgDCr0CCgR0eXBlCgt1c2VyX2FjY2VzcwoKc2Vzc2lvbl9pZAoIdG9rZW5faWQKCmNyZWF0ZWRfYXQKB3VzZXJfaWQKFmpvaG5ybC5zbXVyZkBnbWFpbC5jb20KCHVzZXJuYW1lCgR0ZXN0Cg5hZG1pbmlzdHJhdGV1cgoBdBgDIgoKCAiACBIDGIEIIggKBggWEgIQASIZChcIgggSEioQdhcIyrmfS8quLZZLCPgXTyIZChcIgwgSEioQRzfEWZtrTnKJHscmKhu7WyINCgsIhAgSBiC_za61BiIZChcIhQgSEioQnPB1JjMDRuWvWSTSZnnt8CIJCgcIDhIDGIYIIgoKCAiHCBIDGIgIIgkKBwgGEgMYiQgyKAomCgIIGxIHCAUSAwiKCBoXCgUKAwiKCAoICgYg68-utQYKBBoCCAASJAgAEiD9bJ43UgA20QIzgx5yxS8dortmRHO4Mshly0u5UeHP7BpA8iqYareqXMyXeEAWSymS5pAg3hlM51CeLFkC-SRlpv8b4IQXfE3S1h6mP8I2Qaf7ZFSOp17w_VxxdOyFmY9mByIiCiBbj5W1rltwIjfxw-MA_YE7B_SnoHEqOYdn93XaFOkweg=="
+# API Url (base url for the API) (Need to have the complete URL)
+base_url: "http://localhost:8080/api/v1"
+# Timeout for the API requests in seconds
+timeout: 3000
+
+
+permissions:
+  api: "kingmanageapi.api"
+
+intervals:
+  # Events fetch interval in seconds
+  events: 6
+
+messages:
+  events:
+    receive-message: ""
+  errors:
+    permission: "§5KingFightAPI §f» §cVous n'avez pas la permission d'exécuter cette commande."
+  success:
+    reload: "§5KingFightAPI §f» §aConfiguration rechargée avec succès."
+    pause: "§5KingFightAPI §f» §aL'envoie des événements a été mis en pause."
+    stop: "§5KingFightAPI §f» §cArrêt du plugin."
+    resume: "§5KingFightAPI §f» §aL'envoie des événements a été repris."
+    status: "§5KingFightAPI §f» §aStatus: §e{status}"
+  help:
+    api:
+      - ""
+      - "                         §e§l✸ §6KingFightAPI  §e§l✸      "
+      - "§f• §7Pour reload la configuration du plugin §8▶ §e/api reload"
+      - "§f• §7Pour mettre en pause l'envoie des événements §8▶ §e/api pause"
+      - "§f• §7Pour reprendre l'envoie des événements §8▶ §e/api resume"
+      - "§f• §7Pour voir le status §8▶ §e/api status"
+      - "§f• §7Pour voir cette page §8▶ §e/api help"
+      - "                        §7§oMade by John for §6§oKingFight§7§o.  "

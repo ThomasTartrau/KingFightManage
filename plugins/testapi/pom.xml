@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>fr.kingfight</groupId>
-    <artifactId>KingManageAPI</artifactId>
+    <artifactId>testapi</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
 
-    <name>KingManageAPI</name>
+    <name>testapi</name>
 
     <properties>
         <java.version>8</java.version>
@@ -59,10 +59,6 @@
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
-        <repository>
-            <id>maven-central</id>
-            <url>https://repo1.maven.org/maven2/</url>
-        </repository>
     </repositories>
 
     <dependencies>
@@ -71,6 +67,13 @@
             <artifactId>spigot-api</artifactId>
             <version>1.8.8-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>fr.kingfight</groupId>
+            <artifactId>KingManageAPI</artifactId>
+            <scope>system</scope>
+            <version>1.0</version>
+            <systemPath>${project.basedir}/lib/KingManageAPI.jar</systemPath>
         </dependency>
     </dependencies>
 </project>

@@ -1,3 +1,6 @@
 name: KingManageAPI
 version: '1.0'
+author: John
 main: fr.kingfight.kingManageAPI.KingManageAPI
+commands:
+  api:

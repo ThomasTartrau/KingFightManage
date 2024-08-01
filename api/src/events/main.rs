@@ -143,7 +143,7 @@ pub async fn send_message(
         let event_type = "send_message";
             let event_data = json!({
                 "sender": &token.username,
-                "username": body.username,
+                "target": body.user_id,
                 "message": body.message,
             });
 
