@@ -4,9 +4,10 @@ import type { Logs, PbLogs } from "./BoutiqueService";
 import { getLogs, getPbLogs } from "./BoutiqueService";
 import Loader from "@/components/custom/loader.vue";
 import PromisedError from "@/components/custom/promised-error.vue";
+import graphs from "@/components/custom/boutique/graphs.vue";
 import { config } from "@/lib/config";
 
-type GraphsLogs = {
+export type GraphsLogs = {
   boutiqueLogs: Logs;
   pbLogs: PbLogs;
   objective: number;
@@ -50,7 +51,7 @@ onMounted(async () => {
       <Loader :size="36" />
     </template>
     <template #default="logs">
-      {{ logs }}
+      <graphs :logs="logs" />
     </template>
     <template #rejected="error">
       <PromisedError :content="error" @reload="_onLoad" />

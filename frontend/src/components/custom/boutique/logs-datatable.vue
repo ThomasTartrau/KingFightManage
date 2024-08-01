@@ -60,7 +60,7 @@ const columns: ColumnDef<Log>[] = [
       return h(
         "div",
         { class: "capitalize" },
-        dateConverter.timestampToDate(row.getValue("created_at"))
+        dateConverter.timestampToDateString(row.getValue("created_at"))
       );
     },
   },
