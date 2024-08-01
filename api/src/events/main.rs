@@ -10,7 +10,7 @@ use sqlx::{query, query_as};
 use uuid::Uuid;
 use validator::Validate;
 
-use crate::auth::iam::{authorize_only_user, Action};
+use crate::auth::iam::{authorize, authorize_only_user, Action};
 use crate::utils::{openapi::OaBiscuitUserAccess, problems::MyProblem};
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
@@ -59,7 +59,7 @@ pub async fn ingest_event(
 ) -> Result<NoContent, MyProblem> {
     let body = body.into_inner();
     
-    if let Ok(_token) = authorize_only_user(&biscuit, Action::EventsIngest) {
+    if authorize(&biscuit, Action::EventsIngest).is_err() {
         let is_ingested = query!(
             "INSERT INTO events.event (event_type, event_data) VALUES ($1, $2) RETURNING event__id",
             body.event_type,
@@ -92,7 +92,7 @@ pub async fn get_events(
     _: OaBiscuitUserAccess,
     biscuit: ReqData<Biscuit>,
 ) -> Result<CreatedJson<GetEventsResponse>, MyProblem> {
-    if let Ok(_token) = authorize_only_user(&biscuit, Action::EventsGetAll) {
+    if authorize(&biscuit, Action::EventsGetAll).is_err() {
        
         let events = query_as!(Event, "SELECT event__id AS event_id, event_type, event_data, created_at, dispatched_at, status FROM events.event WHERE status = 'pending' AND dispatched_at IS NULL ORDER BY created_at ASC")
             .fetch_all(&state.db)

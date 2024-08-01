@@ -1,14 +1,15 @@
 use actix_web::web::ReqData;
 use biscuit_auth::Biscuit;
 use chrono::{DateTime, Utc};
-use log::{debug};
+use log::debug;
 use paperclip::actix::web::{Data, Json, Path};
 use paperclip::actix::{api_v2_operation, Apiv2Schema, CreatedJson, NoContent};
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as};
 use uuid::Uuid;
 
-use crate::{auth::auth::UserLookup, auth::iam::{authorize_only_user, create_registration_token, Action, Role}, utils::{openapi::OaBiscuitUserAccess, problems::MyProblem}};
+use crate::auth::iam::{authorize, AuthorizedToken};
+use crate::{auth::auth::UserLookup, auth::iam::{create_registration_token, Action, Role}, utils::{openapi::OaBiscuitUserAccess, problems::MyProblem}};
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct GenerateRegistrationTokenResponse {
@@ -66,7 +67,7 @@ pub async fn generate_registration_token(
     biscuit: ReqData<Biscuit>,
 ) -> Result<CreatedJson<GenerateRegistrationTokenResponse>, MyProblem> {
 
-    if let Ok(_token) = authorize_only_user(&biscuit, Action::StaffsGenerateRegistrationToken) {
+    if authorize(&biscuit, Action::StaffsGenerateRegistrationToken).is_err() {
         let token = create_registration_token(&state.biscuit_private_key).map_err(|e| {
             debug!("{e}");
             MyProblem::Forbidden
@@ -94,7 +95,7 @@ pub async fn get_staffs(
     biscuit: ReqData<Biscuit>,
 ) -> Result<CreatedJson<GetUsersResponse>, MyProblem> {
 
-    if let Ok(_token) = authorize_only_user(&biscuit, Action::StaffsGetUsers) {
+    if authorize(&biscuit, Action::StaffsGetUsers).is_err() {
         let users = query_as!(
             User,
             "SELECT iam.user.user__id as user_id, username, role, players.is_logged_in(players.player.player__id) as is_online
@@ -131,16 +132,19 @@ pub async fn set_role(
 
     let body = body.into_inner();
     
-    if let Ok(token) = authorize_only_user(&biscuit, Action::StaffsSetRank) {
+    if let Ok(token) = authorize(&biscuit, Action::StaffsSetRank) {
 
-        let roles = Role::values();
-        if !roles.contains(&body.role) {
-            return Err(MyProblem::BadRequest);
-        }
+        if let AuthorizedToken::User(user) = token {
+            let roles = Role::values();
+            if !roles.contains(&body.role) {
+                return Err(MyProblem::BadRequest);
+            }
 
-        if Role::to_role(&body.role).get_order() >= Role::to_role(&token.role).get_order() {
-            return Err(MyProblem::Forbidden);
+            if Role::to_role(&body.role).get_order() >= Role::to_role(&user.role).get_order() {
+                return Err(MyProblem::Forbidden);
+            }
         }
+        
 
         let mut tx = state.db.begin().await?;
     
@@ -201,7 +205,7 @@ pub async fn delete_user(
 ) -> Result<NoContent, MyProblem> {
     let user_id = user_id.into_inner();
 
-    if let Ok(token) = authorize_only_user(&biscuit, Action::StaffsDeleteUser) {
+    if let Ok(token) = authorize(&biscuit, Action::StaffsDeleteUser) {
         let user_lookup = query_as!(
             UserLookup,
             "
@@ -219,8 +223,10 @@ pub async fn delete_user(
         })?;
 
         if let Some(user) = user_lookup {
-            if Role::to_role(&user.role).get_order() >= Role::to_role(&token.role).get_order() {
-                return Err(MyProblem::Forbidden);
+            if let AuthorizedToken::User(token_user) = token {
+                if Role::to_role(&user.role).get_order() >= Role::to_role(&token_user.role).get_order() {
+                    return Err(MyProblem::Forbidden);
+                }
             }
 
             let delete_user = query!(
@@ -275,7 +281,7 @@ pub async fn get_logs(
     _: OaBiscuitUserAccess,
     biscuit: ReqData<Biscuit>,
 ) -> Result<CreatedJson<GetLogsResponse>, MyProblem> {
-    if let Ok(_token) = authorize_only_user(&biscuit, Action::StaffsGetLogs) {
+    if authorize(&biscuit, Action::StaffsGetLogs).is_err() {
         let logs = query_as!(
             Log,
             "SELECT staff_log__id as log_id, username, action, created_at FROM logs.staffs",

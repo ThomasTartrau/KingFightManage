@@ -6,7 +6,7 @@ import type { components } from "@/types";
 type definitions = components["schemas"];
 type Log = definitions["Log"];
 type PbLog = definitions["PbLog"];
-type GetBoutiqueLogsResponse = definitions["GetBoutiqueLogsResponse"];
+type BoutiqueGetLogsResponse = definitions["BoutiqueGetLogsResponse"];
 type GetPbLogsResponse = definitions["GetPbLogsResponse"];
 
 export type Logs = Log[];
@@ -14,7 +14,7 @@ export type PbLogs = PbLog[];
 
 export async function getLogs(): Promise<Logs> {
   const res = await http.get("/logs/boutique").then(
-    (res: AxiosResponse<GetBoutiqueLogsResponse>) => {
+    (res: AxiosResponse<BoutiqueGetLogsResponse>) => {
       return res.data;
     },
     (err: AxiosError<AxiosResponse<Problem>>) =>

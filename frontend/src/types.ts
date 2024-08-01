@@ -67,7 +67,7 @@ export interface components {
         },
       ];
     };
-    GetBoutiqueLogsResponse: {
+    BoutiqueGetLogsResponse: {
       logs: [
         {
           log_id: UUID;

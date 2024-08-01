@@ -18,6 +18,7 @@ mod user_settings;
 mod events;
 mod staffs;
 mod boutique;
+mod service_access;
 
 const APP_TITLE: &str = "KingFightManage";
 const WEBAPP_INDEX_FILE: &str = "index.html";
@@ -328,6 +329,16 @@ async fn main() -> anyhow::Result<()> {
                                     .wrap(biscuit_auth.clone())
                                     .route("", web::post().to(events::main::ingest_event))
                                     .route("", web::get().to(events::main::get_events)),
+                                )
+                                .service(
+                                    web::scope("/service-access")
+                                    .service(
+                                        web::resource("/{token_id}")
+                                        .wrap(biscuit_auth.clone())
+                                        .route(web::delete().to(service_access::main::delete_service_access))
+                                    )
+                                    .wrap(biscuit_auth.clone())
+                                    .route("", web::post().to(service_access::main::create_service_access))
                                 )
                                 
                         )

@@ -27,7 +27,7 @@ create table iam.token (
     biscuit text,
     user__id uuid ,
     session_id uuid,
-    constraint token_type_chk check (type in ('user_access', 'refresh')),
+    constraint token_type_chk check (type in ('user_access', 'refresh', 'service_access')),
     constraint token_user__id_fk foreign key (user__id) references iam.user (user__id) on delete cascade on update cascade,
     constraint token_user__id_chk check (type not in ('user_access', 'refresh') or user__id is not null),
     constraint token_session_id_chk check (type not in ('user_access', 'refresh') or session_id is not null)

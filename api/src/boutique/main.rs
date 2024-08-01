@@ -8,7 +8,8 @@ use serde::{Deserialize, Serialize};
 use sqlx::query_as;
 use uuid::Uuid;
 
-use crate::{auth::iam::{authorize_only_user, Action}, utils::{openapi::OaBiscuitUserAccess, problems::MyProblem}};
+use crate::auth::iam::authorize;
+use crate::{auth::iam::Action, utils::{openapi::OaBiscuitUserAccess, problems::MyProblem}};
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct Log {
@@ -50,7 +51,7 @@ pub async fn get_logs(
     _: OaBiscuitUserAccess,
     biscuit: ReqData<Biscuit>,
 ) -> Result<CreatedJson<GetLogsResponse>, MyProblem> {
-    if let Ok(_token) = authorize_only_user(&biscuit, Action::GetBoutiqueLogs) {
+    if authorize(&biscuit, Action::BoutiqueGetLogs).is_err() {
         let logs = query_as!(
             Log,
             "SELECT boutique_log__id as log_id, username, action, created_at FROM logs.boutique",
@@ -83,7 +84,7 @@ pub async fn get_pb_logs(
     _: OaBiscuitUserAccess,
     biscuit: ReqData<Biscuit>,
 ) -> Result<CreatedJson<GetPbLogsResponse>, MyProblem> {
-    if let Ok(_token) = authorize_only_user(&biscuit, Action::GetBoutiquePbLogs) {
+    if authorize(&biscuit, Action::BoutiqueGetPbLogs).is_err() {
         let logs = query_as!(
             PbLog,
             "SELECT pb_log__id as log_id, username, action, amount, created_at FROM logs.pb",

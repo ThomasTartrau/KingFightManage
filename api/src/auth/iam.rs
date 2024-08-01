@@ -18,6 +18,7 @@ pub struct RootToken {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AuthorizedToken {
     User(AuthorizedUserToken),
+    Service,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -128,8 +129,10 @@ pub enum Action {
     EventsSendMessage,
     EventsIngest,
     EventsGetAll,
-    GetBoutiqueLogs,
-    GetBoutiquePbLogs,
+    BoutiqueGetLogs,
+    BoutiqueGetPbLogs,
+    ServiceAccessCreateServiceAccess,
+    ServiceAccessDeleteServiceAccess,
 }
 
 impl<'a> Action {
@@ -148,8 +151,10 @@ impl<'a> Action {
             Action::EventsSendMessage => "users-management:send-message",
             Action::EventsIngest => "events:ingest",
             Action::EventsGetAll => "events:get_all",
-            Action::GetBoutiqueLogs => "boutique:get-logs",
-            Action::GetBoutiquePbLogs => "boutique:get-pb-logs",
+            Action::BoutiqueGetLogs => "boutique:get-logs",
+            Action::BoutiqueGetPbLogs => "boutique:get-pb-logs",
+            Action::ServiceAccessCreateServiceAccess => "service-access:create-service-access",
+            Action::ServiceAccessDeleteServiceAccess => "service-access:delete-service-access",
         }
     }
 
@@ -171,8 +176,10 @@ impl<'a> Action {
             Self::EventsSendMessage => all_roles,
             Self::EventsIngest => vec![],
             Self::EventsGetAll => vec![],
-            Self::GetBoutiqueLogs => vec![],
-            Self::GetBoutiquePbLogs => vec![],
+            Self::BoutiqueGetLogs => vec![],
+            Self::BoutiqueGetPbLogs => vec![],
+            Self::ServiceAccessCreateServiceAccess => vec![],
+            Self::ServiceAccessDeleteServiceAccess => vec![],
         };
 
         roles.append(&mut per_action_roles);
@@ -194,8 +201,10 @@ impl<'a> Action {
             Self::EventsSendMessage => vec![],
             Self::EventsIngest => vec![],
             Self::EventsGetAll => vec![],
-            Self::GetBoutiqueLogs => vec![],
-            Self::GetBoutiquePbLogs => vec![],
+            Self::BoutiqueGetLogs => vec![],
+            Self::BoutiqueGetPbLogs => vec![],
+            Self::ServiceAccessCreateServiceAccess => vec![],
+            Self::ServiceAccessDeleteServiceAccess => vec![],
         };
 
         facts.push(fact!("action({action})", action = self.action_name()));
@@ -449,11 +458,12 @@ pub fn authorize(
 
     let mut authorizer = authorizer!(
         r#"
-            valid_types(["user_access"]);
+            valid_types(["user_access", "service_access"]);
             valid_type($t) <- type($t), valid_types($vt), $vt.contains($t);
             check if valid_type($t);
 
             supported_version("user_access", 1);
+            supported_version("service_access", 1);
             valid_version($t, $v) <- type($t), version($v), supported_version($t, $v);
             check if valid_version($t, $v);
 
@@ -530,7 +540,10 @@ pub fn authorize(
                 username,
                 role,
             }))
-        },
+        }
+        "service_access" => {
+            Ok(AuthorizedToken::Service)
+        }
         _ => {
             error!("Invalid token type: {}", token_type);
             Err(biscuit_auth::error::Token::InternalError)
@@ -697,4 +710,37 @@ pub fn authorize_registration(
     result?;
 
     Ok(())
+}
+
+const SERVICE_ACCESS_TOKEN_VERSION: i64 = 1;
+
+pub fn create_service_access_token(
+    private_key: &PrivateKey,
+    token_id: Uuid,
+) -> Result<RootToken, biscuit_auth::error::Token> {
+    let keypair = KeyPair::from(private_key);
+    let created_at = SystemTime::now();
+
+    let biscuit = biscuit!(
+        r#"
+            type("service_access");
+            version({SERVICE_ACCESS_TOKEN_VERSION});
+            token_id({token_id});
+            created_at({created_at});
+        "#,
+    )
+    .build(&keypair)?;
+    let serialized_biscuit = biscuit.to_base64()?;
+    let revocation_id = biscuit
+        .revocation_identifiers()
+        .first()
+        .map(|rid| rid.to_owned())
+        .ok_or(biscuit_auth::error::Token::InternalError)?;
+
+    Ok(RootToken {
+        biscuit,
+        serialized_biscuit,
+        revocation_id,
+        expired_at: None,
+    })
 }
