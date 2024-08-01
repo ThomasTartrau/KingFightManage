@@ -6,9 +6,9 @@ import {
   getPaginationRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
-import { h, reactive, ref } from "vue";
+import { h, onMounted, reactive, ref } from "vue";
 
-import { Search } from "lucide-vue-next";
+import { KeyRound } from "lucide-vue-next";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -22,6 +22,10 @@ import DropdownAction from "@/components/custom/staffs/dropdown-action.vue";
 import OnlineIcons from "@/components/custom/staffs/online_icons.vue";
 import type { components } from "@/types";
 import { Input } from "@/components/ui/input";
+import { generateRegistrationToken } from "./StaffsService";
+import { getRole } from "@/iam";
+import type { Roles } from "@/utils/perms";
+import perms, { Actions } from "@/utils/perms";
 
 type definitions = components["schemas"];
 type User = definitions["User"];
@@ -35,6 +39,12 @@ const datas = ref<User[]>(props.data || []);
 
 function emitRefresh() {
   emit("refreshDatatable");
+}
+
+const role = ref<null | Roles>();
+
+async function handleGenerateRegistrationToken() {
+  await generateRegistrationToken();
 }
 
 const columns: ColumnDef<User>[] = [
@@ -99,23 +109,37 @@ const tableOptions = reactive<TableOptions<User>>({
 });
 
 const table = useVueTable(tableOptions);
+
+function _onLoad() {
+  role.value = getRole().value;
+}
+
+onMounted(_onLoad);
 </script>
 
 <template>
   <div class="w-full">
-    <div class="relative w-full max-w-sm items-center mb-8">
+    <div class="flex justify-between items-center mb-8">
       <Input
         id="search"
         type="text"
         placeholder="Rechercher un utilisateur"
-        class="pl-10"
+        class="relative w-full max-w-sm items-center"
         @input="onSearch($event.target.value)"
       />
-      <span
-        class="absolute start-0 inset-y-0 flex items-center justify-center px-2"
+      <Button
+        v-if="
+          role &&
+          perms.hasPermission(role, Actions.StaffsGenerateRegistrationToken)
+        "
+        type="button"
+        @click="handleGenerateRegistrationToken"
       >
-        <Search class="size-6 text-muted-foreground" />
-      </span>
+        Générer un token
+        <span class="ml-2">
+          <KeyRound class="size-4" />
+        </span>
+      </Button>
     </div>
     <div class="rounded-md border">
       <Table>

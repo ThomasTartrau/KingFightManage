@@ -11,6 +11,7 @@ export enum Actions {
   StaffsDeleteUser,
   StaffsSendMessage,
   StaffsGetLogs,
+  StaffsGenerateRegistrationToken,
 
   SidebarStaffs,
   SidebarLogsStaffs,
@@ -30,6 +31,7 @@ const allowed = {
   [Actions.StaffsDeleteUser]: HeadRoles,
   [Actions.StaffsSendMessage]: AllRoles,
   [Actions.StaffsGetLogs]: AllRoles,
+  [Actions.StaffsGenerateRegistrationToken]: HeadRoles,
 
   [Actions.SidebarStaffs]: AllRoles,
   [Actions.SidebarLogsStaffs]: AllRoles,
