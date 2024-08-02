@@ -43,10 +43,12 @@ function _onLoad() {
   // Donuts
   donutsData.value = donuts.getDonutsData(props.logs, actualDate);
   mensualyPbBuys.value = donuts.getMensualyPbBuys(props.logs, actualDate);
-  monthlyObjectivePercentage.value = donuts.getMonthlyObjectivePercentage(
+  const tempMonthlyObjectivePercentage = donuts.getMonthlyObjectivePercentage(
     mensualyPbBuys.value,
     props.logs.objective
   );
+  monthlyObjectivePercentage.value =
+    tempMonthlyObjectivePercentage > 100 ? 100 : tempMonthlyObjectivePercentage;
 
   // Area
   areaData.value = line.getLineData(props.logs.pbLogs, period.value);

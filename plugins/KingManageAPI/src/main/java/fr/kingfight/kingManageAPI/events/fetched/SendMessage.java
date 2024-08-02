@@ -18,6 +18,7 @@ public class SendMessage {
 
     public void dispatch() {
         Player player = Bukkit.getPlayer(target);
+        System.out.println(message);
         if (player == null) return;
         player.sendMessage(message.replace("{sender}", sender));
     }

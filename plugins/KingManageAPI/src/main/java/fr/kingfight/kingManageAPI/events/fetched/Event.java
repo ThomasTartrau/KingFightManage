@@ -1,5 +1,6 @@
 package fr.kingfight.kingManageAPI.events.fetched;
 
+import fr.kingfight.kingManageAPI.KingManageAPI;
 import fr.kingfight.kingManageAPI.utils.Helpers;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -7,6 +8,8 @@ import org.json.simple.parser.JSONParser;
 import java.util.UUID;
 
 public class Event {
+    private KingManageAPI instance = KingManageAPI.getInstance();
+
     private UUID event_id;
     private String event_type;
     private JSONObject event_data;
@@ -29,7 +32,7 @@ public class Event {
                         Helpers.sendAPIErrorMessage(new Exception("Missing required fields in send_message event"));
                         return;
                     }
-                    new SendMessage(sender, target, message).dispatch();
+                    new SendMessage(sender, target, instance.getConfig().getString("messages.events.fetched.send_message").replace("{message}", message)).dispatch();
                 } catch (Exception e) {
                     Helpers.sendAPIErrorMessage(new Exception("Error dispatching send_message event: " + e.getMessage()));
                 }

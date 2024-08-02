@@ -100,7 +100,7 @@ pub async fn get_staffs(
     } else {
         let users = query_as!(
             User,
-            "SELECT iam.user.user__id as user_id, username, role, players.is_logged_in(players.player.player__id) as is_online
+            "SELECT players.player.player__id as user_id, username, role, players.is_logged_in(players.player.player__id) as is_online
             FROM iam.user
             JOIN players.player ON iam.user.username = players.player.name;"
         )

@@ -15,7 +15,7 @@ function getPerDayPbBuys(pbLogs: PbLogs): { date: string; total: number }[] {
     perDayPbBuys.push({ date: day, total: amount });
   });
 
-  return perDayPbBuys;
+  return dateConverter.sortByDayString(perDayPbBuys);
 }
 
 function getPerWeekPbBuys(pbLogs: PbLogs): { date: string; total: number }[] {
@@ -32,7 +32,7 @@ function getPerWeekPbBuys(pbLogs: PbLogs): { date: string; total: number }[] {
     perWeekPbBuys.push({ date: week, total: amount });
   });
 
-  return perWeekPbBuys;
+  return dateConverter.sortByWeekString(perWeekPbBuys);
 }
 
 function getPerMonthPbBuys(pbLogs: PbLogs): { date: string; total: number }[] {
@@ -49,7 +49,7 @@ function getPerMonthPbBuys(pbLogs: PbLogs): { date: string; total: number }[] {
     perMonthPbBuys.push({ date: month, total: amount });
   });
 
-  return perMonthPbBuys;
+  return dateConverter.sortByMonthString(perMonthPbBuys);
 }
 
 function getLineData(
