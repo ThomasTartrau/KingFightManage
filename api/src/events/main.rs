@@ -60,6 +60,8 @@ pub async fn ingest_event(
     let body = body.into_inner();
     
     if authorize(&biscuit, Action::EventsIngest).is_err() {
+        Err(MyProblem::Forbidden)
+    } else {
         let is_ingested = query!(
             "INSERT INTO events.event (event_type, event_data) VALUES ($1, $2) RETURNING event__id",
             body.event_type,
@@ -74,8 +76,6 @@ pub async fn ingest_event(
         } else {
             Err(MyProblem::NotFound)
         }
-    } else {
-        Err(MyProblem::Forbidden)
     }
 
 }
@@ -93,7 +93,8 @@ pub async fn get_events(
     biscuit: ReqData<Biscuit>,
 ) -> Result<CreatedJson<GetEventsResponse>, MyProblem> {
     if authorize(&biscuit, Action::EventsGetAll).is_err() {
-       
+        Err(MyProblem::Forbidden)
+    } else {
         let events = query_as!(Event, "SELECT event__id AS event_id, event_type, event_data, created_at, dispatched_at, status FROM events.event WHERE status = 'pending' AND dispatched_at IS NULL ORDER BY created_at ASC")
             .fetch_all(&state.db)
             .await
@@ -114,8 +115,6 @@ pub async fn get_events(
         }
 
         Ok(CreatedJson(GetEventsResponse { events }))
-    } else {
-        Err(MyProblem::Forbidden)
     }
 }
 

@@ -90,5 +90,21 @@ export interface components {
         },
       ];
     };
+    ServiceAccess: {
+      token_id: UUID;
+      biscuit: string;
+      /** Format: date-time */
+      created_at: string;
+    };
+    GetServiceAccessResponse: {
+      service_access: [
+        {
+          token_id: UUID;
+          biscuit: string;
+          /** Format: date-time */
+          created_at: string;
+        },
+      ];
+    };
   };
 }

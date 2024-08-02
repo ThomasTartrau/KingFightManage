@@ -52,6 +52,8 @@ pub async fn get_logs(
     biscuit: ReqData<Biscuit>,
 ) -> Result<CreatedJson<GetLogsResponse>, MyProblem> {
     if authorize(&biscuit, Action::BoutiqueGetLogs).is_err() {
+        Err(MyProblem::Forbidden)
+    } else {
         let logs = query_as!(
             Log,
             "SELECT boutique_log__id as log_id, username, action, created_at FROM logs.boutique",
@@ -66,8 +68,6 @@ pub async fn get_logs(
         trace!("logs: {logs:?}");
 
         Ok(CreatedJson(GetLogsResponse { logs }))
-    } else {
-        Err(MyProblem::Forbidden)
     }
 }
 
@@ -85,6 +85,8 @@ pub async fn get_pb_logs(
     biscuit: ReqData<Biscuit>,
 ) -> Result<CreatedJson<GetPbLogsResponse>, MyProblem> {
     if authorize(&biscuit, Action::BoutiqueGetPbLogs).is_err() {
+        Err(MyProblem::Forbidden)
+    } else {
         let logs = query_as!(
             PbLog,
             "SELECT pb_log__id as log_id, username, action, amount, created_at FROM logs.pb",
@@ -97,7 +99,5 @@ pub async fn get_pb_logs(
         })?;
 
         Ok(CreatedJson(GetPbLogsResponse { logs }))
-    } else {
-        Err(MyProblem::Forbidden)
     }
 }

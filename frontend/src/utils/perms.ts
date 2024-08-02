@@ -12,6 +12,7 @@ export enum Actions {
   StaffsSendMessage,
   StaffsGetLogs,
   StaffsGenerateRegistrationToken,
+  StaffsGenerateServiceAccessToken,
 
   SidebarStaffs,
   SidebarLogsStaffs,
@@ -21,6 +22,7 @@ export enum Actions {
 
   SidebarCategoryAdmin,
   SidebarCategoryBoutique,
+  SidebarServiceAccess,
 }
 
 const HeadRoles = [Roles.ADMINISTRATEUR, Roles.DEVELOPPEUR, Roles.RESPONSABLE];
@@ -41,6 +43,8 @@ const allowed = {
 
   [Actions.SidebarCategoryAdmin]: AllRoles,
   [Actions.SidebarCategoryBoutique]: [Roles.ADMINISTRATEUR],
+  [Actions.SidebarServiceAccess]: [Roles.ADMINISTRATEUR],
+  [Actions.StaffsGenerateServiceAccessToken]: [Roles.ADMINISTRATEUR],
 };
 
 function getRole(roleName: string): Roles {

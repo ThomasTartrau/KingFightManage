@@ -13,9 +13,14 @@ use crate::{auth::iam::Action, utils::{openapi::OaBiscuitUserAccess, problems::M
 
 #[derive(Debug, Serialize, Apiv2Schema)]
 pub struct ServiceToken {
-    pub token_id: Uuid,
-    pub biscuit: String,
-    pub created_at: DateTime<Utc>,
+    token_id: Uuid,
+    biscuit: String,
+    created_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Serialize, Apiv2Schema)]
+pub struct ServiceTokenResponse {
+    service_access: Vec<ServiceToken>,
 }
 
 #[api_v2_operation(
@@ -32,8 +37,11 @@ pub async fn create_service_access(
     biscuit: ReqData<Biscuit>,
 ) -> Result<CreatedJson<ServiceToken>, MyProblem> {
     if authorize(&biscuit, Action::ServiceAccessCreateServiceAccess).is_err() {
-        let token_id = Uuid::new_v4();
-        match create_service_access_token(&state.biscuit_private_key, token_id) {
+        return Err(MyProblem::Forbidden);
+    }
+
+    let token_id = Uuid::new_v4();
+    match create_service_access_token(&state.biscuit_private_key, token_id) {
             Ok(RootToken {
                 serialized_biscuit,
                 revocation_id,
@@ -58,10 +66,7 @@ pub async fn create_service_access(
             Err(e) => {
                 error!("Could not create a Biscuit (service access token): {e}");
                 Err(MyProblem::InternalServerError)
-            }
         }
-    } else {
-        Err(MyProblem::Forbidden)
     }
 }
 
@@ -124,4 +129,44 @@ pub async fn delete_service_access(
         }
         None => Err(MyProblem::NotFound),
     }
+}
+
+#[api_v2_operation(
+    summary = "Get service access",
+    description = "",
+    operation_id = "service-access.get-service-access",
+    consumes = "application/json",
+    produces = "application/json",
+    tags("Service Access")
+)]
+pub async fn get_service_access(
+    state: Data<crate::State>,
+    _: OaBiscuitUserAccess,
+    biscuit: ReqData<Biscuit>,
+) -> Result<CreatedJson<ServiceTokenResponse>, MyProblem> {
+    if authorize(
+        &biscuit,
+        Action::ServiceAccessGetServiceAccess
+    )
+    .is_err()
+    {
+        return Err(MyProblem::Forbidden);
+    }
+
+    let service_access = query_as!(
+        ServiceToken,
+        r#"
+            SELECT token__id AS token_id, biscuit AS "biscuit!", created_at
+            FROM iam.token
+            WHERE type = 'service_access'
+                AND (expired_at IS NULL OR expired_at > statement_timestamp())
+        "#,
+    )
+    .fetch_all(&state.db)
+    .await
+    .map_err(MyProblem::from)?;
+
+    Ok(CreatedJson(ServiceTokenResponse {
+        service_access,
+    }))
 }

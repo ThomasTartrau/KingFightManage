@@ -6,11 +6,15 @@ import type { components } from "@/types";
 type definitions = components["schemas"];
 type User = definitions["User"];
 type Log = definitions["Log"];
+type ServiceAccess = definitions["ServiceAccess"];
+
 type GetStaffsResponse = definitions["GetStaffsResponse"];
 type GetStaffLogsResponse = definitions["GetStaffLogsResponse"];
+type GetServiceAccessResponse = definitions["GetServiceAccessResponse"];
 
 export type Staffs = User[];
 export type Logs = Log[];
+export type ServicesAccess = ServiceAccess[];
 
 export async function getStaffs(): Promise<Staffs> {
   const res = await http.get("/staffs").then(
@@ -34,4 +38,26 @@ export async function getLogs(): Promise<Logs> {
   );
 
   return res.logs;
+}
+
+export async function createServiceAccess(): Promise<void> {
+  const res = await http.post("/service-access").then(
+    (res: AxiosResponse<void>) => {
+      return res.data;
+    },
+    (err: AxiosError<AxiosResponse<Problem>>) =>
+      Promise.reject(handleError(err))
+  );
+}
+
+export async function getServiceAccess(): Promise<ServicesAccess> {
+  const res = await http.get("/service-access").then(
+    (res: AxiosResponse<GetServiceAccessResponse>) => {
+      return res.data;
+    },
+    (err: AxiosError<AxiosResponse<Problem>>) =>
+      Promise.reject(handleError(err))
+  );
+
+  return res.service_access;
 }

@@ -1,7 +1,7 @@
 use std::time::{Duration, SystemTime};
 use biscuit_auth::{builder::Fact, builder_ext::AuthorizerExt, error, macros::*, AuthorizerLimits, Biscuit, KeyPair, PrivateKey};
 use chrono::{DateTime, Utc};
-use log::{error, trace};
+use log::{error, trace, warn};
 use paperclip::v2::schema::TypedData;
 use serde::Serialize;
 use strum::{AsRefStr, EnumIter, EnumString, IntoEnumIterator, VariantNames};
@@ -133,6 +133,7 @@ pub enum Action {
     BoutiqueGetPbLogs,
     ServiceAccessCreateServiceAccess,
     ServiceAccessDeleteServiceAccess,
+    ServiceAccessGetServiceAccess,
 }
 
 impl<'a> Action {
@@ -155,6 +156,7 @@ impl<'a> Action {
             Action::BoutiqueGetPbLogs => "boutique:get-pb-logs",
             Action::ServiceAccessCreateServiceAccess => "service-access:create-service-access",
             Action::ServiceAccessDeleteServiceAccess => "service-access:delete-service-access",
+            Action::ServiceAccessGetServiceAccess => "service-access:get-service-access",
         }
     }
 
@@ -180,6 +182,7 @@ impl<'a> Action {
             Self::BoutiqueGetPbLogs => vec![],
             Self::ServiceAccessCreateServiceAccess => vec![],
             Self::ServiceAccessDeleteServiceAccess => vec![],
+            Self::ServiceAccessGetServiceAccess => vec![],
         };
 
         roles.append(&mut per_action_roles);
@@ -205,6 +208,7 @@ impl<'a> Action {
             Self::BoutiqueGetPbLogs => vec![],
             Self::ServiceAccessCreateServiceAccess => vec![],
             Self::ServiceAccessDeleteServiceAccess => vec![],
+            Self::ServiceAccessGetServiceAccess => vec![],
         };
 
         facts.push(fact!("action({action})", action = self.action_name()));
@@ -489,6 +493,7 @@ pub fn authorize(
     });
     authorizer.add_token(biscuit)?;
     let result = authorizer.authorize();
+    warn!("Authorizer state:\n{}", authorizer.print_world());
     trace!("Authorizer state:\n{}", authorizer.print_world());
     result?;
 

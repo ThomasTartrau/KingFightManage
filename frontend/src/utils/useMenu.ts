@@ -7,6 +7,7 @@ import {
   LayoutGrid,
   LineChart,
   Shield,
+  Skull,
 } from "lucide-vue-next";
 import { Actions } from "./perms";
 import type { Group } from "@/lib/menu";
@@ -121,6 +122,16 @@ function _useMenu() {
             ),
             action: Actions.SidebarLogsStaffs,
             icon: Book,
+            submenus: [],
+          },
+          {
+            route: "ServiceAccess",
+            label: "Service Access",
+            active: currentRoute.value.fullPath.includes(
+              useRoute("ServiceAccess")
+            ),
+            action: Actions.SidebarServiceAccess,
+            icon: Skull,
             submenus: [],
           },
         ],

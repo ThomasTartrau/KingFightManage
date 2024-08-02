@@ -6,9 +6,9 @@ import {
   getPaginationRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
-import { h, reactive, ref } from "vue";
+import { h, onMounted, reactive, ref } from "vue";
 
-import { Search } from "lucide-vue-next";
+import { KeyRound } from "lucide-vue-next";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -20,62 +20,72 @@ import {
 } from "@/components/ui/table";
 import type { components } from "@/types";
 import { Input } from "@/components/ui/input";
-import dateConverter from "@/utils/dateConverter";
+import { getRole } from "@/iam";
+import type { Roles } from "@/utils/perms";
+import perms, { Actions } from "@/utils/perms";
+import { createServiceAccess } from "@/pages/staffs/StaffsService";
+import { displayProblem } from "@/http";
 
 type definitions = components["schemas"];
-type Log = definitions["Log"];
+type ServiceAccess = definitions["ServiceAccess"];
 
 const props = defineProps<{
-  data: Log[];
+  data: ServiceAccess[];
 }>();
-const emitRefresh = defineEmits(["refreshDatatable"]);
+const emit = defineEmits(["refreshDatatable"]);
 
-const datas = ref<Log[]>(props.data || []);
+const datas = ref<ServiceAccess[]>(props.data || []);
 
-const columns: ColumnDef<Log>[] = [
+function emitRefresh() {
+  emit("refreshDatatable");
+}
+
+const role = ref<null | Roles>();
+
+async function handleGenerateServiceAccessToken() {
+  await createServiceAccess()
+    .then((res) => {
+      console.log(res);
+    })
+    .catch(displayProblem);
+}
+
+const columns: ColumnDef<ServiceAccess>[] = [
   {
-    accessorKey: "log_id",
-    header: "Log ID",
+    accessorKey: "token_id",
+    header: "Token ID",
     cell: ({ row }) => {
-      return h("div", { class: "capitalize" }, row.getValue("log_id"));
-    },
-  },
-  {
-    accessorKey: "username",
-    header: "Username",
-    cell: ({ row }) =>
-      h("div", { class: "lowercase" }, row.getValue("username")),
-  },
-  {
-    accessorKey: "action",
-    header: "Action",
-    cell: ({ row }) => {
-      return h("div", { class: "capitalize" }, row.getValue("action"));
+      return h("div", { class: "capitalize" }, row.getValue("token_id"));
     },
   },
   {
     accessorKey: "created_at",
-    header: "Date",
+    header: "Date de création",
     cell: ({ row }) => {
-      return h(
-        "div",
-        { class: "capitalize" },
-        dateConverter.timestampToDateString(row.getValue("created_at"))
-      );
+      return h("div", { class: "capitalize" }, row.getValue("created_at"));
     },
   },
+  /* {
+    id: "actions",
+    enableHiding: false,
+    cell: ({ row }) => {
+      const user = row.original;
+
+      return h(DropdownAction, {
+        userId: user.user_id,
+        username: user.username,
+      });
+    },
+  }, */
 ];
 
-function onSearch(search: string) {
-  datas.value = props.data.filter(
-    (log) =>
-      log.log_id.toLowerCase().includes(search.toLowerCase()) ||
-      log.username.toLowerCase().includes(search.toLowerCase()) ||
-      log.action.toLowerCase().includes(search.toLowerCase())
+function onSearch(tokenId: string) {
+  datas.value = props.data.filter((serviceAccess) =>
+    serviceAccess.token_id.toLowerCase().includes(tokenId.toLowerCase())
   );
 }
 
-const tableOptions = reactive<TableOptions<Log>>({
+const tableOptions = reactive<TableOptions<ServiceAccess>>({
   get data() {
     return datas.value;
   },
@@ -83,30 +93,42 @@ const tableOptions = reactive<TableOptions<Log>>({
     return columns;
   },
   getCoreRowModel: getCoreRowModel(),
-  rowCount: datas.value.length,
   getPaginationRowModel: getPaginationRowModel(),
 });
 
 const table = useVueTable(tableOptions);
+
+function _onLoad() {
+  role.value = getRole().value;
+}
+
+onMounted(_onLoad);
 </script>
 
 <template>
   <div class="w-full">
-    <div class="relative w-full max-w-sm items-center mb-8">
+    <div class="flex justify-between items-center mb-8">
       <Input
         id="search"
         type="text"
-        placeholder="Rechercher un utilisateur / une action / une id de log"
-        class="pl-10"
+        placeholder="Rechercher un token (ID)"
+        class="relative w-full max-w-sm items-center"
         @input="onSearch($event.target.value)"
       />
-      <span
-        class="absolute start-0 inset-y-0 flex items-center justify-center px-2"
+      <Button
+        v-if="
+          role &&
+          perms.hasPermission(role, Actions.StaffsGenerateServiceAccessToken)
+        "
+        type="button"
+        @click="handleGenerateServiceAccessToken"
       >
-        <Search class="size-6 text-muted-foreground" />
-      </span>
+        Générer un token
+        <span class="ml-2">
+          <KeyRound class="size-4" />
+        </span>
+      </Button>
     </div>
-
     <div class="rounded-md border">
       <Table>
         <TableHeader>

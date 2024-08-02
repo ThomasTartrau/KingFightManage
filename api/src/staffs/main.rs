@@ -68,6 +68,8 @@ pub async fn generate_registration_token(
 ) -> Result<CreatedJson<GenerateRegistrationTokenResponse>, MyProblem> {
 
     if authorize(&biscuit, Action::StaffsGenerateRegistrationToken).is_err() {
+        Err(MyProblem::Forbidden)
+    } else {
         let token = create_registration_token(&state.biscuit_private_key).map_err(|e| {
             debug!("{e}");
             MyProblem::Forbidden
@@ -76,8 +78,6 @@ pub async fn generate_registration_token(
         Ok(CreatedJson(GenerateRegistrationTokenResponse {
             registration_token: token.serialized_biscuit,
         }))
-    } else {
-        Err(MyProblem::Forbidden)
     }
 }
 
@@ -96,6 +96,8 @@ pub async fn get_staffs(
 ) -> Result<CreatedJson<GetUsersResponse>, MyProblem> {
 
     if authorize(&biscuit, Action::StaffsGetUsers).is_err() {
+        Err(MyProblem::Forbidden)
+    } else {
         let users = query_as!(
             User,
             "SELECT iam.user.user__id as user_id, username, role, players.is_logged_in(players.player.player__id) as is_online
@@ -110,8 +112,6 @@ pub async fn get_staffs(
         })?;
 
         Ok(CreatedJson(GetUsersResponse { users }))
-    } else {
-        Err(MyProblem::Forbidden)
     }
 }
 
@@ -282,6 +282,8 @@ pub async fn get_logs(
     biscuit: ReqData<Biscuit>,
 ) -> Result<CreatedJson<GetLogsResponse>, MyProblem> {
     if authorize(&biscuit, Action::StaffsGetLogs).is_err() {
+        Err(MyProblem::Forbidden)
+    } else {
         let logs = query_as!(
             Log,
             "SELECT staff_log__id as log_id, username, action, created_at FROM logs.staffs",
@@ -294,7 +296,5 @@ pub async fn get_logs(
         })?;
 
         Ok(CreatedJson(GetLogsResponse { logs }))
-    } else {
-        Err(MyProblem::Forbidden)
     }
 }

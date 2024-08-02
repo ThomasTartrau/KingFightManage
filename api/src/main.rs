@@ -339,6 +339,7 @@ async fn main() -> anyhow::Result<()> {
                                     )
                                     .wrap(biscuit_auth.clone())
                                     .route("", web::post().to(service_access::main::create_service_access))
+                                    .route("", web::get().to(service_access::main::get_service_access))
                                 )
                                 
                         )

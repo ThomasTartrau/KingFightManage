@@ -11,6 +11,7 @@ import LogsStaffs from "@/pages/staffs/LogsStaffs.vue";
 import LogsBoutique from "@/pages/boutique/LogsBoutique.vue";
 import LogsBoutiquePb from "@/pages/boutique/LogsBoutiquePb.vue";
 import BoutiqueGraphs from "@/pages/boutique/BoutiqueGraphs.vue";
+import ServiceAccess from "@/pages/staffs/ServiceAccess.vue";
 
 export type TemplateRoutes = string;
 
@@ -33,6 +34,7 @@ export const routes: Record<TemplateRoutes, string> = {
 
   Staffs: "Staffs",
   LogsStaffs: "LogsStaffs",
+  ServiceAccess: "ServiceAccess",
 
   Error404: "Error404",
 };
@@ -119,6 +121,11 @@ export default [
     name: routes.LogsStaffs,
     path: "/staffs/logs",
     component: LogsStaffs,
+  },
+  {
+    name: routes.ServiceAccess,
+    path: "/service-access",
+    component: ServiceAccess,
   },
   {
     name: routes.BoutiqueGraphs,
