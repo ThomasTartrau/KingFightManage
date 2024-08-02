@@ -25,6 +25,8 @@ import type { Roles } from "@/utils/perms";
 import perms, { Actions } from "@/utils/perms";
 import { createServiceAccess } from "@/pages/staffs/StaffsService";
 import { displayProblem } from "@/http";
+import { push } from "notivue";
+import ServiceAccessDropdown from "./service-access-dropdown.vue";
 
 type definitions = components["schemas"];
 type ServiceAccess = definitions["ServiceAccess"];
@@ -44,8 +46,13 @@ const role = ref<null | Roles>();
 
 async function handleGenerateServiceAccessToken() {
   await createServiceAccess()
-    .then((res) => {
-      console.log(res);
+    .then(() => {
+      push.success({
+        title: "Token généré",
+        message:
+          "Le token a été généré avec succès. Vous pouvez désormais le copier",
+      });
+      emitRefresh();
     })
     .catch(displayProblem);
 }
@@ -65,18 +72,18 @@ const columns: ColumnDef<ServiceAccess>[] = [
       return h("div", { class: "capitalize" }, row.getValue("created_at"));
     },
   },
-  /* {
+  {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const user = row.original;
+      const token = row.original;
 
-      return h(DropdownAction, {
-        userId: user.user_id,
-        username: user.username,
+      return h(ServiceAccessDropdown, {
+        tokenId: token.token_id,
+        biscuit: token.biscuit,
       });
     },
-  }, */
+  },
 ];
 
 function onSearch(tokenId: string) {
@@ -116,10 +123,7 @@ onMounted(_onLoad);
         @input="onSearch($event.target.value)"
       />
       <Button
-        v-if="
-          role &&
-          perms.hasPermission(role, Actions.StaffsGenerateServiceAccessToken)
-        "
+        v-if="role && perms.hasPermission(role, Actions.ServiceAccessGenerate)"
         type="button"
         @click="handleGenerateServiceAccessToken"
       >

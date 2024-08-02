@@ -21,11 +21,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import CardDescription from "@/components/ui/card/CardDescription.vue";
 
 const actualDate = new Date();
 const props = defineProps<{
   logs: GraphsLogs;
 }>();
+const totalBuys = props.logs.pbLogs.reduce((acc, curr) => acc + curr.amount, 0);
 
 // Donuts
 const donutsData = ref<{ name: string; total: number }[]>([]);
@@ -33,11 +35,10 @@ const mensualyPbBuys = ref(0);
 const monthlyObjectivePercentage = ref(0);
 
 // Area
-const period = ref<"Journalier" | "Hebdomadaire" | "Mensuel">("Journalier");
-watch(period, () => {
-  areaData.value = line.getLineData(props.logs.pbLogs, period.value);
-});
+const period = ref<"journalier" | "hebdomadaire" | "mensuel">("journalier");
 const areaData = ref<{ date: string; total: number }[]>([]);
+const averageBuyInPeriod = ref(0);
+const buyInThisPeriod = ref(0);
 
 function _onLoad() {
   // Donuts
@@ -52,6 +53,14 @@ function _onLoad() {
 
   // Area
   areaData.value = line.getLineData(props.logs.pbLogs, period.value);
+  averageBuyInPeriod.value = line.getAverageBuyInPeriod(areaData.value);
+  buyInThisPeriod.value = line.buyInThisPeriod.value;
+
+  watch(period, () => {
+    areaData.value = line.getLineData(props.logs.pbLogs, period.value);
+    averageBuyInPeriod.value = line.getAverageBuyInPeriod(areaData.value);
+    buyInThisPeriod.value = line.buyInThisPeriod.value;
+  });
 }
 
 onMounted(_onLoad);
@@ -61,16 +70,17 @@ onMounted(_onLoad);
   <div class="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
     <Card class="shadow-2xl shadow-slate-900 xl:col-span-2">
       <CardHeader>
+        <CardDescription>Achats boutique</CardDescription>
         <CardTitle class="flex justify-between">
-          Achats {{ period }}
+          {{ totalBuys }} € récolté(s)
           <Select v-model="period">
             <SelectTrigger class="w-1/3">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Journalier">Journalier</SelectItem>
-              <SelectItem value="Hebdomadaire">Hebdomadaire</SelectItem>
-              <SelectItem value="Mensuel">Mensuel</SelectItem>
+              <SelectItem value="journalier">Journalier</SelectItem>
+              <SelectItem value="hebdomadaire">Hebdomadaire</SelectItem>
+              <SelectItem value="mensuel">Mensuel</SelectItem>
             </SelectContent>
           </Select>
         </CardTitle>
@@ -91,6 +101,22 @@ onMounted(_onLoad);
           "
         />
       </CardContent>
+      <CardFooter>
+        <div class="flex flex-col gap-4 w-full">
+          <Card class="dark:border-gray-500">
+            <CardHeader>
+              <CardDescription>En moyenne {{ period }}</CardDescription>
+              <CardTitle> {{ averageBuyInPeriod.toFixed(2) }} € </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <h2>
+                <span class="font-bold text-xl">{{ buyInThisPeriod }}</span
+                >€ récolté(s) durant cette période
+              </h2>
+            </CardContent>
+          </Card>
+        </div>
+      </CardFooter>
     </Card>
     <Card class="shadow-2xl shadow-slate-900">
       <CardHeader>
@@ -106,10 +132,14 @@ onMounted(_onLoad);
         />
       </CardContent>
       <CardFooter>
-        <div class="w-full flex flex-col items-center lg:mt-16">
-          <h2 class="mb-6">
-            {{ monthlyObjectivePercentage }}% atteint actuellement -
-            {{ dateConverter.monthDayLeft(actualDate) }} jours restants
+        <div class="w-full flex flex-col items-center lg:mt-32">
+          <h2 class="mb-6 text-2xl text-center">
+            <span class="font-medium">{{ monthlyObjectivePercentage }}%</span>
+            atteint actuellement -
+            <span class="font-medium">{{
+              dateConverter.monthDayLeft(actualDate)
+            }}</span>
+            jours restants
           </h2>
           <Progress v-model="monthlyObjectivePercentage" class="w-2/3" />
         </div>

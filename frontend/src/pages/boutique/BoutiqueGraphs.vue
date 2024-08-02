@@ -17,12 +17,10 @@ const graphsLogs$ = ref<Promise<GraphsLogs>>();
 
 async function get() {
   const boutiqueLogs = await getLogs().catch((problem) => {
-    console.log(problem);
     graphsLogs$.value = Promise.reject(problem);
   });
 
   const pbLogs = await getPbLogs().catch((problem) => {
-    console.log(problem);
     graphsLogs$.value = Promise.reject(problem);
   });
 

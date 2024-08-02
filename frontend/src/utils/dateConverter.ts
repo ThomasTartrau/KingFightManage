@@ -1,3 +1,18 @@
+const months = new Map([
+  ["Janvier", 1],
+  ["Février", 2],
+  ["Mars", 3],
+  ["Avril", 4],
+  ["Mai", 5],
+  ["Juin", 6],
+  ["Juillet", 7],
+  ["Août", 8],
+  ["Septembre", 9],
+  ["Octobre", 10],
+  ["Novembre", 11],
+  ["Décembre", 12],
+]);
+
 function timestampToDateString(timestamp: string): string {
   return new Date(timestamp).toLocaleDateString("fr-FR", {
     hour: "2-digit",
@@ -30,16 +45,11 @@ function getDayString(date: Date): string {
 }
 
 function getWeekString(date: Date): string {
-  const firstDayOfWeek = new Date(date.getFullYear(), 0, 1);
-  const pastDaysOfYear = (date.getTime() - firstDayOfWeek.getTime()) / 86400000;
-  const week = Math.ceil((pastDaysOfYear + firstDayOfWeek.getDay() + 1) / 7);
-  return `Semaine ${week}`;
+  return `${date.getFullYear()} - Semaine ${getWeekNumber(date)}`;
 }
 
 function getMonthString(date: Date): string {
-  return date
-    .toLocaleDateString("fr-FR", { month: "long" })
-    .replace(/^\w/, (c) => c.toUpperCase());
+  return `${date.toLocaleDateString("fr-FR", { month: "long" }).replace(/^\w/, (c) => c.toUpperCase())} - ${date.getFullYear()}`;
 }
 
 function sortByDayString(
@@ -57,31 +67,19 @@ function sortByWeekString(
   data: { date: string; total: number }[]
 ): { date: string; total: number }[] {
   return data.sort((a, b) => {
-    const weekA = convertWeekStringToNumber(a.date);
-    const weekB = convertWeekStringToNumber(b.date);
-    return weekA - weekB;
+    const yearWeekA = convertWeekStringToNumber(a.date);
+    const yearWeekB = convertWeekStringToNumber(b.date);
+    return yearWeekA - yearWeekB;
   });
 }
 
 function sortByMonthString(
   data: { date: string; total: number }[]
 ): { date: string; total: number }[] {
-  const monthMap: { [key: string]: number } = {
-    Janvier: 1,
-    Février: 2,
-    Mars: 3,
-    Avril: 4,
-    Mai: 5,
-    Juin: 6,
-    Juillet: 7,
-    Août: 8,
-    Septembre: 9,
-    Octobre: 10,
-    Novembre: 11,
-    Décembre: 12,
-  };
-
-  return data.sort((a, b) => monthMap[a.date] - monthMap[b.date]);
+  return data.sort(
+    (a, b) =>
+      convertMonthStringToNumber(a.date) - convertMonthStringToNumber(b.date)
+  );
 }
 
 function convertSlashDateToDate(date: string): Date {
@@ -90,8 +88,29 @@ function convertSlashDateToDate(date: string): Date {
 }
 
 function convertWeekStringToNumber(date: string): number {
-  const week = date.split(" ")[1];
-  return parseInt(week);
+  const year = parseInt(date.split(" ")[0]);
+  const week = parseInt(date.split(" ")[3]);
+  return year * 100 + week;
+}
+
+function convertMonthStringToNumber(date: string): number {
+  const month = parseInt(months.get(date.split(" ")[0])?.toString() ?? "0");
+  const year = parseInt(date.split(" ")[2]);
+  return year * 100 + month;
+}
+
+function getWeekNumber(date: Date): number {
+  const tempDate = new Date(date.valueOf());
+  const dayNum = (date.getDay() + 6) % 7;
+  tempDate.setDate(tempDate.getDate() - dayNum + 3);
+  const firstThursday = tempDate.valueOf();
+  tempDate.setMonth(0, 1);
+
+  if (tempDate.getDay() !== 4) {
+    tempDate.setMonth(0, 1 + ((4 - tempDate.getDay() + 7) % 7));
+  }
+
+  return 1 + Math.ceil((firstThursday - tempDate.valueOf()) / 604800000);
 }
 
 export default {
@@ -105,4 +124,5 @@ export default {
   sortByDayString,
   sortByWeekString,
   sortByMonthString,
+  getWeekNumber,
 };

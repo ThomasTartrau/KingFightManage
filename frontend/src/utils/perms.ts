@@ -12,17 +12,20 @@ export enum Actions {
   StaffsSendMessage,
   StaffsGetLogs,
   StaffsGenerateRegistrationToken,
-  StaffsGenerateServiceAccessToken,
 
   SidebarStaffs,
   SidebarLogsStaffs,
   SidebarBoutiqueLogs,
   SidebarBoutiquePbLogs,
   SidebarBoutiqueGraphs,
+  SidebarServiceAccess,
 
   SidebarCategoryAdmin,
   SidebarCategoryBoutique,
-  SidebarServiceAccess,
+
+  ServiceAccessGenerate,
+  ServiceAccessDelete,
+  ServiceAccessCopy,
 }
 
 const HeadRoles = [Roles.ADMINISTRATEUR, Roles.DEVELOPPEUR, Roles.RESPONSABLE];
@@ -40,11 +43,14 @@ const allowed = {
   [Actions.SidebarBoutiqueLogs]: [Roles.ADMINISTRATEUR],
   [Actions.SidebarBoutiquePbLogs]: [Roles.ADMINISTRATEUR],
   [Actions.SidebarBoutiqueGraphs]: [Roles.ADMINISTRATEUR],
+  [Actions.SidebarServiceAccess]: [Roles.ADMINISTRATEUR],
 
   [Actions.SidebarCategoryAdmin]: AllRoles,
   [Actions.SidebarCategoryBoutique]: [Roles.ADMINISTRATEUR],
-  [Actions.SidebarServiceAccess]: [Roles.ADMINISTRATEUR],
-  [Actions.StaffsGenerateServiceAccessToken]: [Roles.ADMINISTRATEUR],
+
+  [Actions.ServiceAccessGenerate]: [Roles.ADMINISTRATEUR],
+  [Actions.ServiceAccessDelete]: [Roles.ADMINISTRATEUR],
+  [Actions.ServiceAccessCopy]: [Roles.ADMINISTRATEUR],
 };
 
 function getRole(roleName: string): Roles {

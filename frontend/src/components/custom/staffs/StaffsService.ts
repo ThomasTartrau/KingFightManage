@@ -64,3 +64,15 @@ export async function generateRegistrationToken() {
     })
     .catch(displayError);
 }
+
+export async function deleteServiceAccessToken(tokenId: UUID) {
+  await http
+    .delete(`/service-access/${tokenId}`)
+    .then(() => {
+      push.success({
+        title: "Token supprimé",
+        message: "Le token a été supprimé",
+      });
+    })
+    .catch(displayError);
+}

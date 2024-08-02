@@ -12,7 +12,6 @@ async function get() {
   getServiceAccess()
     .then((serviceAccess) => {
       serviceAccess$.value = Promise.resolve(serviceAccess);
-      console.log(serviceAccess);
     })
     .catch((problem) => {
       serviceAccess$.value = Promise.reject(problem);
