@@ -72,7 +72,7 @@ onMounted(_onLoad);
       <CardHeader>
         <CardDescription>Achats boutique</CardDescription>
         <CardTitle class="flex justify-between">
-          {{ totalBuys }} € récolté(s)
+          {{ new Intl.NumberFormat("fr-FR").format(totalBuys) }}€ récolté(s)
           <Select v-model="period">
             <SelectTrigger class="w-1/3">
               <SelectValue />
@@ -95,7 +95,7 @@ onMounted(_onLoad);
           :y-formatter="
             (tick, _i) => {
               return typeof tick === 'number'
-                ? `${new Intl.NumberFormat('us').format(tick).toString()} €`
+                ? `${new Intl.NumberFormat('fr-FR').format(tick).toString()} €`
                 : '';
             }
           "
@@ -106,11 +106,15 @@ onMounted(_onLoad);
           <Card class="dark:border-gray-500">
             <CardHeader>
               <CardDescription>En moyenne {{ period }}</CardDescription>
-              <CardTitle> {{ averageBuyInPeriod.toFixed(2) }} € </CardTitle>
+              <CardTitle>
+                {{ new Intl.NumberFormat("fr-FR").format(averageBuyInPeriod) }}€
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <h2>
-                <span class="font-bold text-xl">{{ buyInThisPeriod }}</span
+                <span class="font-bold text-xl">{{
+                  new Intl.NumberFormat("fr-FR").format(buyInThisPeriod)
+                }}</span
                 >€ récolté(s) durant cette période
               </h2>
             </CardContent>
