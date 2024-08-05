@@ -1,5 +1,7 @@
 package fr.kingfight.kingManageAPI.utils;
 
+import fr.kingfight.kingManageAPI.KingManageAPI;
+
 public class Problem {
     private final String id;
     private final String title;
@@ -21,5 +23,9 @@ public class Problem {
 
     public String getDetail() {
         return detail;
+    }
+
+    public String getProblem() {
+        return "Problem: " + title + " (" + id + "): " + detail;
     }
 }

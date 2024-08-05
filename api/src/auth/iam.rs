@@ -505,7 +505,6 @@ pub fn authorize(
     });
     authorizer.add_token(biscuit)?;
     let result = authorizer.authorize();
-    warn!("Authorizer state:\n{}", authorizer.print_world());
     trace!("Authorizer state:\n{}", authorizer.print_world());
     result?;
 

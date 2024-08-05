@@ -26,6 +26,7 @@ public class Enable {
         HttpClient httpClient = new HttpClient(instance, apiKey, baseUrl, timeout);
 
         new CommandsManager(instance);
+        new ListenersManager(instance);
 
         new FetchEventsTask(instance).runTaskTimerAsynchronously(instance, 0, 20L*instance.getConfig().getInt("intervals.events"));
 

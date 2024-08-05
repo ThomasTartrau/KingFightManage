@@ -28,7 +28,7 @@ public class HttpClient {
     public CompletableFuture<Object> sendRequest(String method, String urlString, String data) {
         return CompletableFuture.supplyAsync(() -> {
             if (!INSTANCE.getStatus().getStatus().equals(status.ENABLED)) {
-                return new Problem("1", "Error", "Plugin is not enabled");
+                return new Problem("1", "Disabled", "API is disabled");
             }
             try {
                 URL url = new URL(BASE_URL + urlString);

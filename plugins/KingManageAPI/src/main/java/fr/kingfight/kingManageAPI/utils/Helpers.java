@@ -11,6 +11,6 @@ public class Helpers {
     }
 
     public static void sendAPIErrorMessage(Exception e) {
-        Bukkit.getConsoleSender().sendMessage("§cKingFightAPI §f» §cAn error occurred while dispatching an event: §7" + e.getMessage());
+        Bukkit.getConsoleSender().sendMessage("§cKingFightAPI §f» §cAn API error occurred: §7" + e.getMessage());
     }
 }

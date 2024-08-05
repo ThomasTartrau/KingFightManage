@@ -30,7 +30,7 @@ public final class KingManageAPI extends JavaPlugin implements HttpClientAPI {
         response.thenAccept(result -> {
             if (result instanceof Problem) {
                 Problem problem = (Problem) result;
-                System.out.println("Problem: " + problem.getId() + " - " + problem.getTitle() + " - " + problem.getDetail());
+                System.out.println("Problem: " + problem.getProblem());
             } else {
                 getLogger().info(result.toString());
             }
@@ -54,7 +54,7 @@ public final class KingManageAPI extends JavaPlugin implements HttpClientAPI {
 
     @Override
     public void printProblem(Problem problem) {
-        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&cProblem: " + problem.getId() + " - " + problem.getTitle() + " - " + problem.getDetail()));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&cProblem: " + problem.getProblem()));
     }
 
     public Status getStatus() {

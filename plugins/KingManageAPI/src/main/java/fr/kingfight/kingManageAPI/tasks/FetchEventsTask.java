@@ -77,7 +77,7 @@ public class FetchEventsTask extends BukkitRunnable {
                 return null;
             } else if (result instanceof Problem) {
                 Problem problem = (Problem) result;
-                Helpers.sendAPIErrorMessage(new Exception("FetchEvent Error: " + problem.getId() + " - " + problem.getTitle() + " - " + problem.getDetail()));
+                Helpers.sendAPIErrorMessage(new Exception("FetchEvent Error: " + problem.getProblem()));
                 return null;
             } else if (result instanceof String) {
                 return result.toString();

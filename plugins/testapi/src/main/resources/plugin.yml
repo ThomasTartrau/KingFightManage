@@ -1,5 +1,0 @@
-name: testapi
-version: '1.0'
-main: fr.kingfight.testapi.Testapi
-softdepend:
-  - KingManageAPI
