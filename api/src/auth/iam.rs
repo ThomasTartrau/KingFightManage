@@ -134,6 +134,9 @@ pub enum Action {
     ServiceAccessCreateServiceAccess,
     ServiceAccessDeleteServiceAccess,
     ServiceAccessGetServiceAccess,
+    PlayersJoin,
+    PlayersLeave,
+    PlayersGetOnline,
 }
 
 impl<'a> Action {
@@ -157,6 +160,9 @@ impl<'a> Action {
             Action::ServiceAccessCreateServiceAccess => "service-access:create-service-access",
             Action::ServiceAccessDeleteServiceAccess => "service-access:delete-service-access",
             Action::ServiceAccessGetServiceAccess => "service-access:get-service-access",
+            Action::PlayersJoin => "players:join",
+            Action::PlayersLeave => "players:leave",
+            Action::PlayersGetOnline => "players:get-online",
         }
     }
 
@@ -183,6 +189,9 @@ impl<'a> Action {
             Self::ServiceAccessCreateServiceAccess => vec![],
             Self::ServiceAccessDeleteServiceAccess => vec![],
             Self::ServiceAccessGetServiceAccess => vec![],
+            Self::PlayersJoin => vec![],
+            Self::PlayersLeave => vec![],
+            Self::PlayersGetOnline => all_roles,
         };
 
         roles.append(&mut per_action_roles);
@@ -209,6 +218,9 @@ impl<'a> Action {
             Self::ServiceAccessCreateServiceAccess => vec![],
             Self::ServiceAccessDeleteServiceAccess => vec![],
             Self::ServiceAccessGetServiceAccess => vec![],
+            Self::PlayersJoin => vec![],
+            Self::PlayersLeave => vec![],
+            Self::PlayersGetOnline => vec![],
         };
 
         facts.push(fact!("action({action})", action = self.action_name()));

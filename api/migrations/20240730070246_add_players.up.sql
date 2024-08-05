@@ -48,8 +48,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION players.get_online_players() RETURNS TABLE (player__id uuid, name text) AS $$
-    SELECT player__id, name
+CREATE FUNCTION players.get_online_players() RETURNS TABLE (player__id uuid, name text, created_at timestamptz) AS $$
+    SELECT player__id, name, created_at
     FROM players.player
     WHERE players.is_logged_in(player__id) = TRUE;
 $$ LANGUAGE sql;
