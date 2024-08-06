@@ -56,7 +56,6 @@ jobs:
         with:
           java-version: "17"
           distribution: "temurin"
-        working-directory: plugins/KingManageAPI
 
       - name: Create Release 📦
         id: create_release
@@ -68,7 +67,6 @@ jobs:
           release_name: "#${{ github.run_number }}"
           draft: false
           prerelease: false
-        working-directory: plugins/KingManageAPI
 
       - name: Upload Release Asset 🚀
         uses: actions/upload-release-asset@v1
@@ -79,4 +77,3 @@ jobs:
           asset_path: ${{ env.JAR_FILES }}
           asset_name: ${{ env.PLUGIN_NAME }}.jar
           asset_content_type: application/java-archive
-        working-directory: plugins/KingManageAPI
