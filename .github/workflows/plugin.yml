@@ -26,8 +26,8 @@ jobs:
       - name: Set up JDK 17 ☕
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
-          distribution: 'temurin'
+          java-version: "17"
+          distribution: "temurin"
 
       - name: Cache Maven packages 📦
         uses: actions/cache@v2
@@ -54,14 +54,11 @@ jobs:
       - name: Checkout code 🛒
         uses: actions/checkout@v2
 
-      - name: Change to /plugins/KingManageAPI directory 📂
-        run: cd plugins/KingManageAPI
-
       - name: Set up JDK 17 ☕
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
-          distribution: 'temurin'
+          java-version: "17"
+          distribution: "temurin"
 
       - name: Create Release 📦
         id: create_release
@@ -69,8 +66,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: '#${{ github.run_number }}'
-          release_name: '#${{ github.run_number }}'
+          tag_name: "#${{ github.run_number }}"
+          release_name: "#${{ github.run_number }}"
           draft: false
           prerelease: false
 
