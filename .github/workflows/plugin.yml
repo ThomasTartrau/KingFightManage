@@ -9,7 +9,7 @@ on:
       - main
 
 env:
-  JAR_FILES: target/original-KingManageAPI-1.0.jar
+  JAR_FILES: /target/original-KingManageAPI-1.0.jar
   PLUGIN_NAME: KingManageAPI
 
 jobs:
@@ -59,9 +59,6 @@ jobs:
         with:
           java-version: "17"
           distribution: "temurin"
-
-      - name: LS 📂
-        run: cd target && ls
 
       - name: Create Release 📦
         id: create_release
