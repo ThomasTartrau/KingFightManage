@@ -1,0 +1,77 @@
+name: KingFight CI/CD 🚀
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  JAR_FILES: target/original-KingManageAPI-1.0.jar
+  PLUGIN_NAME: KingManageAPI
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code 🛒
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17 ☕
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Maven packages 📦
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Build with Maven 🏗️
+        run: mvn -B package --file pom.xml
+
+      - name: Run tests 🧪
+        run: mvn test
+
+  release:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code 🛒
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17 ☕
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Create Release 📦
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: '#${{ github.run_number }}'
+          release_name: '#${{ github.run_number }}'
+          draft: false
+          prerelease: false
+
+
+      - name: Upload Release Asset 🚀
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ env.JAR_FILES }}
+          asset_name: ${{ env.PLUGIN_NAME }}.jar
+          asset_content_type: application/java-archive
