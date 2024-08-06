@@ -9,7 +9,7 @@ on:
       - main
 
 env:
-  JAR_FILES: /target/original-KingManageAPI-1.0.jar
+  JAR_FILES: ./target/original-KingManageAPI-1.0.jar
   PLUGIN_NAME: KingManageAPI
 
 jobs:
