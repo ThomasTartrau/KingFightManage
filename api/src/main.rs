@@ -1,7 +1,7 @@
 use std::{str::FromStr, time::Duration};
 use actix_cors::Cors;
 use actix_files::{Files, NamedFile};
-use actix_web::{middleware::{self, Logger, NormalizePath}, web::{self}, App, HttpServer};
+use actix_web::{middleware::{self, Logger, NormalizePath}, web::{self, route}, App, HttpServer};
 use biscuit_auth::{KeyPair, PrivateKey};
 
 use clap::{crate_name, Parser};
@@ -20,6 +20,7 @@ mod staffs;
 mod boutique;
 mod service_access;
 mod players;
+mod sanctions;
 
 const APP_TITLE: &str = "KingFightManage";
 const WEBAPP_INDEX_FILE: &str = "index.html";
@@ -359,6 +360,18 @@ async fn main() -> anyhow::Result<()> {
                                         .wrap(biscuit_auth.clone())
                                         .route(web::get().to(players::main::get_online_players)),
                                     )
+                                )
+                                .service(
+                                    web::scope("/sanctions")
+                                    .service(
+                                        web::resource("/{sanction_id}")
+                                        .wrap(biscuit_auth.clone())
+                                        .route(web::patch().to(sanctions::main::update_sanction))
+                                        .route(web::delete().to(sanctions::main::delete_sanction)),
+                                    )
+                                    .wrap(biscuit_auth.clone())
+                                    .route("", web::get().to(sanctions::main::get_sanctions))
+                                    .route("", web::post().to(sanctions::main::create_sanction))
                                 )
                                 
                         )

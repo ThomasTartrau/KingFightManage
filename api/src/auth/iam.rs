@@ -1,7 +1,7 @@
 use std::time::{Duration, SystemTime};
 use biscuit_auth::{builder::Fact, builder_ext::AuthorizerExt, error, macros::*, AuthorizerLimits, Biscuit, KeyPair, PrivateKey};
 use chrono::{DateTime, Utc};
-use log::{error, trace, warn};
+use log::{error, trace};
 use paperclip::v2::schema::TypedData;
 use serde::Serialize;
 use strum::{AsRefStr, EnumIter, EnumString, IntoEnumIterator, VariantNames};
@@ -137,6 +137,10 @@ pub enum Action {
     PlayersJoin,
     PlayersLeave,
     PlayersGetOnline,
+    SanctionsCreate,
+    SanctionsUpdate,
+    SanctionsDelete,
+    SanctionsGets,
 }
 
 impl<'a> Action {
@@ -163,6 +167,10 @@ impl<'a> Action {
             Action::PlayersJoin => "players:join",
             Action::PlayersLeave => "players:leave",
             Action::PlayersGetOnline => "players:get-online",
+            Action::SanctionsCreate => "sanctions:create",
+            Action::SanctionsUpdate => "sanctions:update",
+            Action::SanctionsDelete => "sanctions:delete",
+            Action::SanctionsGets => "sanctions:gets",
         }
     }
 
@@ -192,6 +200,10 @@ impl<'a> Action {
             Self::PlayersJoin => vec![],
             Self::PlayersLeave => vec![],
             Self::PlayersGetOnline => all_roles,
+            Self::SanctionsCreate => vec![Role::Responsable, Role::Developpeur],
+            Self::SanctionsUpdate => vec![Role::Responsable, Role::Developpeur],
+            Self::SanctionsDelete => vec![Role::Responsable, Role::Developpeur],
+            Self::SanctionsGets => all_roles,
         };
 
         roles.append(&mut per_action_roles);
@@ -221,6 +233,9 @@ impl<'a> Action {
             Self::PlayersJoin => vec![],
             Self::PlayersLeave => vec![],
             Self::PlayersGetOnline => vec![],
+            Self::SanctionsCreate => vec![],
+            Self::SanctionsUpdate => vec![],
+            Self::SanctionsDelete => vec![],
         };
 
         facts.push(fact!("action({action})", action = self.action_name()));
