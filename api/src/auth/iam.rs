@@ -236,6 +236,7 @@ impl<'a> Action {
             Self::SanctionsCreate => vec![],
             Self::SanctionsUpdate => vec![],
             Self::SanctionsDelete => vec![],
+            Self::SanctionsGets => vec![],
         };
 
         facts.push(fact!("action({action})", action = self.action_name()));
