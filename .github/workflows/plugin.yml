@@ -46,6 +46,9 @@ jobs:
   release:
     needs: build-and-test
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: plugins/KingManageAPI
 
     steps:
       - name: Checkout code 🛒
@@ -56,6 +59,9 @@ jobs:
         with:
           java-version: "17"
           distribution: "temurin"
+
+      - name: LS 📂
+        run: ls
 
       - name: Create Release 📦
         id: create_release
