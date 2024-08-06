@@ -9,8 +9,8 @@ on:
       - main
 
 env:
-  JAR_FILES: target/original-KingManageAPI-1.0.jar
-  PLUGIN_NAME: KingManageAPI
+  JAR_FILES: target/original-KingFightCore-1.0.jar
+  PLUGIN_NAME: KingFightCore
 
 jobs:
   build-and-test:
@@ -19,6 +19,9 @@ jobs:
     steps:
       - name: Checkout code 🛒
         uses: actions/checkout@v2
+
+      - name: Change to /plugins/KingManageAPI directory 📂
+        run: cd plugins/KingManageAPI
 
       - name: Set up JDK 17 ☕
         uses: actions/setup-java@v3
@@ -48,6 +51,9 @@ jobs:
       - name: Checkout code 🛒
         uses: actions/checkout@v2
 
+      - name: Change to /plugins/KingManageAPI directory 📂
+        run: cd plugins/KingManageAPI
+
       - name: Set up JDK 17 ☕
         uses: actions/setup-java@v3
         with:
@@ -64,7 +70,6 @@ jobs:
           release_name: '#${{ github.run_number }}'
           draft: false
           prerelease: false
-
 
       - name: Upload Release Asset 🚀
         uses: actions/upload-release-asset@v1
