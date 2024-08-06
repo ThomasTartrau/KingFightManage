@@ -61,7 +61,7 @@ jobs:
           distribution: "temurin"
 
       - name: LS 📂
-        run: ls
+        run: cd target && ls
 
       - name: Create Release 📦
         id: create_release
