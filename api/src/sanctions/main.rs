@@ -16,7 +16,6 @@ use crate::{auth::iam::Action, utils::{openapi::OaBiscuitUserAccess, problems::M
 pub struct CreateSanctionPost {
     type_: String,
     name: String,
-    motif: String,
     duration: i64,
 }
 
@@ -24,7 +23,6 @@ pub struct CreateSanctionPost {
 pub struct UpdateSanctionPost {
     type_: String,
     name: String,
-    motif: String,
     duration: i64,
 }
 
@@ -38,7 +36,6 @@ pub struct Sanction {
     sanction_id: Uuid,
     type_: String,
     name: String,
-    motif: String,
     duration: i64,
     created_at: DateTime<Utc>,
 }
@@ -91,10 +88,9 @@ pub async fn create_sanction(
     }
 
     query!(
-        "INSERT INTO sanctions.sanction(type, name, motif, duration) VALUES ($1, $2, $3, $4)",
+        "INSERT INTO sanctions.sanction(type, name, duration) VALUES ($1, $2, $3)",
         body.type_,
         body.name,
-        body.motif,
         body.duration
     )
     .execute(&state.db)
@@ -129,10 +125,9 @@ pub async fn update_sanction(
     let sanction_id = sanction_id.into_inner();
 
     query!(
-        "UPDATE sanctions.sanction SET type = $1, name = $2, motif = $3, duration = $4 WHERE sanction__id = $5",
+        "UPDATE sanctions.sanction SET type = $1, name = $2, duration = $3 WHERE sanction__id = $4",
         body.type_,
         body.name,
-        body.motif,
         body.duration,
         sanction_id
     )
@@ -196,7 +191,7 @@ pub async fn get_sanctions(
 
     let sanctions = query_as!(
         Sanction,
-        "SELECT sanction__id as sanction_id, type as type_, name, motif, duration, created_at FROM sanctions.sanction"
+        "SELECT sanction__id as sanction_id, type as type_, name, duration, created_at FROM sanctions.sanction"
     )
     .fetch_all(&state.db)
     .await
@@ -234,9 +229,9 @@ pub async fn get_player_sanctions(
             p.player__id as player_id,
             p.name AS player_name,
             ls.staff_name as staff_name,
+            ls.sanction_motif as sanction_motif,
             s.name AS sanction_name,
             s.type AS sanction_type,
-            s.motif AS sanction_motif,
             s.duration AS sanction_duration,
             s.created_at AS sanction_created_at
         FROM
@@ -283,9 +278,9 @@ pub async fn get_sanctions_logs(
             p.player__id as player_id,
             p.name AS player_name,
             ls.staff_name as staff_name,
+            ls.sanction_motif as sanction_motif,
             s.name AS sanction_name,
             s.type AS sanction_type,
-            s.motif AS sanction_motif,
             s.duration AS sanction_duration,
             s.created_at AS sanction_created_at
         FROM
