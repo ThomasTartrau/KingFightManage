@@ -377,7 +377,7 @@ async fn main() -> anyhow::Result<()> {
                                     .service(
                                         web::resource("/{sanction_id}")
                                         .wrap(biscuit_auth.clone())
-                                        .route(web::patch().to(sanctions::main::update_sanction))
+                                        .route(web::put().to(sanctions::main::update_sanction))
                                         .route(web::delete().to(sanctions::main::delete_sanction)),
                                     )
                                     .wrap(biscuit_auth.clone())
