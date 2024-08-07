@@ -153,15 +153,17 @@ pub async fn delete_sanction(
     state: Data<crate::State>,
     _: OaBiscuitUserAccess,
     biscuit: ReqData<Biscuit>,
-    body: Json<DeleteSanctionPost>,
+    sanction_id: Path<Uuid>,
 ) -> Result<NoContent, MyProblem> {
     if authorize(&biscuit, Action::SanctionsDelete).is_err() {
         return Err(MyProblem::Forbidden);
     }
 
+    let sanction_id = sanction_id.into_inner();
+
     query!(
         "DELETE FROM sanctions.sanction WHERE sanction__id = $1",
-        body.sanction_id
+        sanction_id
     )
     .execute(&state.db)
     .await
