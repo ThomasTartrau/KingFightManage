@@ -12,8 +12,9 @@ create table sanctions.sanction(
 create table logs.sanction(
     log__id uuid primary key default public.gen_random_uuid(),
     sanction__id uuid not null,
-    user__id uuid not null,
+    player__id uuid not null,
+    staff_name text not null,
     created_at timestamptz not null default now(),
     constraint log_sanction__id_fk foreign key (sanction__id) references sanctions.sanction (sanction__id) on delete cascade on update cascade,
-    constraint log_user__id_fk foreign key (user__id) references iam.user (user__id) on delete cascade on update cascade
+    constraint log_player_id_fk foreign key (player__id) references players.player (player__id) on delete cascade on update cascade
 );

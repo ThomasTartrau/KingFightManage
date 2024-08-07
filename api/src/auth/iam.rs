@@ -141,6 +141,8 @@ pub enum Action {
     SanctionsUpdate,
     SanctionsDelete,
     SanctionsGets,
+    SanctionsGetPlayerSanction,
+    SanctionsGetLogs,
 }
 
 impl<'a> Action {
@@ -171,6 +173,8 @@ impl<'a> Action {
             Action::SanctionsUpdate => "sanctions:update",
             Action::SanctionsDelete => "sanctions:delete",
             Action::SanctionsGets => "sanctions:gets",
+            Action::SanctionsGetPlayerSanction => "sanctions:get-player-sanction",
+            Action::SanctionsGetLogs => "sanctions:get-logs",
         }
     }
 
@@ -204,6 +208,8 @@ impl<'a> Action {
             Self::SanctionsUpdate => vec![Role::Responsable, Role::Developpeur],
             Self::SanctionsDelete => vec![Role::Responsable, Role::Developpeur],
             Self::SanctionsGets => all_roles,
+            Self::SanctionsGetPlayerSanction => all_roles,
+            Self::SanctionsGetLogs => all_roles,
         };
 
         roles.append(&mut per_action_roles);
@@ -237,6 +243,8 @@ impl<'a> Action {
             Self::SanctionsUpdate => vec![],
             Self::SanctionsDelete => vec![],
             Self::SanctionsGets => vec![],
+            Self::SanctionsGetPlayerSanction => vec![],
+            Self::SanctionsGetLogs => vec![],
         };
 
         facts.push(fact!("action({action})", action = self.action_name()));

@@ -1,5 +1,3 @@
-use std::time::Duration;
-
 use actix_web::web::ReqData;
 use biscuit_auth::Biscuit;
 use chrono::{DateTime, Utc};
@@ -24,10 +22,10 @@ pub struct CreateSanctionPost {
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct UpdateSanctionPost {
-    type_: Option<String>,
-    name: Option<String>,
-    motif: Option<String>,
-    duration: Option<i64>,
+    type_: String,
+    name: String,
+    motif: String,
+    duration: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
@@ -46,8 +44,32 @@ pub struct Sanction {
 }
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
-pub struct GetSanctins {
+pub struct GetSanctions {
     sanctions: Vec<Sanction>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
+pub struct GetPlayerSanctions {
+    player_id: Uuid,
+    player_name: String,
+    staff_name: String,
+    sanction_name: String,
+    sanction_type: String,
+    sanction_motif: String,
+    sanction_duration: i64,
+    sanction_created_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
+pub struct GetSanctionsLogs {
+    player_id: Uuid,
+    player_name: String,
+    staff_name: String,
+    sanction_name: String,
+    sanction_type: String,
+    sanction_motif: String,
+    sanction_duration: i64,
+    sanction_created_at: DateTime<Utc>,
 }
 
 #[api_v2_operation(
@@ -167,7 +189,7 @@ pub async fn get_sanctions(
     state: Data<crate::State>,
     _: OaBiscuitUserAccess,
     biscuit: ReqData<Biscuit>,
-) -> Result<Json<GetSanctins>, MyProblem> {
+) -> Result<CreatedJson<GetSanctions>, MyProblem> {
     if authorize(&biscuit, Action::SanctionsGets).is_err() {
         return Err(MyProblem::Forbidden);
     }
@@ -183,5 +205,103 @@ pub async fn get_sanctions(
         MyProblem::InternalServerError
     })?;
 
-    Ok(Json(GetSanctins { sanctions }))
+    Ok(CreatedJson(GetSanctions { sanctions }))
+}
+
+#[api_v2_operation(
+    summary = "Get player sanctions",
+    description = "",
+    operation_id = "sanctions.get-player-sanction",
+    produces = "application/json",
+    tags("Sanctions")
+)]
+pub async fn get_player_sanctions(
+    state: Data<crate::State>,
+    _: OaBiscuitUserAccess,
+    biscuit: ReqData<Biscuit>,
+    player_id: Path<Uuid>,
+) -> Result<CreatedJson<Vec<GetPlayerSanctions>>, MyProblem> {
+    if authorize(&biscuit, Action::SanctionsGetPlayerSanction).is_err() {
+        return Err(MyProblem::Forbidden);
+    }
+
+    let player_id = player_id.into_inner();
+
+    let sanctions = query_as!(
+        GetPlayerSanctions,
+        r#"
+        SELECT
+            p.player__id as player_id,
+            p.name AS player_name,
+            ls.staff_name as staff_name,
+            s.name AS sanction_name,
+            s.type AS sanction_type,
+            s.motif AS sanction_motif,
+            s.duration AS sanction_duration,
+            s.created_at AS sanction_created_at
+        FROM
+            logs.sanction ls
+        JOIN
+            sanctions.sanction s ON s.sanction__id = ls.sanction__id
+        JOIN
+            players.player p ON p.player__id = ls.player__id
+        WHERE
+            p.player__id = $1
+        "#,
+        player_id
+    )
+    .fetch_all(&state.db)
+    .await
+    .map_err(|e| {
+        error!("Failed to get player sanctions: {:?}", e);
+        MyProblem::InternalServerError
+    })?;
+
+    Ok(CreatedJson(sanctions))
+}
+
+#[api_v2_operation(
+    summary = "Get sanctions logs",
+    description = "",
+    operation_id = "sanctions.get-logs",
+    produces = "application/json",
+    tags("Sanctions")
+)]
+pub async fn get_sanctions_logs(
+    state: Data<crate::State>,
+    _: OaBiscuitUserAccess,
+    biscuit: ReqData<Biscuit>,
+) -> Result<CreatedJson<Vec<GetSanctionsLogs>>, MyProblem> {
+    if authorize(&biscuit, Action::SanctionsGetLogs).is_err() {
+        return Err(MyProblem::Forbidden);
+    }
+
+    let sanctions = query_as!(
+        GetSanctionsLogs,
+        r#"
+        SELECT
+            p.player__id as player_id,
+            p.name AS player_name,
+            ls.staff_name as staff_name,
+            s.name AS sanction_name,
+            s.type AS sanction_type,
+            s.motif AS sanction_motif,
+            s.duration AS sanction_duration,
+            s.created_at AS sanction_created_at
+        FROM
+            logs.sanction ls
+        JOIN
+            sanctions.sanction s ON s.sanction__id = ls.sanction__id
+        JOIN
+            players.player p ON p.player__id = ls.player__id
+        "#,
+    )
+    .fetch_all(&state.db)
+    .await
+    .map_err(|e| {
+        error!("Failed to get sanctions logs: {:?}", e);
+        MyProblem::InternalServerError
+    })?;
+
+    Ok(CreatedJson(sanctions))
 }

@@ -1,7 +1,7 @@
 use std::{str::FromStr, time::Duration};
 use actix_cors::Cors;
 use actix_files::{Files, NamedFile};
-use actix_web::{middleware::{self, Logger, NormalizePath}, web::{self, route}, App, HttpServer};
+use actix_web::{middleware::{self, Logger, NormalizePath}, web::{self}, App, HttpServer};
 use biscuit_auth::{KeyPair, PrivateKey};
 
 use clap::{crate_name, Parser};
@@ -169,7 +169,6 @@ async fn main() -> anyhow::Result<()> {
         // Run web server
         let webapp_path = config.webapp_path.clone();
         HttpServer::new(move || {
-
             // Prepare CORS configuration
             let cors = {
                 let mut c = Cors::default()
@@ -200,10 +199,11 @@ async fn main() -> anyhow::Result<()> {
                 .add(("X-Content-Type-Options", "nosniff"))
                 .add(("Referrer-Policy", "strict-origin-when-cross-origin"))
                 .add(("X-XSS-Protection", "1; mode=block"))
-                .add(("Referrer-Policy", "SAMEORIGIN"));
+                .add(("Referrer-Policy", "SAMEORIGIN"))
+                .add(("X-Frame-Options", "DENY"));
 
             let hsts_header = middleware::DefaultHeaders::new()
-                .add(("Strict-Transport-Security", "max-age=157680000"));
+                .add(("Strict-Transport-Security", "max-age=63072000"));
 
             let security_headers_condition =
                 middleware::Condition::new(config.enable_security_headers, security_headers);
@@ -276,6 +276,17 @@ async fn main() -> anyhow::Result<()> {
                                             web::resource("/pb")
                                                 .wrap(biscuit_auth.clone())
                                                 .route(web::get().to(boutique::main::get_pb_logs)),
+                                        )
+                                        .service(
+                                            web::scope("/sanction")
+                                                .service(
+                                                    web::resource("/{player_id}")
+                                                        .wrap(biscuit_auth.clone())
+                                                        .route(web::get().to(sanctions::main::get_player_sanctions)),
+                                                )
+                                                .wrap(biscuit_auth.clone())
+                                                .route("", web::get().to(sanctions::main::get_sanctions_logs)),
+                                                
                                         )
                                 )
                                 .service(
@@ -375,7 +386,7 @@ async fn main() -> anyhow::Result<()> {
                                 )
                                 
                         )
-                );
+                    );
 
                 if !config.disable_serving_webapp {
                     app = app.default_service(
@@ -387,7 +398,6 @@ async fn main() -> anyhow::Result<()> {
                             ),
                     );
                 }
-
                 app
         })
             .bind(&format!("{}:{}", config.ip, config.port))?
