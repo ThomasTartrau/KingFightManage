@@ -8,7 +8,6 @@ import {
 } from "@tanstack/vue-table";
 import { h, onMounted, reactive, ref } from "vue";
 
-import { CirclePlus } from "lucide-vue-next";
 import DropdownAction from "./dropdown-action.vue";
 import CreateSanctionDialog from "./create-sanction-dialog.vue";
 import { Button } from "@/components/ui/button";
@@ -29,10 +28,10 @@ import { Dialog } from "@/components/ui/dialog";
 import dateConverter from "@/utils/dateConverter";
 
 type definitions = components["schemas"];
-type Sanction = definitions["Sanction"];
+type Player = definitions["Player"];
 
 const props = defineProps<{
-  data: Sanction[];
+  data: Player[];
 }>();
 const emit = defineEmits(["refreshDatatable"]);
 
@@ -48,7 +47,7 @@ function closeAndRefresh() {
   emitRefresh();
 }
 
-const datas = ref<Sanction[]>(props.data || []);
+const datas = ref<Player[]>(props.data || []);
 
 function emitRefresh() {
   emit("refreshDatatable");
@@ -56,11 +55,11 @@ function emitRefresh() {
 
 const role = ref<null | Roles>();
 
-const columns: ColumnDef<Sanction>[] = [
+const columns: ColumnDef<Player>[] = [
   {
-    accessorKey: "type_",
-    header: "Type",
-    cell: ({ row }) => h("div", { class: "capitalize" }, row.getValue("type_")),
+    accessorKey: "player_id",
+    header: "UUID",
+    cell: ({ row }) => h("div", row.getValue("player_id")),
   },
   {
     accessorKey: "name",
@@ -70,15 +69,15 @@ const columns: ColumnDef<Sanction>[] = [
     },
   },
   {
-    accessorKey: "duration",
-    header: "Duration",
+    accessorKey: "created_at",
+    header: "Première connexion",
     cell: ({ row }) => {
       const sanction = row.original;
 
-      return h("div", dateConverter.convertSecondToTime(sanction.duration));
+      return h("div", dateConverter.timestampToDateString(sanction.created_at));
     },
   },
-  {
+  /* {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
@@ -88,18 +87,18 @@ const columns: ColumnDef<Sanction>[] = [
         sanction,
       });
     },
-  },
+  }, */
 ];
 
-function onSearch(username: string) {
+function onSearch(search: string) {
   datas.value = props.data.filter(
-    (sanction) =>
-      sanction.type_.toLowerCase().includes(username.toLowerCase()) ||
-      sanction.name.toLowerCase().includes(username.toLowerCase())
+    (player) =>
+      player.player_id.toLowerCase().includes(search.toLowerCase()) ||
+      player.name.toLowerCase().includes(search.toLowerCase())
   );
 }
 
-const tableOptions = reactive<TableOptions<Sanction>>({
+const tableOptions = reactive<TableOptions<Player>>({
   get data() {
     return datas.value;
   },
@@ -121,25 +120,14 @@ onMounted(_onLoad);
 
 <template>
   <div class="w-full">
-    <div class="flex justify-between md:items-center mb-8 flex-col sm:flex-row">
+    <div class="relative w-full max-w-sm items-center mb-8">
       <Input
         id="search"
         type="text"
-        placeholder="Rechercher un type ou un nom de sanction"
+        placeholder="Rechercher un id ou nom de joueur"
         class="relative w-full max-w-sm items-center"
         @input="onSearch($event.target.value)"
       />
-      <Button
-        v-if="role && perms.hasPermission(role, Actions.SanctionsCreate)"
-        type="button"
-        class="mt-4 sm:mt-0"
-        @click="openCreateSanctionDialog"
-      >
-        Créer une sanction
-        <span class="ml-2">
-          <CirclePlus class="size-4" />
-        </span>
-      </Button>
     </div>
     <div class="rounded-md border">
       <Table>
@@ -219,10 +207,10 @@ onMounted(_onLoad);
       </div>
     </div>
   </div>
-  <Dialog v-model:open="isCreateSanctionOpen">
+  <!-- <Dialog v-model:open="isCreateSanctionOpen">
     <CreateSanctionDialog
       @close-create-sanciton-dialog="closeCreateSanctionDialog"
       @close-and-refresh-sanction-dialog="closeAndRefresh"
     />
-  </Dialog>
+  </Dialog> -->
 </template>

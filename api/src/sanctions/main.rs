@@ -8,7 +8,6 @@ use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as};
 use uuid::Uuid;
 
-use crate::auth;
 use crate::auth::iam::{authorize, create_service_access_token, RootToken};
 use crate::{auth::iam::Action, utils::{openapi::OaBiscuitUserAccess, problems::MyProblem}};
 

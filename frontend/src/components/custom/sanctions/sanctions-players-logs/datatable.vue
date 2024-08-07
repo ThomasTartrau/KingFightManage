@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { ColumnDef, TableOptions } from '@tanstack/vue-table'
+import type { ColumnDef, TableOptions } from "@tanstack/vue-table";
 import {
   FlexRender,
   getCoreRowModel,
   getPaginationRowModel,
   useVueTable,
-} from '@tanstack/vue-table'
-import { h, reactive, ref } from 'vue'
+} from "@tanstack/vue-table";
+import { h, reactive, ref } from "vue";
 
-import { Button } from '@/components/ui/button'
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -16,86 +16,86 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import type { components } from '@/types'
-import { Input } from '@/components/ui/input'
-import dateConverter from '@/utils/dateConverter'
+} from "@/components/ui/table";
+import type { components } from "@/types";
+import { Input } from "@/components/ui/input";
+import dateConverter from "@/utils/dateConverter";
 
-type definitions = components['schemas']
-type GetSanctionsLogs = definitions['GetSanctionsLogs']
+type definitions = components["schemas"];
+type GetSanctionsLogs = definitions["GetSanctionsLogs"];
 
 const props = defineProps<{
-  data: GetSanctionsLogs[]
-}>()
-const emit = defineEmits(['refreshDatatable'])
+  data: GetSanctionsLogs[];
+}>();
+const emit = defineEmits(["refreshDatatable"]);
 
-const datas = ref<GetSanctionsLogs[]>(props.data || [])
+const datas = ref<GetSanctionsLogs[]>(props.data || []);
 
 function emitRefresh() {
-  emit('refreshDatatable')
+  emit("refreshDatatable");
 }
 
 const columns: ColumnDef<GetSanctionsLogs>[] = [
   {
-    accessorKey: 'player_name',
-    header: 'Nom du joueur',
-    cell: ({ row }) => h('div', row.getValue('player_name')),
+    accessorKey: "player_name",
+    header: "Nom du joueur",
+    cell: ({ row }) => h("div", row.getValue("player_name")),
   },
   {
-    accessorKey: 'staff_name',
-    header: 'Sanctionné par',
+    accessorKey: "staff_name",
+    header: "Sanctionné par",
     cell: ({ row }) => {
-      return h('div', row.getValue('staff_name'))
+      return h("div", row.getValue("staff_name"));
     },
   },
   {
-    accessorKey: 'sanction_type_and_name',
-    header: 'Type & Nom de la sanction',
+    accessorKey: "sanction_type_and_name",
+    header: "Type & Nom de la sanction",
     cell: ({ row }) => {
-      const sanction = row.original
+      const sanction = row.original;
 
-      return h('div', `${sanction.sanction_type} - ${sanction.sanction_name}`)
+      return h("div", `${sanction.sanction_type} - ${sanction.sanction_name}`);
     },
   },
   {
-    accessorKey: 'sanction_motif',
-    header: 'Motif',
+    accessorKey: "sanction_motif",
+    header: "Motif",
     cell: ({ row }) => {
-      return h('div', row.getValue('sanction_motif'))
+      return h("div", row.getValue("sanction_motif"));
     },
   },
   {
-    accessorKey: 'sanction_created_at',
-    header: 'Date',
+    accessorKey: "sanction_created_at",
+    header: "Date",
     cell: ({ row }) => {
       return h(
-        'div',
-        dateConverter.timestampToDateString(row.getValue('sanction_created_at')),
-      )
+        "div",
+        dateConverter.timestampToDateString(row.getValue("sanction_created_at"))
+      );
     },
   },
-]
+];
 
 function onSearch(search: string) {
   datas.value = props.data.filter(
-    sanction =>
-      sanction.sanction_motif.toLowerCase().includes(search.toLowerCase())
-      || sanction.staff_name.toLowerCase().includes(search.toLowerCase()),
-  )
+    (sanction) =>
+      sanction.sanction_motif.toLowerCase().includes(search.toLowerCase()) ||
+      sanction.staff_name.toLowerCase().includes(search.toLowerCase())
+  );
 }
 
 const tableOptions = reactive<TableOptions<GetSanctionsLogs>>({
   get data() {
-    return datas.value
+    return datas.value;
   },
   get columns() {
-    return columns
+    return columns;
   },
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
-})
+});
 
-const table = useVueTable(tableOptions)
+const table = useVueTable(tableOptions);
 </script>
 
 <template>
@@ -158,12 +158,12 @@ const table = useVueTable(tableOptions)
       <div class="flex-1 text-sm text-muted-foreground">
         Affichage de
         {{
-          table.getFilteredRowModel().rows.length
-            < (table.getState().pagination.pageIndex + 1)
-            * table.getState().pagination.pageSize
+          table.getFilteredRowModel().rows.length <
+          (table.getState().pagination.pageIndex + 1) *
+            table.getState().pagination.pageSize
             ? table.getFilteredRowModel().rows.length
-            : (table.getState().pagination.pageIndex + 1)
-              * table.getState().pagination.pageSize
+            : (table.getState().pagination.pageIndex + 1) *
+              table.getState().pagination.pageSize
         }}
         sur {{ table.getFilteredRowModel().rows.length }} donnée(s).
       </div>

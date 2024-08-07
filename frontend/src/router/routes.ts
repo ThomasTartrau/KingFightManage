@@ -15,6 +15,8 @@ import ServiceAccess from "@/pages/staffs/ServiceAccess.vue";
 import GetSanctions from "@/pages/sanctions/GetSanctions.vue";
 import LogsSanctions from "@/pages/sanctions/LogsSanctions.vue";
 import LogsPlayerSanction from "@/pages/sanctions/LogsPlayerSanction.vue";
+import path from "path";
+import GetPlayers from "@/pages/players/GetPlayers.vue";
 
 export type TemplateRoutes = string;
 
@@ -42,6 +44,8 @@ export const routes: Record<TemplateRoutes, string> = {
   Sanctions: "Sanctions",
   SanctionsLogs: "SanctionsLogs",
   SanctionsPlayersLogs: "SanctionsPlayersLogs",
+
+  Players: "Players",
 
   Error404: "Error404",
 };
@@ -154,6 +158,12 @@ export default [
     name: routes.SanctionsPlayersLogs,
     path: "/sanctions/logs/:player_id",
     component: LogsPlayerSanction,
+  },
+
+  {
+    name: routes.Players,
+    path: "/players",
+    component: GetPlayers,
   },
 
   {
