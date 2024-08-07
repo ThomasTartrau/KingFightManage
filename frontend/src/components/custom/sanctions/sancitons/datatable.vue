@@ -8,8 +8,9 @@ import {
 } from '@tanstack/vue-table'
 import { h, onMounted, reactive, ref } from 'vue'
 
-import { KeyRound } from 'lucide-vue-next'
-import { generateRegistrationToken } from './StaffsService'
+import { CirclePlus } from 'lucide-vue-next'
+import DropdownAction from './dropdown-action.vue'
+import CreateSanctionDialog from './create-sanction-dialog.vue'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -19,23 +20,34 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import DropdownAction from '@/components/custom/staffs/dropdown-action.vue'
-import OnlineIcons from '@/components/custom/staffs/online_icons.vue'
 import type { components } from '@/types'
 import { Input } from '@/components/ui/input'
 import { getRole } from '@/iam'
 import type { Roles } from '@/utils/perms'
 import perms, { Actions } from '@/utils/perms'
+import { Dialog } from '@/components/ui/dialog'
 
 type definitions = components['schemas']
-type User = definitions['User']
+type Sanction = definitions['Sanction']
 
 const props = defineProps<{
-  data: User[]
+  data: Sanction[]
 }>()
 const emit = defineEmits(['refreshDatatable'])
 
-const datas = ref<User[]>(props.data || [])
+const isCreateSanctionOpen = ref(false)
+function openCreateSanctionDialog() {
+  isCreateSanctionOpen.value = true
+}
+function closeCreateSanctionDialog() {
+  isCreateSanctionOpen.value = false
+}
+function closeAndRefresh() {
+  closeCreateSanctionDialog()
+  emitRefresh()
+}
+
+const datas = ref<Sanction[]>(props.data || [])
 
 function emitRefresh() {
   emit('refreshDatatable')
@@ -43,61 +55,50 @@ function emitRefresh() {
 
 const role = ref<null | Roles>()
 
-async function handleGenerateRegistrationToken() {
-  await generateRegistrationToken()
-}
-
-const columns: ColumnDef<User>[] = [
+const columns: ColumnDef<Sanction>[] = [
   {
-    accessorKey: 'user_id',
-    header: 'UUID',
+    accessorKey: 'type_',
+    header: 'Type',
+    cell: ({ row }) => h('div', { class: 'capitalize' }, row.getValue('type_')),
+  },
+  {
+    accessorKey: 'name',
+    header: 'Nom',
     cell: ({ row }) => {
-      return h('div', { class: 'capitalize' }, row.getValue('user_id'))
+      return h('div', row.getValue('name'))
     },
   },
   {
-    accessorKey: 'username',
-    header: 'Username',
-    cell: ({ row }) =>
-      h('div', { class: 'lowercase' }, row.getValue('username')),
-  },
-  {
-    accessorKey: 'role',
-    header: 'Role',
+    accessorKey: 'duration',
+    header: 'Duration',
     cell: ({ row }) => {
-      return h('div', { class: 'capitalize' }, row.getValue('role'))
-    },
-  },
-  {
-    accessorKey: 'is_online',
-    header: 'Online',
-    cell: ({ row }) => {
-      const user = row.original
+      const sanction = row.original
 
-      return h(OnlineIcons, { isOnline: user.is_online })
+      return h('div', sanction.duration)
     },
   },
   {
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      const user = row.original
+      const sanction = row.original
 
       return h(DropdownAction, {
-        userId: user.user_id,
-        username: user.username,
+        sanction,
       })
     },
   },
 ]
 
 function onSearch(username: string) {
-  datas.value = props.data.filter(user =>
-    user.username.toLowerCase().includes(username.toLowerCase()),
+  datas.value = props.data.filter(
+    sanction =>
+      sanction.type_.toLowerCase().includes(username.toLowerCase())
+      || sanction.name.toLowerCase().includes(username.toLowerCase()),
   )
 }
 
-const tableOptions = reactive<TableOptions<User>>({
+const tableOptions = reactive<TableOptions<Sanction>>({
   get data() {
     return datas.value
   },
@@ -123,22 +124,19 @@ onMounted(_onLoad)
       <Input
         id="search"
         type="text"
-        placeholder="Rechercher un utilisateur"
+        placeholder="Rechercher un type ou un nom de sanction"
         class="relative w-full max-w-sm items-center"
         @input="onSearch($event.target.value)"
       />
       <Button
-        v-if="
-          role
-            && perms.hasPermission(role, Actions.StaffsGenerateRegistrationToken)
-        "
-        class="mt-4 sm:mt-0"
+        v-if="role && perms.hasPermission(role, Actions.SanctionsCreate)"
         type="button"
-        @click="handleGenerateRegistrationToken"
+        class="mt-4 sm:mt-0"
+        @click="openCreateSanctionDialog"
       >
-        Générer un token
+        Créer une sanction
         <span class="ml-2">
-          <KeyRound class="size-4" />
+          <CirclePlus class="size-4" />
         </span>
       </Button>
     </div>
@@ -220,4 +218,10 @@ onMounted(_onLoad)
       </div>
     </div>
   </div>
+  <Dialog v-model:open="isCreateSanctionOpen">
+    <CreateSanctionDialog
+      @close-create-sanciton-dialog="closeCreateSanctionDialog"
+      @close-and-refresh-sanction-dialog="closeAndRefresh"
+    />
+  </Dialog>
 </template>

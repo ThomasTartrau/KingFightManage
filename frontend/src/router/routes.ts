@@ -12,6 +12,9 @@ import LogsBoutique from "@/pages/boutique/LogsBoutique.vue";
 import LogsBoutiquePb from "@/pages/boutique/LogsBoutiquePb.vue";
 import BoutiqueGraphs from "@/pages/boutique/BoutiqueGraphs.vue";
 import ServiceAccess from "@/pages/staffs/ServiceAccess.vue";
+import GetSanctions from "@/pages/sanctions/GetSanctions.vue";
+import LogsSanctions from "@/pages/sanctions/LogsSanctions.vue";
+import LogsPlayerSanction from "@/pages/sanctions/LogsPlayerSanction.vue";
 
 export type TemplateRoutes = string;
 
@@ -35,6 +38,10 @@ export const routes: Record<TemplateRoutes, string> = {
   Staffs: "Staffs",
   LogsStaffs: "LogsStaffs",
   ServiceAccess: "ServiceAccess",
+
+  Sanctions: "Sanctions",
+  SanctionsLogs: "SanctionsLogs",
+  SanctionsPlayersLogs: "SanctionsPlayersLogs",
 
   Error404: "Error404",
 };
@@ -131,6 +138,22 @@ export default [
     name: routes.BoutiqueGraphs,
     path: "/boutique/graphs",
     component: BoutiqueGraphs,
+  },
+
+  {
+    name: routes.Sanctions,
+    path: "/sanctions",
+    component: GetSanctions,
+  },
+  {
+    name: routes.SanctionsLogs,
+    path: "/sanctions/logs",
+    component: LogsSanctions,
+  },
+  {
+    name: routes.SanctionsPlayersLogs,
+    path: "/sanctions/logs/:player_id",
+    component: LogsPlayerSanction,
   },
 
   {

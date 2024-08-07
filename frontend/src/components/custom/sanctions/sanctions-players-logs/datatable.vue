@@ -6,10 +6,8 @@ import {
   getPaginationRowModel,
   useVueTable,
 } from '@tanstack/vue-table'
-import { h, onMounted, reactive, ref } from 'vue'
+import { h, reactive, ref } from 'vue'
 
-import { KeyRound } from 'lucide-vue-next'
-import { generateRegistrationToken } from './StaffsService'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -19,85 +17,74 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import DropdownAction from '@/components/custom/staffs/dropdown-action.vue'
-import OnlineIcons from '@/components/custom/staffs/online_icons.vue'
 import type { components } from '@/types'
 import { Input } from '@/components/ui/input'
-import { getRole } from '@/iam'
-import type { Roles } from '@/utils/perms'
-import perms, { Actions } from '@/utils/perms'
+import dateConverter from '@/utils/dateConverter'
 
 type definitions = components['schemas']
-type User = definitions['User']
+type GetSanctionsLogs = definitions['GetSanctionsLogs']
 
 const props = defineProps<{
-  data: User[]
+  data: GetSanctionsLogs[]
 }>()
 const emit = defineEmits(['refreshDatatable'])
 
-const datas = ref<User[]>(props.data || [])
+const datas = ref<GetSanctionsLogs[]>(props.data || [])
 
 function emitRefresh() {
   emit('refreshDatatable')
 }
 
-const role = ref<null | Roles>()
-
-async function handleGenerateRegistrationToken() {
-  await generateRegistrationToken()
-}
-
-const columns: ColumnDef<User>[] = [
+const columns: ColumnDef<GetSanctionsLogs>[] = [
   {
-    accessorKey: 'user_id',
-    header: 'UUID',
+    accessorKey: 'player_name',
+    header: 'Nom du joueur',
+    cell: ({ row }) => h('div', row.getValue('player_name')),
+  },
+  {
+    accessorKey: 'staff_name',
+    header: 'Sanctionné par',
     cell: ({ row }) => {
-      return h('div', { class: 'capitalize' }, row.getValue('user_id'))
+      return h('div', row.getValue('staff_name'))
     },
   },
   {
-    accessorKey: 'username',
-    header: 'Username',
-    cell: ({ row }) =>
-      h('div', { class: 'lowercase' }, row.getValue('username')),
-  },
-  {
-    accessorKey: 'role',
-    header: 'Role',
+    accessorKey: 'sanction_type_and_name',
+    header: 'Type & Nom de la sanction',
     cell: ({ row }) => {
-      return h('div', { class: 'capitalize' }, row.getValue('role'))
+      const sanction = row.original
+
+      return h('div', `${sanction.sanction_type} - ${sanction.sanction_name}`)
     },
   },
   {
-    accessorKey: 'is_online',
-    header: 'Online',
+    accessorKey: 'sanction_motif',
+    header: 'Motif',
     cell: ({ row }) => {
-      const user = row.original
-
-      return h(OnlineIcons, { isOnline: user.is_online })
+      return h('div', row.getValue('sanction_motif'))
     },
   },
   {
-    id: 'actions',
-    enableHiding: false,
+    accessorKey: 'sanction_created_at',
+    header: 'Date',
     cell: ({ row }) => {
-      const user = row.original
-
-      return h(DropdownAction, {
-        userId: user.user_id,
-        username: user.username,
-      })
+      return h(
+        'div',
+        dateConverter.timestampToDateString(row.getValue('sanction_created_at')),
+      )
     },
   },
 ]
 
-function onSearch(username: string) {
-  datas.value = props.data.filter(user =>
-    user.username.toLowerCase().includes(username.toLowerCase()),
+function onSearch(search: string) {
+  datas.value = props.data.filter(
+    sanction =>
+      sanction.sanction_motif.toLowerCase().includes(search.toLowerCase())
+      || sanction.staff_name.toLowerCase().includes(search.toLowerCase()),
   )
 }
 
-const tableOptions = reactive<TableOptions<User>>({
+const tableOptions = reactive<TableOptions<GetSanctionsLogs>>({
   get data() {
     return datas.value
   },
@@ -109,38 +96,18 @@ const tableOptions = reactive<TableOptions<User>>({
 })
 
 const table = useVueTable(tableOptions)
-
-function _onLoad() {
-  role.value = getRole().value
-}
-
-onMounted(_onLoad)
 </script>
 
 <template>
   <div class="w-full">
-    <div class="flex justify-between md:items-center mb-8 flex-col sm:flex-row">
+    <div class="relative w-full max-w-sm items-center mb-8">
       <Input
         id="search"
         type="text"
-        placeholder="Rechercher un utilisateur"
+        placeholder="Rechercher un staff ou un motif"
         class="relative w-full max-w-sm items-center"
         @input="onSearch($event.target.value)"
       />
-      <Button
-        v-if="
-          role
-            && perms.hasPermission(role, Actions.StaffsGenerateRegistrationToken)
-        "
-        class="mt-4 sm:mt-0"
-        type="button"
-        @click="handleGenerateRegistrationToken"
-      >
-        Générer un token
-        <span class="ml-2">
-          <KeyRound class="size-4" />
-        </span>
-      </Button>
     </div>
     <div class="rounded-md border">
       <Table>
