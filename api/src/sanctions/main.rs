@@ -1,15 +1,19 @@
 use actix_web::web::ReqData;
 use biscuit_auth::Biscuit;
 use chrono::{DateTime, Utc};
-use log::{error, trace};
-use paperclip::actix::web::{Data, Path, Json};
+use log::error;
+use paperclip::actix::web::{Data, Json, Path};
 use paperclip::actix::{api_v2_operation, Apiv2Schema, CreatedJson, NoContent};
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use sqlx::{query, query_as};
 use uuid::Uuid;
 
-use crate::auth::iam::{authorize, create_service_access_token, RootToken};
-use crate::{auth::iam::Action, utils::{openapi::OaBiscuitUserAccess, problems::MyProblem}};
+use crate::auth::iam::authorize;
+use crate::{
+    auth::iam::Action,
+    utils::{openapi::OaBiscuitUserAccess, problems::MyProblem},
+};
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct CreateSanctionPost {
@@ -66,6 +70,32 @@ pub struct GetSanctionsLogs {
     sanction_motif: String,
     sanction_duration: i64,
     sanction_created_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
+pub struct MutePlayerPost {
+    player_id: Uuid,
+    staff_name: String,
+    sanction_id: Uuid,
+    motif: String,
+    generate_event: bool,
+}
+#[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
+pub struct KickPlayerPost {
+    player_id: Uuid,
+    staff_name: String,
+    sanction_id: Uuid,
+    motif: String,
+    generate_event: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
+pub struct BanPlayerPost {
+    player_id: Uuid,
+    staff_name: String,
+    sanction_id: Uuid,
+    motif: String,
+    generate_event: bool,
 }
 
 #[api_v2_operation(
@@ -300,4 +330,164 @@ pub async fn get_sanctions_logs(
     })?;
 
     Ok(CreatedJson(sanctions))
+}
+
+#[api_v2_operation(
+    summary = "Mute a player",
+    description = "",
+    operation_id = "sanctions.mute",
+    consumes = "application/json",
+    produces = "application/json",
+    tags("Sanctions")
+)]
+pub async fn mute_player(
+    state: Data<crate::State>,
+    _: OaBiscuitUserAccess,
+    biscuit: ReqData<Biscuit>,
+    body: Json<MutePlayerPost>,
+) -> Result<NoContent, MyProblem> {
+    if authorize(&biscuit, Action::SanctionsMute).is_err() {
+        return Err(MyProblem::Forbidden);
+    }
+
+    query!(
+        "INSERT INTO logs.sanction(player__id, sanction__id, staff_name, sanction_motif) VALUES ($1, $2, $3, $4)",
+        body.player_id,
+        body.sanction_id,
+        body.staff_name,
+        body.motif
+    )
+    .execute(&state.db)
+    .await
+    .map_err(|e| {
+        error!("Failed to insert sanction: {:?}", e);
+        MyProblem::InternalServerError
+    })?;
+
+    if body.generate_event {
+        let event_type = "player_muted";
+        let event_data = json!({
+            "player_id": body.player_id,
+            "staff_name": body.staff_name,
+            "motif": body.motif,
+        });
+
+        query!(
+            "INSERT INTO events.event (event_type, event_data) VALUES ($1, $2)",
+            event_type,
+            event_data
+        )
+        .execute(&state.db)
+        .await
+        .map_err(MyProblem::from)?;
+    }
+
+    Ok(NoContent)
+}
+
+#[api_v2_operation(
+    summary = "Kick a player",
+    description = "",
+    operation_id = "sanctions.kick",
+    consumes = "application/json",
+    produces = "application/json",
+    tags("Sanctions")
+)]
+pub async fn kick_player(
+    state: Data<crate::State>,
+    _: OaBiscuitUserAccess,
+    biscuit: ReqData<Biscuit>,
+    body: Json<KickPlayerPost>,
+) -> Result<NoContent, MyProblem> {
+    if authorize(&biscuit, Action::SanctionsKick).is_err() {
+        return Err(MyProblem::Forbidden);
+    }
+
+    query!(
+        "INSERT INTO logs.sanction(player__id, sanction__id, staff_name, sanction_motif) VALUES ($1, $2, $3, $4)",
+        body.player_id,
+        body.sanction_id,
+        body.staff_name,
+        body.motif
+    )
+    .execute(&state.db)
+    .await
+    .map_err(|e| {
+        error!("Failed to insert sanction: {:?}", e);
+        MyProblem::InternalServerError
+    })?;
+
+    if body.generate_event {
+        let event_type = "player_kicked";
+        let event_data = json!({
+            "player_id": body.player_id,
+            "staff_name": body.staff_name,
+            "motif": body.motif,
+        });
+
+        query!(
+            "INSERT INTO events.event (event_type, event_data) VALUES ($1, $2)",
+            event_type,
+            event_data
+        )
+        .execute(&state.db)
+        .await
+        .map_err(MyProblem::from)?;
+    }
+
+    Ok(NoContent)
+}
+
+
+#[api_v2_operation(
+    summary = "Ban a player",
+    description = "",
+    operation_id = "sanctions.ban",
+    consumes = "application/json",
+    produces = "application/json",
+    tags("Sanctions")
+)]
+pub async fn ban_player(
+    state: Data<crate::State>,
+    _: OaBiscuitUserAccess,
+    biscuit: ReqData<Biscuit>,
+    body: Json<BanPlayerPost>,
+) -> Result<NoContent, MyProblem> {
+    if authorize(&biscuit, Action::SanctionsBan).is_err() {
+        return Err(MyProblem::Forbidden);
+    }
+
+    query!(
+        "INSERT INTO logs.sanction(player__id, sanction__id, staff_name, sanction_motif) VALUES ($1, $2, $3, $4)",
+        body.player_id,
+        body.sanction_id,
+        body.staff_name,
+        body.motif
+    )
+    .execute(&state.db)
+    .await
+    .map_err(|e| {
+        error!("Failed to insert sanction: {:?}", e);
+        MyProblem::InternalServerError
+    })?;
+
+    if body.generate_event {
+        let event_type = "player_banned";
+        let event_data = json!({
+            "player_id": body.player_id,
+            "staff_name": body.staff_name,
+            "motif": body.motif,
+        });
+
+        query!(
+            "INSERT INTO events.event (event_type, event_data) VALUES ($1, $2)",
+            event_type,
+            event_data
+        )
+        .execute(&state.db)
+        .await
+        .map_err(MyProblem::from)?;
+    }
+
+    Ok(NoContent)
 }

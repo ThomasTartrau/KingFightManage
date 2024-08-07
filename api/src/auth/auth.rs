@@ -14,12 +14,14 @@ use std::str::FromStr;
 use uuid::Uuid;
 use validator::Validate;
 
-use crate::utils::mailer::Mail;
-use crate::utils::problems::MyProblem;
 use crate::auth::iam::{
-    authorize_email_verification, authorize_only_user, authorize_refresh_token, create_refresh_token, create_reset_password_token, create_user_access_token, authorize_reset_password, Action
+    authorize_email_verification, authorize_only_user, authorize_refresh_token,
+    authorize_reset_password, create_refresh_token, create_reset_password_token,
+    create_user_access_token, Action,
 };
+use crate::utils::mailer::Mail;
 use crate::utils::openapi::{OaBiscuitRefresh, OaBiscuitUserAccess};
+use crate::utils::problems::MyProblem;
 
 use super::iam::{create_email_verification_token, get_user_id_from_expired_email_verification};
 
@@ -415,19 +417,18 @@ pub async fn resend_email_verification(
 
         if let Some(user) = user_lookup {
             let verification_token =
-            create_email_verification_token(&state.biscuit_private_key, user_id).map_err(|e| {
-                error!("Error trying to create email verification token: {e}");
-                MyProblem::InternalServerError
-            })?;
+                create_email_verification_token(&state.biscuit_private_key, user_id).map_err(
+                    |e| {
+                        error!("Error trying to create email verification token: {e}");
+                        MyProblem::InternalServerError
+                    },
+                )?;
 
             let address = Address::from_str(&user.email).map_err(|e| {
                 error!("Error trying to parse email address: {e}");
                 MyProblem::InternalServerError
             })?;
-            let recipient = Mailbox::new(
-                Some(format!("{}", &user.username)),
-                address,
-            );
+            let recipient = Mailbox::new(Some(format!("{}", &user.username)), address);
             state
                 .mailer
                 .send_mail(
@@ -444,17 +445,14 @@ pub async fn resend_email_verification(
                     warn!("Could not send verification email: {e}");
                     e
                 })?;
-    
-    
+
             Ok(NoContent)
         } else {
             Err(MyProblem::AuthEmailExpired)
         }
     } else {
         Err(MyProblem::Forbidden)
-    
     }
-    
 }
 
 #[api_v2_operation(
@@ -504,10 +502,7 @@ pub async fn begin_reset_password(
             error!("Error trying to parse email address: {e}");
             MyProblem::InternalServerError
         })?;
-        let recipient = Mailbox::new(
-            Some(format!("{}", &user.username)),
-            address,
-        );
+        let recipient = Mailbox::new(Some(format!("{}", &user.username)), address);
 
         match state
             .mailer
@@ -623,10 +618,7 @@ pub async fn change_password(
 
     let body = body.into_inner();
 
-    if let Ok(token) = authorize_only_user(
-        &biscuit,
-        Action::AuthChangePassword,
-    ) {
+    if let Ok(token) = authorize_only_user(&biscuit, Action::AuthChangePassword) {
         do_change_password(
             &state.db,
             state.password_minimum_length,

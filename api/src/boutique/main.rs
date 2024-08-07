@@ -9,7 +9,10 @@ use sqlx::query_as;
 use uuid::Uuid;
 
 use crate::auth::iam::authorize;
-use crate::{auth::iam::Action, utils::{openapi::OaBiscuitUserAccess, problems::MyProblem}};
+use crate::{
+    auth::iam::Action,
+    utils::{openapi::OaBiscuitUserAccess, problems::MyProblem},
+};
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct Log {

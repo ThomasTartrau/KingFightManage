@@ -1,33 +1,33 @@
 <script setup lang="ts">
-import { Ellipsis, LogOut } from "lucide-vue-next";
-import { onMounted, ref } from "vue";
-import CustomRouterLink from "../custom-router-link.vue";
-import CollapseMenu from "./CollapseMenu.vue";
-import { cn } from "@/lib/utils";
-import { useMenu } from "@/utils/useMenu";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import TooltipProvider from "@/components/ui/tooltip/TooltipProvider.vue";
-import Tooltip from "@/components/ui/tooltip/Tooltip.vue";
-import TooltipTrigger from "@/components/ui/tooltip/TooltipTrigger.vue";
+import { Ellipsis, LogOut } from 'lucide-vue-next'
+import { onMounted, ref } from 'vue'
+import CustomRouterLink from '../custom-router-link.vue'
+import CollapseMenu from './CollapseMenu.vue'
+import { cn } from '@/lib/utils'
+import { useMenu } from '@/utils/useMenu'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import TooltipProvider from '@/components/ui/tooltip/TooltipProvider.vue'
+import Tooltip from '@/components/ui/tooltip/Tooltip.vue'
+import TooltipTrigger from '@/components/ui/tooltip/TooltipTrigger.vue'
 
-import Button from "@/components/ui/button/Button.vue";
-import TooltipContent from "@/components/ui/tooltip/TooltipContent.vue";
-import { getRole, logout } from "@/iam";
-import type { Roles } from "@/utils/perms";
-import perms from "@/utils/perms";
+import Button from '@/components/ui/button/Button.vue'
+import TooltipContent from '@/components/ui/tooltip/TooltipContent.vue'
+import { getRole, logout } from '@/iam'
+import type { Roles } from '@/utils/perms'
+import perms from '@/utils/perms'
 
 defineProps<{
-  isOpen: boolean;
-}>();
+  isOpen: boolean
+}>()
 
-const role = ref<null | Roles>();
-const { menuList } = useMenu();
+const role = ref<null | Roles>()
+const { menuList } = useMenu()
 
 function _onLoad() {
-  role.value = getRole().value;
+  role.value = getRole().value
 }
 
-onMounted(_onLoad);
+onMounted(_onLoad)
 </script>
 
 <template>
@@ -97,7 +97,7 @@ onMounted(_onLoad);
                             :class="
                               cn(
                                 'flex justify-center items-center',
-                                !isOpen ? '' : 'mr-4'
+                                !isOpen ? '' : 'mr-4',
                               )
                             "
                           >
@@ -109,7 +109,7 @@ onMounted(_onLoad);
                                 'max-w-[200px] flex justify-center items-center truncate',
                                 !isOpen
                                   ? '-translate-x-96 opacity-0'
-                                  : 'translate-x-0 opacity-100'
+                                  : 'translate-x-0 opacity-100',
                               )
                             "
                           >
@@ -154,7 +154,7 @@ onMounted(_onLoad);
                     :class="
                       cn(
                         'flex justify-center items-center',
-                        isOpen === false ? '' : 'mr-4'
+                        isOpen === false ? '' : 'mr-4',
                       )
                     "
                   >
@@ -164,7 +164,7 @@ onMounted(_onLoad);
                     :class="
                       cn(
                         'whitespace-nowrap',
-                        !isOpen ? 'opacity-0 hidden' : 'opacity-100'
+                        !isOpen ? 'opacity-0 hidden' : 'opacity-100',
                       )
                     "
                   >

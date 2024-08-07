@@ -13,6 +13,20 @@ export enum Actions {
   StaffsGetLogs,
   StaffsGenerateRegistrationToken,
 
+  ServiceAccessGenerate,
+  ServiceAccessDelete,
+  ServiceAccessCopy,
+
+  SanctionsCreate,
+  SanctionsUpdate,
+  SanctionsDelete,
+
+  PlayersMute,
+  PlayersKick,
+  PlayersBan,
+  PlayersSendMessage,
+  PlayersGetSanctionLogs,
+
   SidebarStaffs,
   SidebarLogsStaffs,
   SidebarBoutiqueLogs,
@@ -22,18 +36,12 @@ export enum Actions {
   SidebarSanctions,
   SidebarSanctionsLogs,
   SidebarSanctionPlayersLogs,
+  SidebarPlayers,
 
   SidebarCategoryAdmin,
   SidebarCategoryBoutique,
   SidebarCategorySanction,
-
-  ServiceAccessGenerate,
-  ServiceAccessDelete,
-  ServiceAccessCopy,
-
-  SanctionsCreate,
-  SanctionsUpdate,
-  SanctionsDelete,
+  SidebarCategoryPlayers,
 }
 
 const HeadRoles = [Roles.ADMINISTRATEUR, Roles.DEVELOPPEUR, Roles.RESPONSABLE]
@@ -46,6 +54,30 @@ const allowed = {
   [Actions.StaffsGetLogs]: AllRoles,
   [Actions.StaffsGenerateRegistrationToken]: HeadRoles,
 
+  [Actions.ServiceAccessGenerate]: [Roles.ADMINISTRATEUR],
+  [Actions.ServiceAccessDelete]: [Roles.ADMINISTRATEUR],
+  [Actions.ServiceAccessCopy]: [Roles.ADMINISTRATEUR],
+
+  [Actions.SanctionsCreate]: HeadRoles,
+  [Actions.SanctionsUpdate]: HeadRoles,
+  [Actions.SanctionsDelete]: HeadRoles,
+
+  [Actions.PlayersMute]: AllRoles,
+  [Actions.PlayersKick]: [
+    Roles.ADMINISTRATEUR,
+    Roles.DEVELOPPEUR,
+    Roles.RESPONSABLE,
+    Roles.MODERATEUR,
+  ],
+  [Actions.PlayersBan]: [
+    Roles.ADMINISTRATEUR,
+    Roles.DEVELOPPEUR,
+    Roles.RESPONSABLE,
+    Roles.MODERATEUR,
+  ],
+  [Actions.PlayersSendMessage]: AllRoles,
+  [Actions.PlayersGetSanctionLogs]: AllRoles,
+
   [Actions.SidebarStaffs]: AllRoles,
   [Actions.SidebarLogsStaffs]: AllRoles,
   [Actions.SidebarBoutiqueLogs]: [Roles.ADMINISTRATEUR],
@@ -55,18 +87,12 @@ const allowed = {
   [Actions.SidebarSanctions]: AllRoles,
   [Actions.SidebarSanctionsLogs]: AllRoles,
   [Actions.SidebarSanctionPlayersLogs]: AllRoles,
+  [Actions.SidebarPlayers]: AllRoles,
 
   [Actions.SidebarCategoryAdmin]: AllRoles,
   [Actions.SidebarCategoryBoutique]: [Roles.ADMINISTRATEUR],
   [Actions.SidebarCategorySanction]: AllRoles,
-
-  [Actions.ServiceAccessGenerate]: [Roles.ADMINISTRATEUR],
-  [Actions.ServiceAccessDelete]: [Roles.ADMINISTRATEUR],
-  [Actions.ServiceAccessCopy]: [Roles.ADMINISTRATEUR],
-
-  [Actions.SanctionsCreate]: HeadRoles,
-  [Actions.SanctionsUpdate]: HeadRoles,
-  [Actions.SanctionsDelete]: HeadRoles,
+  [Actions.SidebarCategoryPlayers]: AllRoles,
 }
 
 function getRole(roleName: string): Roles {

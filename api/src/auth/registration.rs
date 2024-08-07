@@ -13,9 +13,9 @@ use std::str::FromStr;
 use uuid::Uuid;
 use validator::Validate;
 
-use crate::utils::problems::MyProblem;
-use crate::utils::mailer::Mail;
 use crate::auth::iam::create_email_verification_token;
+use crate::utils::mailer::Mail;
+use crate::utils::problems::MyProblem;
 
 use super::iam::authorize_registration;
 
@@ -48,18 +48,17 @@ pub async fn register(
     state: Data<crate::State>,
     body: Json<RegistrationPost>,
 ) -> Result<CreatedJson<Registration>, MyProblem> {
-
     if let Err(e) = body.validate() {
         return Err(MyProblem::Validation(e));
     }
 
     let body = body.into_inner();
 
-    let token =
-        Biscuit::from_base64(body.registration_token, state.biscuit_private_key.public()).map_err(|e| {
-            debug!("{e}");
-            MyProblem::Forbidden
-        })?;
+    let token = Biscuit::from_base64(body.registration_token, state.biscuit_private_key.public())
+        .map_err(|e| {
+        debug!("{e}");
+        MyProblem::Forbidden
+    })?;
 
     authorize_registration(&token).map_err(|e| {
         debug!("{e}");
@@ -103,10 +102,7 @@ pub async fn register(
                 error!("Error trying to create email verification token: {e}");
                 MyProblem::InternalServerError
             })?;
-        let recipient = Mailbox::new(
-            Some(format!("{}", body.username)),
-            recipient_address,
-        );
+        let recipient = Mailbox::new(Some(format!("{}", body.username)), recipient_address);
         state
             .mailer
             .send_mail(
@@ -126,12 +122,8 @@ pub async fn register(
 
         tx.commit().await?;
 
-        Ok(CreatedJson(Registration {
-            user_id,
-        }))
+        Ok(CreatedJson(Registration { user_id }))
     } else {
-        Err(MyProblem::PasswordTooShort(
-            state.password_minimum_length,
-        ))
+        Err(MyProblem::PasswordTooShort(state.password_minimum_length))
     }
 }

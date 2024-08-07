@@ -9,7 +9,11 @@ use sqlx::{query, query_as};
 use uuid::Uuid;
 
 use crate::auth::iam::{authorize, AuthorizedToken};
-use crate::{auth::auth::UserLookup, auth::iam::{create_registration_token, Action, Role}, utils::{openapi::OaBiscuitUserAccess, problems::MyProblem}};
+use crate::{
+    auth::auth::UserLookup,
+    auth::iam::{create_registration_token, Action, Role},
+    utils::{openapi::OaBiscuitUserAccess, problems::MyProblem},
+};
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct GenerateRegistrationTokenResponse {
@@ -66,7 +70,6 @@ pub async fn generate_registration_token(
     _: OaBiscuitUserAccess,
     biscuit: ReqData<Biscuit>,
 ) -> Result<CreatedJson<GenerateRegistrationTokenResponse>, MyProblem> {
-
     if authorize(&biscuit, Action::StaffsGenerateRegistrationToken).is_err() {
         Err(MyProblem::Forbidden)
     } else {
@@ -74,7 +77,7 @@ pub async fn generate_registration_token(
             debug!("{e}");
             MyProblem::Forbidden
         })?;
-    
+
         Ok(CreatedJson(GenerateRegistrationTokenResponse {
             registration_token: token.serialized_biscuit,
         }))
@@ -94,7 +97,6 @@ pub async fn get_staffs(
     _: OaBiscuitUserAccess,
     biscuit: ReqData<Biscuit>,
 ) -> Result<CreatedJson<GetUsersResponse>, MyProblem> {
-
     if authorize(&biscuit, Action::StaffsGetUsers).is_err() {
         Err(MyProblem::Forbidden)
     } else {
@@ -129,11 +131,9 @@ pub async fn set_role(
     biscuit: ReqData<Biscuit>,
     body: Json<SetRolePost>,
 ) -> Result<NoContent, MyProblem> {
-
     let body = body.into_inner();
-    
-    if let Ok(token) = authorize(&biscuit, Action::StaffsSetRank) {
 
+    if let Ok(token) = authorize(&biscuit, Action::StaffsSetRank) {
         if let AuthorizedToken::User(user) = token {
             let roles = Role::values();
             if !roles.contains(&body.role) {
@@ -144,10 +144,8 @@ pub async fn set_role(
                 return Err(MyProblem::Forbidden);
             }
         }
-        
 
         let mut tx = state.db.begin().await?;
-    
 
         let set_role = query!(
             "
@@ -175,7 +173,8 @@ pub async fn set_role(
         )
         .execute(&mut *tx)
         .await?
-        .rows_affected() > 0;
+        .rows_affected()
+            > 0;
 
         if set_role && tokens_revoked {
             tx.commit().await?;
@@ -224,22 +223,22 @@ pub async fn delete_user(
 
         if let Some(user) = user_lookup {
             if let AuthorizedToken::User(token_user) = token {
-                if Role::to_role(&user.role).get_order() >= Role::to_role(&token_user.role).get_order() {
+                if Role::to_role(&user.role).get_order()
+                    >= Role::to_role(&token_user.role).get_order()
+                {
                     return Err(MyProblem::Forbidden);
                 }
             }
 
-            let delete_user = query!(
-                "DELETE FROM iam.user WHERE user__id = $1",
-                &user_id,
-            )
-            .execute(&state.db)
-            .await
-            .map_err(|e| {
-                debug!("{e}");
-                MyProblem::InternalServerError
-            })?
-            .rows_affected() > 0;
+            let delete_user = query!("DELETE FROM iam.user WHERE user__id = $1", &user_id,)
+                .execute(&state.db)
+                .await
+                .map_err(|e| {
+                    debug!("{e}");
+                    MyProblem::InternalServerError
+                })?
+                .rows_affected()
+                > 0;
 
             let revoke_tokens = query!(
                 "
@@ -253,7 +252,8 @@ pub async fn delete_user(
             )
             .execute(&state.db)
             .await?
-            .rows_affected() > 0;
+            .rows_affected()
+                > 0;
 
             if delete_user && revoke_tokens {
                 Ok(NoContent)

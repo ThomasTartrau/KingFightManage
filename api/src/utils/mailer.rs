@@ -23,7 +23,9 @@ pub enum Mail {
 impl Mail {
     pub fn template(&self) -> &'static str {
         match self {
-            Mail::VerifyUserEmail { .. } => include_str!("../mail_templates/verify_user_email.mjml"),
+            Mail::VerifyUserEmail { .. } => {
+                include_str!("../mail_templates/verify_user_email.mjml")
+            }
             Mail::ResetPassword { .. } => include_str!("../mail_templates/reset_password.mjml"),
         }
     }

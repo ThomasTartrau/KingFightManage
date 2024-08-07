@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
 import { getPlayerSanctions } from "./SanctionsService";
 import Loader from "@/components/custom/loader.vue";
 import PromisedError from "@/components/custom/promised-error.vue";
 import Datatable from "@/components/custom/sanctions/sanctions-logs/datatable.vue";
 import type { components } from "@/types";
-import { UUID } from "@/http";
-import { useRoute } from "vue-router";
+import type { Problem, UUID } from "@/http";
 
 const route = useRoute();
 
@@ -33,7 +33,13 @@ async function _onLoad() {
     return;
   }
 
-  playersSanctions$.value = Promise.reject("L'id du joueur est manquant");
+  const problem: Problem = {
+    id: "bad_request",
+    status: 400,
+    title: "Bad Request",
+    detail: "Player ID is required",
+  };
+  playersSanctions$.value = Promise.reject(problem);
 }
 
 onMounted(async () => {

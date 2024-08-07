@@ -9,7 +9,10 @@ use sqlx::{query, query_as};
 use uuid::Uuid;
 
 use crate::auth::iam::{authorize, create_service_access_token, RootToken};
-use crate::{auth::iam::Action, utils::{openapi::OaBiscuitUserAccess, problems::MyProblem}};
+use crate::{
+    auth::iam::Action,
+    utils::{openapi::OaBiscuitUserAccess, problems::MyProblem},
+};
 
 #[derive(Debug, Serialize, Apiv2Schema)]
 pub struct ServiceToken {
@@ -42,30 +45,30 @@ pub async fn create_service_access(
 
     let token_id = Uuid::new_v4();
     match create_service_access_token(&state.biscuit_private_key, token_id) {
-            Ok(RootToken {
-                serialized_biscuit,
-                revocation_id,
-                ..
-            }) => {
-                let service_token = query_as!(
-                    ServiceToken,
-                    r#"
+        Ok(RootToken {
+            serialized_biscuit,
+            revocation_id,
+            ..
+        }) => {
+            let service_token = query_as!(
+                ServiceToken,
+                r#"
                         INSERT INTO iam.token (type, revocation_id, biscuit)
                         VALUES ('service_access', $1, $2)
                         RETURNING token__id AS token_id, biscuit AS "biscuit!", created_at
                     "#,
-                    revocation_id,
-                    Some(serialized_biscuit),
-                )
-                .fetch_one(&state.db)
-                .await
-                .map_err(MyProblem::from)?;
+                revocation_id,
+                Some(serialized_biscuit),
+            )
+            .fetch_one(&state.db)
+            .await
+            .map_err(MyProblem::from)?;
 
-                Ok(CreatedJson(service_token))
-            }
-            Err(e) => {
-                error!("Could not create a Biscuit (service access token): {e}");
-                Err(MyProblem::InternalServerError)
+            Ok(CreatedJson(service_token))
+        }
+        Err(e) => {
+            error!("Could not create a Biscuit (service access token): {e}");
+            Err(MyProblem::InternalServerError)
         }
     }
 }
@@ -86,12 +89,7 @@ pub async fn delete_service_access(
 ) -> Result<NoContent, MyProblem> {
     let token_id = token_id.into_inner();
 
-    if authorize(
-        &biscuit,
-        Action::ServiceAccessDeleteServiceAccess
-    )
-    .is_err()
-    {
+    if authorize(&biscuit, Action::ServiceAccessDeleteServiceAccess).is_err() {
         return Err(MyProblem::Forbidden);
     }
 
@@ -144,12 +142,7 @@ pub async fn get_service_access(
     _: OaBiscuitUserAccess,
     biscuit: ReqData<Biscuit>,
 ) -> Result<CreatedJson<ServiceTokenResponse>, MyProblem> {
-    if authorize(
-        &biscuit,
-        Action::ServiceAccessGetServiceAccess
-    )
-    .is_err()
-    {
+    if authorize(&biscuit, Action::ServiceAccessGetServiceAccess).is_err() {
         return Err(MyProblem::Forbidden);
     }
 
@@ -166,7 +159,5 @@ pub async fn get_service_access(
     .await
     .map_err(MyProblem::from)?;
 
-    Ok(CreatedJson(ServiceTokenResponse {
-        service_access,
-    }))
+    Ok(CreatedJson(ServiceTokenResponse { service_access }))
 }

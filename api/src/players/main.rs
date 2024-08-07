@@ -1,16 +1,18 @@
 use actix_web::web::ReqData;
 use biscuit_auth::Biscuit;
 use chrono::{DateTime, Utc};
-use log::{error, trace};
-use paperclip::actix::web::{Data, Path, Json};
-use paperclip::actix::{api_v2_operation, Apiv2Schema, CreatedJson, NoContent};
+use log::error;
+use paperclip::actix::web::{Data, Json};
+use paperclip::actix::{api_v2_operation, Apiv2Schema, NoContent};
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as};
 use uuid::Uuid;
 
-use crate::auth;
-use crate::auth::iam::{authorize, create_service_access_token, RootToken};
-use crate::{auth::iam::Action, utils::{openapi::OaBiscuitUserAccess, problems::MyProblem}};
+use crate::auth::iam::authorize;
+use crate::{
+    auth::iam::Action,
+    utils::{openapi::OaBiscuitUserAccess, problems::MyProblem},
+};
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct PlayerJoinPost {

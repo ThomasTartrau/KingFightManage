@@ -130,8 +130,8 @@ where
                             }
                             Err(biscuit_err) => {
                                 let e = MyProblem::AuthInvalidBiscuit;
-                                        debug!("{e}: {biscuit_err}");
-                                        Box::pin(ready(Ok(req.error_response(e))))
+                                debug!("{e}: {biscuit_err}");
+                                Box::pin(ready(Ok(req.error_response(e))))
                             }
                         }
                     }

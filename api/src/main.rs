@@ -1,26 +1,33 @@
-use std::{str::FromStr, time::Duration};
 use actix_cors::Cors;
 use actix_files::{Files, NamedFile};
-use actix_web::{middleware::{self, Logger, NormalizePath}, web::{self}, App, HttpServer};
+use actix_web::{
+    middleware::{self, Logger, NormalizePath},
+    web::{self},
+    App, HttpServer,
+};
 use biscuit_auth::{KeyPair, PrivateKey};
+use std::{str::FromStr, time::Duration};
 
 use clap::{crate_name, Parser};
 use lettre::Address;
 use log::{info, warn};
-use sqlx::{postgres::{PgConnectOptions, PgPoolOptions}, PgPool};
+use sqlx::{
+    postgres::{PgConnectOptions, PgPoolOptions},
+    PgPool,
+};
 use url::Url;
 
 use crate::auth::middleware_biscuit;
 
 mod auth;
-mod utils;
-mod user_settings;
-mod events;
-mod staffs;
 mod boutique;
-mod service_access;
+mod events;
 mod players;
 mod sanctions;
+mod service_access;
+mod staffs;
+mod user_settings;
+mod utils;
 
 const APP_TITLE: &str = "KingFightManage";
 const WEBAPP_INDEX_FILE: &str = "index.html";
@@ -74,7 +81,11 @@ struct Config {
     smtp_timeout_in_s: u64,
 
     /// URL of the Hook0 logo
-    #[clap(long, env, default_value = "https://cdn.discordapp.com/icons/1196515381620260986/a30a00c4d936c8c30854cb3381e44981.webp?size=128")]
+    #[clap(
+        long,
+        env,
+        default_value = "https://cdn.discordapp.com/icons/1196515381620260986/a30a00c4d936c8c30854cb3381e44981.webp?size=128"
+    )]
     email_logo_url: Url,
 
     /// Frontend application URL (used for building links in emails)
@@ -96,7 +107,6 @@ struct Config {
     /// Path to the profile picture directory
     #[clap(long, env, default_value = "../frontend/public/profile-pictures/")]
     profile_picture_dir: String,
-
 
     /// Default role for new users
     #[clap(long, env, default_value = "Support")]
@@ -184,7 +194,7 @@ async fn main() -> anyhow::Result<()> {
                 /* for origin in &config.cors_allowed_origins {
                     c = c.allowed_origin(origin);
                 } */
-                
+
                 c = c.allow_any_origin(); // Allow all origins for now
                 c
             };
@@ -194,7 +204,7 @@ async fn main() -> anyhow::Result<()> {
                 db: initial_state.db.clone(),
                 biscuit_private_key: initial_state.biscuit_private_key.clone(),
             };
-            
+
             let security_headers = middleware::DefaultHeaders::new()
                 .add(("X-Content-Type-Options", "nosniff"))
                 .add(("Referrer-Policy", "strict-origin-when-cross-origin"))
@@ -219,121 +229,149 @@ async fn main() -> anyhow::Result<()> {
                 .wrap(Logger::default())
                 .wrap(NormalizePath::trim())
                 .service(
-                    
-                    web::scope("/api")
-                        .service(
-                            web::scope("/v1")
-                                .service(
-                                    web::scope("/auth")
-                                        .service(
-                                            web::resource("/login")
-                                                .route(web::post().to(auth::auth::login)),
-                                        )
-                                        .service(
-                                            web::resource("/register")
-                                                .route(web::post().to(auth::registration::register)),
-                                        )
-                                        .service(
-                                            web::resource("/logout")
-                                                .wrap(biscuit_auth.clone())
-                                                .route(web::post().to(auth::auth::logout)),
-                                        )
-                                        .service(
-                                            web::resource("/refresh")
-                                                .wrap(biscuit_auth.clone())
-                                                .route(web::post().to(auth::auth::refresh)),
-                                        )
-                                        .service(
-                                            web::resource("/verify-email")
-                                                .route(web::post().to(auth::auth::verify_email)),
-                                        ).service(
-                                            web::resource("/resend-verification-email")
-                                                .route(web::post().to(auth::auth::resend_email_verification)),
-                                        )
-                                        .service(
-                                            web::resource("/begin-reset-password").route(
-                                                web::post().to(auth::auth::begin_reset_password),
-                                            ),
-                                        )
-                                        .service(
-                                            web::resource("/reset-password")
-                                                .route(web::post().to(auth::auth::reset_password)),
-                                        )
-                                        .service(
-                                            web::resource("/password")
-                                                .wrap(biscuit_auth.clone())
-                                                .route(web::get().to(auth::auth::change_password)),
+                    web::scope("/api").service(
+                        web::scope("/v1")
+                            .service(
+                                web::scope("/auth")
+                                    .service(
+                                        web::resource("/login")
+                                            .route(web::post().to(auth::auth::login)),
+                                    )
+                                    .service(
+                                        web::resource("/register")
+                                            .route(web::post().to(auth::registration::register)),
+                                    )
+                                    .service(
+                                        web::resource("/logout")
+                                            .wrap(biscuit_auth.clone())
+                                            .route(web::post().to(auth::auth::logout)),
+                                    )
+                                    .service(
+                                        web::resource("/refresh")
+                                            .wrap(biscuit_auth.clone())
+                                            .route(web::post().to(auth::auth::refresh)),
+                                    )
+                                    .service(
+                                        web::resource("/verify-email")
+                                            .route(web::post().to(auth::auth::verify_email)),
+                                    )
+                                    .service(web::resource("/resend-verification-email").route(
+                                        web::post().to(auth::auth::resend_email_verification),
+                                    ))
+                                    .service(
+                                        web::resource("/begin-reset-password").route(
+                                            web::post().to(auth::auth::begin_reset_password),
                                         ),
-                                )
-                                .service(
-                                    web::scope("/logs")
-                                        .service(
-                                            web::resource("/boutique")
+                                    )
+                                    .service(
+                                        web::resource("/reset-password")
+                                            .route(web::post().to(auth::auth::reset_password)),
+                                    )
+                                    .service(
+                                        web::resource("/password")
+                                            .wrap(biscuit_auth.clone())
+                                            .route(web::get().to(auth::auth::change_password)),
+                                    ),
+                            )
+                            .service(
+                                web::scope("/logs")
+                                    .service(
+                                        web::resource("/boutique")
+                                            .wrap(biscuit_auth.clone())
+                                            .route(web::get().to(boutique::main::get_logs)),
+                                    )
+                                    .service(
+                                        web::resource("/pb")
+                                            .wrap(biscuit_auth.clone())
+                                            .route(web::get().to(boutique::main::get_pb_logs)),
+                                    )
+                                    .service(
+                                        web::scope("/sanction")
+                                            .service(
+                                                web::scope("/{player_id}")
+                                                    .wrap(biscuit_auth.clone())
+                                                    .route(
+                                                        "",
+                                                        web::get().to(
+                                                            sanctions::main::get_player_sanctions,
+                                                        ),
+                                                    )
+                                                    .route(
+                                                        "/mute",
+                                                        web::post()
+                                                            .to(sanctions::main::mute_player),
+                                                    )
+                                                    .route(
+                                                        "/kick",
+                                                        web::post()
+                                                            .to(sanctions::main::kick_player),
+                                                    )
+                                                    .route(
+                                                        "/ban",
+                                                        web::post().to(sanctions::main::ban_player),
+                                                    ),
+                                            )
+                                            .wrap(biscuit_auth.clone())
+                                            .route(
+                                                "",
+                                                web::get().to(sanctions::main::get_sanctions_logs),
+                                            ),
+                                    ),
+                            )
+                            .service(
+                                web::scope("/user")
+                                    .service(
+                                        web::resource("/profile-picture")
+                                            .wrap(biscuit_auth.clone())
+                                            .route(
+                                                web::post().to(
+                                                    user_settings::main::change_profile_picture,
+                                                ),
+                                            ),
+                                    )
+                                    .service(
+                                        web::scope("/profile").service(
+                                            web::resource("/username")
                                                 .wrap(biscuit_auth.clone())
-                                                .route(web::get().to(boutique::main::get_logs)),
-                                        )
-                                        .service(
-                                            web::resource("/pb")
-                                                .wrap(biscuit_auth.clone())
-                                                .route(web::get().to(boutique::main::get_pb_logs)),
-                                        )
-                                        .service(
-                                            web::scope("/sanction")
-                                                .service(
-                                                    web::resource("/{player_id}")
-                                                        .wrap(biscuit_auth.clone())
-                                                        .route(web::get().to(sanctions::main::get_player_sanctions)),
-                                                )
-                                                .wrap(biscuit_auth.clone())
-                                                .route("", web::get().to(sanctions::main::get_sanctions_logs)),
-                                                
-                                        )
-                                )
-                                .service(
-                                    web::scope("/user")
-                                        .service(
-                                            web::resource("/profile-picture")
-                                                .wrap(biscuit_auth.clone())
-                                                .route(web::post().to(user_settings::main::change_profile_picture)),
-                                        )
-                                        .service(
-                                            web::scope("/profile")
-                                                .service(
-                                                    web::resource("/username")
-                                                        .wrap(biscuit_auth.clone())
-                                                        .route(web::post().to(user_settings::main::change_username)),
-                                                )
-                                        )
+                                                .route(
+                                                    web::post()
+                                                        .to(user_settings::main::change_username),
+                                                ),
+                                        ),
+                                    )
                                     .wrap(biscuit_auth.clone())
                                     .route("", web::delete().to(user_settings::main::delete_user)),
-                                )
-                                .service(
-                                    web::scope("/staffs")
+                            )
+                            .service(
+                                web::scope("/staffs")
                                     .service(
                                         web::resource("/generate-registration-token")
-                                        .wrap(biscuit_auth.clone())
-                                        .route(web::get().to(staffs::main::generate_registration_token)),
+                                            .wrap(biscuit_auth.clone())
+                                            .route(
+                                                web::get()
+                                                    .to(staffs::main::generate_registration_token),
+                                            ),
                                     )
                                     .service(
                                         web::resource("/set-role")
-                                        .wrap(biscuit_auth.clone())
-                                        .route(web::post().to(staffs::main::set_role)),
+                                            .wrap(biscuit_auth.clone())
+                                            .route(web::post().to(staffs::main::set_role)),
                                     )
                                     .service(
                                         web::resource("/logs")
-                                        .wrap(biscuit_auth.clone())
-                                        .route(web::get().to(staffs::main::get_logs)),
+                                            .wrap(biscuit_auth.clone())
+                                            .route(web::get().to(staffs::main::get_logs)),
                                     )
                                     .service(
                                         web::resource("/{user_id}")
-                                        .wrap(biscuit_auth.clone())
-                                        .route(web::delete().to(staffs::main::delete_user)),
+                                            .wrap(biscuit_auth.clone())
+                                            .route(web::delete().to(staffs::main::delete_user)),
                                     )
                                     .wrap(biscuit_auth.clone())
                                     .route("", web::get().to(staffs::main::get_staffs)),
-                                )
-                                .service(
-                                    web::scope("/events")
+                            )
+                            .service(
+                                web::scope("/events")
                                     .service(
                                         web::resource("/send-message")
                                             .wrap(biscuit_auth.clone())
@@ -342,75 +380,88 @@ async fn main() -> anyhow::Result<()> {
                                     .wrap(biscuit_auth.clone())
                                     .route("", web::post().to(events::main::ingest_event))
                                     .route("", web::get().to(events::main::get_events)),
-                                )
-                                .service(
-                                    web::scope("/service-access")
+                            )
+                            .service(
+                                web::scope("/service-access")
                                     .service(
                                         web::resource("/{token_id}")
-                                        .wrap(biscuit_auth.clone())
-                                        .route(web::delete().to(service_access::main::delete_service_access))
+                                            .wrap(biscuit_auth.clone())
+                                            .route(
+                                                web::delete().to(
+                                                    service_access::main::delete_service_access,
+                                                ),
+                                            ),
                                     )
                                     .wrap(biscuit_auth.clone())
-                                    .route("", web::post().to(service_access::main::create_service_access))
-                                    .route("", web::get().to(service_access::main::get_service_access))
-                                )
-                                .service(
-                                    web::scope("/players")
+                                    .route(
+                                        "",
+                                        web::post().to(service_access::main::create_service_access),
+                                    )
+                                    .route(
+                                        "",
+                                        web::get().to(service_access::main::get_service_access),
+                                    ),
+                            )
+                            .service(
+                                web::scope("/players")
                                     .service(
                                         web::resource("/join")
-                                        .wrap(biscuit_auth.clone())
-                                        .route(web::post().to(players::main::player_join)),
+                                            .wrap(biscuit_auth.clone())
+                                            .route(web::post().to(players::main::player_join)),
                                     )
                                     .service(
                                         web::resource("/leave")
-                                        .wrap(biscuit_auth.clone())
-                                        .route(web::post().to(players::main::player_leave)),
+                                            .wrap(biscuit_auth.clone())
+                                            .route(web::post().to(players::main::player_leave)),
                                     )
                                     .service(
-                                        web::resource("/onlines")
-                                        .wrap(biscuit_auth.clone())
-                                        .route(web::get().to(players::main::get_online_players)),
-                                    )
-                                )
-                                .service(
-                                    web::scope("/sanctions")
+                                        web::resource("/onlines").wrap(biscuit_auth.clone()).route(
+                                            web::get().to(players::main::get_online_players),
+                                        ),
+                                    ),
+                            )
+                            .service(
+                                web::scope("/sanctions")
                                     .service(
                                         web::resource("/{sanction_id}")
-                                        .wrap(biscuit_auth.clone())
-                                        .route(web::put().to(sanctions::main::update_sanction))
-                                        .route(web::delete().to(sanctions::main::delete_sanction)),
+                                            .wrap(biscuit_auth.clone())
+                                            .route(web::put().to(sanctions::main::update_sanction))
+                                            .route(
+                                                web::delete().to(sanctions::main::delete_sanction),
+                                            ),
                                     )
                                     .wrap(biscuit_auth.clone())
                                     .route("", web::get().to(sanctions::main::get_sanctions))
-                                    .route("", web::post().to(sanctions::main::create_sanction))
-                                )
-                                
-                        )
-                    );
-
-                if !config.disable_serving_webapp {
-                    app = app.default_service(
-                        Files::new("/", webapp_path.as_str())
-                            .index_file(WEBAPP_INDEX_FILE)
-                            .default_handler(
-                                NamedFile::open(format!("{}/{}", &webapp_path, WEBAPP_INDEX_FILE))
-                                    .expect("Cannot open SPA main file"),
+                                    .route("", web::post().to(sanctions::main::create_sanction)),
                             ),
-                    );
-                }
-                app
+                    ),
+                );
+
+            if !config.disable_serving_webapp {
+                app = app.default_service(
+                    Files::new("/", webapp_path.as_str())
+                        .index_file(WEBAPP_INDEX_FILE)
+                        .default_handler(
+                            NamedFile::open(format!("{}/{}", &webapp_path, WEBAPP_INDEX_FILE))
+                                .expect("Cannot open SPA main file"),
+                        ),
+                );
+            }
+            app
         })
-            .bind(&format!("{}:{}", config.ip, config.port))?
-            .run()
-            .await
-            .map_err(|e| e.into())
+        .bind(&format!("{}:{}", config.ip, config.port))?
+        .run()
+        .await
+        .map_err(|e| e.into())
     } else {
         warn!("No BISCUIT_PRIVATE_KEY environment variable found. Generating a new keypair.");
         let keypair = KeyPair::new();
-        Ok(println!("BISCUIT_PRIVATE_KEY={:?}", keypair.private().to_bytes_hex()))
+        Ok(println!(
+            "BISCUIT_PRIVATE_KEY={:?}",
+            keypair.private().to_bytes_hex()
+        ))
     }
 }
-
 
 /// Initialise a logger with default level at INFO
 fn mk_log_builder() -> env_logger::Builder {
@@ -421,4 +472,3 @@ fn init_logger() {
     mk_log_builder().init();
     info!("Started logger");
 }
-

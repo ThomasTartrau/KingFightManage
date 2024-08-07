@@ -9,7 +9,6 @@ use serde_json::{to_value, Value};
 use sqlx::{postgres::PgDatabaseError, Error};
 use strum::EnumIter;
 
-
 #[api_v2_errors(code = 403, code = 500, code = 400, code = 404, code = 409)]
 #[derive(Debug, Clone, EnumIter, strum::Display)]
 pub enum MyProblem {
@@ -219,7 +218,6 @@ impl From<MyProblem> for Problem {
                 }
             },
 
-            
 
             // Generics errors
             MyProblem::Validation(e) => {

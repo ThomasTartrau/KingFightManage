@@ -58,7 +58,7 @@ pub async fn ingest_event(
     body: Json<IngestEventPost>,
 ) -> Result<NoContent, MyProblem> {
     let body = body.into_inner();
-    
+
     if authorize(&biscuit, Action::EventsIngest).is_err() {
         Err(MyProblem::Forbidden)
     } else {
@@ -77,7 +77,6 @@ pub async fn ingest_event(
             Err(MyProblem::NotFound)
         }
     }
-
 }
 
 #[api_v2_operation(
@@ -140,22 +139,26 @@ pub async fn send_message(
 
     if let Ok(token) = authorize_only_user(&biscuit, Action::EventsSendMessage) {
         let event_type = "send_message";
-            let event_data = json!({
-                "sender": &token.username,
-                "target": body.user_id,
-                "message": body.message,
-            });
+        let event_data = json!({
+            "sender": &token.username,
+            "target": body.user_id,
+            "message": body.message,
+        });
 
-            let result = query!("INSERT INTO events.event (event_type, event_data) VALUES ($1, $2)", event_type, event_data)
-                .execute(&state.db)
-                .await
-                .map_err(MyProblem::from)?;
+        let result = query!(
+            "INSERT INTO events.event (event_type, event_data) VALUES ($1, $2)",
+            event_type,
+            event_data
+        )
+        .execute(&state.db)
+        .await
+        .map_err(MyProblem::from)?;
 
-            if result.rows_affected() > 0 {
-                Ok(NoContent)
-            } else {
-                Err(MyProblem::InternalServerError)
-            }
+        if result.rows_affected() > 0 {
+            Ok(NoContent)
+        } else {
+            Err(MyProblem::InternalServerError)
+        }
     } else {
         Err(MyProblem::Forbidden)
     }

@@ -1,9 +1,12 @@
-use std::time::{Duration, SystemTime};
-use biscuit_auth::{builder::Fact, builder_ext::AuthorizerExt, error, macros::*, AuthorizerLimits, Biscuit, KeyPair, PrivateKey};
+use biscuit_auth::{
+    builder::Fact, builder_ext::AuthorizerExt, error, macros::*, AuthorizerLimits, Biscuit,
+    KeyPair, PrivateKey,
+};
 use chrono::{DateTime, Utc};
 use log::{error, trace};
 use paperclip::v2::schema::TypedData;
 use serde::Serialize;
+use std::time::{Duration, SystemTime};
 use strum::{AsRefStr, EnumIter, EnumString, IntoEnumIterator, VariantNames};
 use uuid::Uuid;
 
@@ -137,12 +140,16 @@ pub enum Action {
     PlayersJoin,
     PlayersLeave,
     PlayersGetOnline,
+    PlayersSanction,
     SanctionsCreate,
     SanctionsUpdate,
     SanctionsDelete,
     SanctionsGets,
     SanctionsGetPlayerSanction,
     SanctionsGetLogs,
+    SanctionsMute,
+    SanctionsKick,
+    SanctionsBan,
 }
 
 impl<'a> Action {
@@ -153,7 +160,9 @@ impl<'a> Action {
             Action::UserSettingsChangeProfilePicture => "users-settings:change_profile_picture",
             Action::UserSettingsChangeName => "users-settings:change_name",
             Action::UserSettingsDeleteUser => "users-settings:delete_user",
-            Action::StaffsGenerateRegistrationToken => "users-management:generate_registration_token",
+            Action::StaffsGenerateRegistrationToken => {
+                "users-management:generate_registration_token"
+            }
             Action::StaffsGetUsers => "users-management:get-users",
             Action::StaffsSetRank => "users-management:set-role",
             Action::StaffsDeleteUser => "users-management:delete-user",
@@ -169,18 +178,28 @@ impl<'a> Action {
             Action::PlayersJoin => "players:join",
             Action::PlayersLeave => "players:leave",
             Action::PlayersGetOnline => "players:get-online",
+            Action::PlayersSanction => "players:sanction",
             Action::SanctionsCreate => "sanctions:create",
             Action::SanctionsUpdate => "sanctions:update",
             Action::SanctionsDelete => "sanctions:delete",
             Action::SanctionsGets => "sanctions:gets",
             Action::SanctionsGetPlayerSanction => "sanctions:get-player-sanction",
             Action::SanctionsGetLogs => "sanctions:get-logs",
+            Action::SanctionsMute => "sanctions:mute",
+            Action::SanctionsKick => "sanctions:kick",
+            Action::SanctionsBan => "sanctions:ban",
         }
     }
 
     fn allowed_roles(&self) -> Vec<Role> {
         let mut roles = vec![Role::Administrateur];
-        let all_roles: Vec<Role> = vec![Role::Support, Role::Moderateur, Role::Responsable, Role::Developpeur];
+        let all_roles: Vec<Role> = vec![
+            Role::Support,
+            Role::Moderateur,
+            Role::Responsable,
+            Role::Developpeur,
+        ];
+        let head_staffs: Vec<Role> = vec![Role::Responsable, Role::Developpeur];
 
         let mut per_action_roles = match self {
             Self::AuthLogout => all_roles,
@@ -190,8 +209,8 @@ impl<'a> Action {
             Self::UserSettingsDeleteUser => all_roles,
             Self::StaffsGenerateRegistrationToken => vec![],
             Self::StaffsGetUsers => all_roles,
-            Self::StaffsSetRank => vec![Role::Responsable, Role::Developpeur],
-            Self::StaffsDeleteUser => vec![Role::Responsable, Role::Developpeur],
+            Self::StaffsSetRank => head_staffs,
+            Self::StaffsDeleteUser => head_staffs,
             Self::StaffsGetLogs => all_roles,
             Self::EventsSendMessage => all_roles,
             Self::EventsIngest => vec![],
@@ -204,12 +223,16 @@ impl<'a> Action {
             Self::PlayersJoin => vec![],
             Self::PlayersLeave => vec![],
             Self::PlayersGetOnline => all_roles,
-            Self::SanctionsCreate => vec![Role::Responsable, Role::Developpeur],
-            Self::SanctionsUpdate => vec![Role::Responsable, Role::Developpeur],
-            Self::SanctionsDelete => vec![Role::Responsable, Role::Developpeur],
+            Self::PlayersSanction => all_roles,
+            Self::SanctionsCreate => head_staffs,
+            Self::SanctionsUpdate => head_staffs,
+            Self::SanctionsDelete => head_staffs,
             Self::SanctionsGets => all_roles,
             Self::SanctionsGetPlayerSanction => all_roles,
             Self::SanctionsGetLogs => all_roles,
+            Self::SanctionsMute => all_roles,
+            Self::SanctionsKick => vec![Role::Moderateur, Role::Responsable, Role::Developpeur],
+            Self::SanctionsBan => vec![Role::Moderateur, Role::Responsable, Role::Developpeur],
         };
 
         roles.append(&mut per_action_roles);
@@ -239,12 +262,16 @@ impl<'a> Action {
             Self::PlayersJoin => vec![],
             Self::PlayersLeave => vec![],
             Self::PlayersGetOnline => vec![],
+            Self::PlayersSanction => vec![],
             Self::SanctionsCreate => vec![],
             Self::SanctionsUpdate => vec![],
             Self::SanctionsDelete => vec![],
             Self::SanctionsGets => vec![],
             Self::SanctionsGetPlayerSanction => vec![],
             Self::SanctionsGetLogs => vec![],
+            Self::SanctionsMute => vec![],
+            Self::SanctionsKick => vec![],
+            Self::SanctionsBan => vec![],
         };
 
         facts.push(fact!("action({action})", action = self.action_name()));
@@ -426,7 +453,8 @@ pub fn authorize_only_user(
 ) -> Result<AuthorizedUserToken, biscuit_auth::error::Token> {
     match authorize(biscuit, action) {
         Ok(AuthorizedToken::User(aut)) => Ok(aut),
-        #[allow(unreachable_patterns)] // This is unreachable because the only authorized token is a user token
+        #[allow(unreachable_patterns)]
+        // This is unreachable because the only authorized token is a user token
         Ok(_) => {
             trace!("Authorization was denied because a user_access token was required");
             Err(biscuit_auth::error::Token::InternalError)
@@ -491,11 +519,7 @@ pub fn authorize_refresh_token(
     })
 }
 
-pub fn authorize(
-    biscuit: &Biscuit,
-    action: Action,
-) -> Result<AuthorizedToken, error::Token> {
-
+pub fn authorize(biscuit: &Biscuit, action: Action) -> Result<AuthorizedToken, error::Token> {
     let mut authorizer = authorizer!(
         r#"
             valid_types(["user_access", "service_access"]);
@@ -540,26 +564,30 @@ pub fn authorize(
 
     match token_type.as_str() {
         "user_access" => {
-            let raw_session_id: Vec<(Vec<u8>,)> = authorizer.query(rule!("data($id) <- session_id($id)"))?;
+            let raw_session_id: Vec<(Vec<u8>,)> =
+                authorizer.query(rule!("data($id) <- session_id($id)"))?;
             let session_id = raw_session_id
                 .first()
                 .and_then(|(str,)| Uuid::from_slice(str).ok())
                 .ok_or(biscuit_auth::error::Token::InternalError)?;
 
-            let raw_user_id: Vec<(Vec<u8>,)> = authorizer.query(rule!("data($id) <- user_id($id)"))?;
+            let raw_user_id: Vec<(Vec<u8>,)> =
+                authorizer.query(rule!("data($id) <- user_id($id)"))?;
             let user_id = raw_user_id
                 .first()
                 .and_then(|(str,)| Uuid::from_slice(str).ok())
                 .ok_or(biscuit_auth::error::Token::InternalError)?;
 
-            let raw_email: Vec<(String,)> = authorizer.query(rule!("data($email) <- email($email)"))?;
+            let raw_email: Vec<(String,)> =
+                authorizer.query(rule!("data($email) <- email($email)"))?;
             let email = raw_email
                 .first()
                 .ok_or(biscuit_auth::error::Token::InternalError)?
                 .0
                 .to_owned();
 
-            let raw_username: Vec<(String,)> = authorizer.query(rule!("data($username) <- username($username)"))?;
+            let raw_username: Vec<(String,)> =
+                authorizer.query(rule!("data($username) <- username($username)"))?;
             let username = raw_username
                 .first()
                 .ok_or(biscuit_auth::error::Token::InternalError)?
@@ -581,9 +609,7 @@ pub fn authorize(
                 role,
             }))
         }
-        "service_access" => {
-            Ok(AuthorizedToken::Service)
-        }
+        "service_access" => Ok(AuthorizedToken::Service),
         _ => {
             error!("Invalid token type: {}", token_type);
             Err(biscuit_auth::error::Token::InternalError)
@@ -723,9 +749,7 @@ pub fn create_registration_token(
     })
 }
 
-pub fn authorize_registration(
-    biscuit: &Biscuit,
-) -> Result<(), biscuit_auth::error::Token> {
+pub fn authorize_registration(biscuit: &Biscuit) -> Result<(), biscuit_auth::error::Token> {
     let mut authorizer = authorizer!(
         r#"
             supported_version("registration", 1);

@@ -1,5 +1,5 @@
-use actix_web::web::{Json, ReqData};
 use actix_multipart::Multipart;
+use actix_web::web::{Json, ReqData};
 use biscuit_auth::Biscuit;
 use futures_util::TryStreamExt;
 use log::{error, warn};
@@ -8,13 +8,13 @@ use paperclip::actix::web::Data;
 use paperclip::actix::{api_v2_operation, Apiv2Schema, NoContent};
 use serde::{Deserialize, Serialize};
 use sqlx::query;
-use validator::Validate;
 use std::fs;
 use std::io::Write;
+use validator::Validate;
 
-use crate::utils::problems::MyProblem;
 use crate::auth::iam::{authorize_only_user, Action};
 use crate::utils::openapi::OaBiscuitUserAccess;
+use crate::utils::problems::MyProblem;
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema, Validate)]
 pub struct ChangeUsernamePost {
@@ -40,27 +40,27 @@ pub async fn change_profile_picture(
     biscuit: ReqData<Biscuit>,
     mut payload: Multipart,
 ) -> Result<NoContent, MyProblem> {
-    if let Ok(token) = authorize_only_user(
-        &biscuit,
-        Action::UserSettingsChangeProfilePicture,
-    ) {
+    if let Ok(token) = authorize_only_user(&biscuit, Action::UserSettingsChangeProfilePicture) {
         let mut current_count = 0;
         loop {
-            if current_count == MAX_FILE_COUNT { break; }
+            if current_count == MAX_FILE_COUNT {
+                break;
+            }
             if let Some(mut field) = payload.try_next().await.map_err(|e| {
                 error!("Error trying to read profile picture: {e}");
                 MyProblem::InternalServerError
             })? {
                 let filetype: Option<&Mime> = field.content_type();
-                if filetype.is_none() { continue; }
-                if !ALLOWED_FILE_TYPES.contains(&filetype.unwrap()) { continue; }
+                if filetype.is_none() {
+                    continue;
+                }
+                if !ALLOWED_FILE_TYPES.contains(&filetype.unwrap()) {
+                    continue;
+                }
 
-                let destination: String = format!(
-                    "{}{}.jpeg",
-                    state.profile_picture_dir,
-                    token.user_id
-                );
-    
+                let destination: String =
+                    format!("{}{}.jpeg", state.profile_picture_dir, token.user_id);
+
                 let mut saved_file: fs::File = fs::File::create(&destination).map_err(|e| {
                     error!("Error trying to create profile picture: {e}");
                     MyProblem::InternalServerError
@@ -71,11 +71,10 @@ pub async fn change_profile_picture(
                         MyProblem::InternalServerError
                     })?;
                 }
-                
-            } else { 
+            } else {
                 warn!("No profile picture found in the request");
                 break;
-             }
+            }
             current_count += 1;
         }
 
@@ -98,10 +97,7 @@ pub async fn change_username(
     biscuit: ReqData<Biscuit>,
     body: Json<ChangeUsernamePost>,
 ) -> Result<NoContent, MyProblem> {
-    if let Ok(token) = authorize_only_user(
-        &biscuit,
-        Action::UserSettingsChangeName,
-    ) {
+    if let Ok(token) = authorize_only_user(&biscuit, Action::UserSettingsChangeName) {
         query!(
             "UPDATE iam.user SET username = $1 WHERE user__id = $2",
             body.username,
@@ -128,16 +124,10 @@ pub async fn delete_user(
     _: OaBiscuitUserAccess,
     biscuit: ReqData<Biscuit>,
 ) -> Result<NoContent, MyProblem> {
-    if let Ok(token) = authorize_only_user(
-        &biscuit,
-        Action::UserSettingsDeleteUser,
-    ) {
-        query!(
-            "DELETE FROM iam.user WHERE user__id = $1",
-            token.user_id
-        )
-        .execute(&state.db)
-        .await?;
+    if let Ok(token) = authorize_only_user(&biscuit, Action::UserSettingsDeleteUser) {
+        query!("DELETE FROM iam.user WHERE user__id = $1", token.user_id)
+            .execute(&state.db)
+            .await?;
 
         Ok(NoContent)
     } else {
