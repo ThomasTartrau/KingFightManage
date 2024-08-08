@@ -22,8 +22,8 @@ FROM rust:1.69 AS build-rust
 WORKDIR /app
 
 # Copier les fichiers source Rust
-COPY backend/Cargo.toml backend/Cargo.lock ./
-COPY backend/src ./src
+COPY api/Cargo.toml backend/Cargo.lock ./
+COPY api/src ./src
 
 # Compiler l'application Rust en mode release
 RUN cargo build --release
