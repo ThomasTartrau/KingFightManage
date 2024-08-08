@@ -6,7 +6,7 @@ use chrono::{DateTime, Utc};
 use log::{error, trace};
 use paperclip::v2::schema::TypedData;
 use serde::Serialize;
-use std::time::{Duration, SystemTime};
+use std::{time::{Duration, SystemTime}, vec};
 use strum::{AsRefStr, EnumIter, EnumString, IntoEnumIterator, VariantNames};
 use uuid::Uuid;
 
@@ -150,6 +150,8 @@ pub enum Action {
     SanctionsMute,
     SanctionsKick,
     SanctionsBan,
+    ErrorsGet,
+    ErrorsPost,
 }
 
 impl<'a> Action {
@@ -188,6 +190,8 @@ impl<'a> Action {
             Action::SanctionsMute => "sanctions:mute",
             Action::SanctionsKick => "sanctions:kick",
             Action::SanctionsBan => "sanctions:ban",
+            Action::ErrorsGet => "errors:get",
+            Action::ErrorPost => "errors:post",
         }
     }
 
@@ -233,6 +237,8 @@ impl<'a> Action {
             Self::SanctionsMute => all_roles,
             Self::SanctionsKick => vec![Role::Moderateur, Role::Responsable, Role::Developpeur],
             Self::SanctionsBan => vec![Role::Moderateur, Role::Responsable, Role::Developpeur],
+            Self::ErrorsGet => head_staffs,
+            Self::ErrorsPost => vec![],
         };
 
         roles.append(&mut per_action_roles);
@@ -272,6 +278,8 @@ impl<'a> Action {
             Self::SanctionsMute => vec![],
             Self::SanctionsKick => vec![],
             Self::SanctionsBan => vec![],
+            Self::ErrorsGet => vec![],
+            Self::ErrorsPost => vec![],
         };
 
         facts.push(fact!("action({action})", action = self.action_name()));

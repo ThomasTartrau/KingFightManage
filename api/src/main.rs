@@ -21,6 +21,7 @@ mod boutique;
 mod service_access;
 mod players;
 mod sanctions;
+mod errors;
 
 const APP_TITLE: &str = "KingFightManage";
 const WEBAPP_INDEX_FILE: &str = "index.html";
@@ -397,6 +398,13 @@ async fn main() -> anyhow::Result<()> {
                                         .route(web::put().to(sanctions::main::update_sanction))
                                         .route(web::delete().to(sanctions::main::delete_sanction)),
                                     ),
+                                )
+                                .service(
+                                    web::resource("/errors")
+                                    .wrap(biscuit_auth.clone())
+                                    .route(web::get().to(errors::main::get_errors))
+                                    .route(web::post().to(errors::main::post_error)),
+                                    
                                 )
                                 
                         )
