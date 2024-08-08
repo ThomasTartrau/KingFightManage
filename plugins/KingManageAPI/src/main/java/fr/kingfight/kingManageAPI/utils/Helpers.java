@@ -3,7 +3,6 @@ package fr.kingfight.kingManageAPI.utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.json.simple.JSONObject;
 
 public class Helpers {
     public static Boolean hasPermission(CommandSender sender, String permission) {

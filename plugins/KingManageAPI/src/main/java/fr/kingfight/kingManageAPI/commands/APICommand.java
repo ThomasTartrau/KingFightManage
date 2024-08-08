@@ -18,9 +18,9 @@ public class APICommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        Boolean hasPermission = Helpers.hasPermission(sender, instance.getConfig().getString("permission.api"));
+        Boolean hasPermission = Helpers.hasPermission(sender, instance.getConfiguration().getString("permission.api"));
         if (!hasPermission) {
-            sender.sendMessage(instance.getConfig().getString("messages.errors.permission"));
+            sender.sendMessage(instance.getConfiguration().getString("messages.errors.permission"));
             return false;
         }
         if (args.length != 1) {
@@ -31,7 +31,7 @@ public class APICommand implements CommandExecutor {
         switch (args[0]) {
             case "reload":
                 instance.reloadConfig();
-                sender.sendMessage(instance.getConfig().getString("messages.success.reload"));
+                sender.sendMessage(instance.getConfiguration().getString("messages.success.reload"));
                 break;
             case "pause":
                 instance.getStatus().setStatus(status.PAUSED);
@@ -43,7 +43,7 @@ public class APICommand implements CommandExecutor {
                 instance.getStatus().setStatus(status.STOPPED);
                 break;
             case "status":
-                sender.sendMessage(instance.getConfig().getString("messages.success.status").replace("{status}", instance.getStatus().getStatus().toString()));
+                sender.sendMessage(instance.getConfiguration().getString("messages.success.status").replace("{status}", instance.getStatus().getStatus().toString()));
                 break;
             default:
                 sendHelp(sender);
@@ -54,7 +54,7 @@ public class APICommand implements CommandExecutor {
     }
 
     public void sendHelp(CommandSender sender) {
-        List<String> help = instance.getConfig().getStringList("messages.help.api");
+        List<String> help = instance.getConfiguration().getStringList("messages.help.api");
         help.forEach(sender::sendMessage);
     }
 }

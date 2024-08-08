@@ -8,6 +8,7 @@ import fr.kingfight.kingManageAPI.utils.HttpClient;
 import fr.kingfight.kingManageAPI.utils.Problem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -15,6 +16,7 @@ import java.util.concurrent.CompletableFuture;
 
 public final class KingManageAPI extends JavaPlugin implements HttpClientAPI {
     private static KingManageAPI instance;
+    private static FileConfiguration configuration;
     private HttpClient httpClient = null;
     private Status status;
 
@@ -59,5 +61,9 @@ public final class KingManageAPI extends JavaPlugin implements HttpClientAPI {
 
     public Status getStatus() {
         return status;
+    }
+
+    public FileConfiguration getConfiguration() {
+        return configuration;
     }
 }

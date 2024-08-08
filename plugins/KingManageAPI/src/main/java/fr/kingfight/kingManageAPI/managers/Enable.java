@@ -20,15 +20,15 @@ public class Enable {
 
         instance.saveDefaultConfig();
 
-        String baseUrl = instance.getConfig().getString("base_url");
-        String apiKey = instance.getConfig().getString("api_key");
-        Integer timeout = instance.getConfig().getInt("timeout");
+        String baseUrl = instance.getConfiguration().getString("base_url");
+        String apiKey = instance.getConfiguration().getString("api_key");
+        Integer timeout = instance.getConfiguration().getInt("timeout");
         HttpClient httpClient = new HttpClient(instance, apiKey, baseUrl, timeout);
 
         new CommandsManager(instance);
         new ListenersManager(instance);
 
-        new FetchEventsTask(instance).runTaskTimerAsynchronously(instance, 0, 20L*instance.getConfig().getInt("intervals.events"));
+        new FetchEventsTask(instance).runTaskTimerAsynchronously(instance, 0, 20L*instance.getConfiguration().getInt("intervals.events"));
 
         long timeAtEnd = System.currentTimeMillis();
         long timeTakenInMS = timeAtEnd - timeAtStart;

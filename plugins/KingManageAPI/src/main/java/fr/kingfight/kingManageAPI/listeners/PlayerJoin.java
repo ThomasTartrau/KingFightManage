@@ -1,6 +1,7 @@
 package fr.kingfight.kingManageAPI.listeners;
 
 import fr.kingfight.kingManageAPI.KingManageAPI;
+import fr.kingfight.kingManageAPI.events.ingested.PlayerJoinE;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -14,6 +15,6 @@ public class PlayerJoin implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        fr.kingfight.kingManageAPI.events.ingested.PlayerJoinE.dispatch(event.getPlayer().getUniqueId(), event.getPlayer().getName());
+        PlayerJoinE.dispatch(event.getPlayer().getUniqueId(), event.getPlayer().getName());
     }
 }

@@ -12,6 +12,12 @@ intervals:
   # Events fetch interval in seconds
   events: 6
 
+commands:
+  sanctions:
+    mute: "mute {player} {time} {motif} par {staff_name}"
+    ban: "ban {player} {time} {motif} par {staff_name}"
+    kick: "kick {player} {motif} par {staff_name}"
+
 messages:
   events:
     fetched:
