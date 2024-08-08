@@ -38,6 +38,9 @@ VOLUME /app/storage
 # Copier les fichiers de configuration de l'api
 COPY api/ ./
 
+RUN ls -al
+RUN ls -al ../
+
 # Installation des dépendances & compilation de l'api
 RUN cargo build --release
 
