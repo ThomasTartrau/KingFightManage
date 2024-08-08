@@ -6,7 +6,10 @@ use chrono::{DateTime, Utc};
 use log::{error, trace};
 use paperclip::v2::schema::TypedData;
 use serde::Serialize;
-use std::{time::{Duration, SystemTime}, vec};
+use std::{
+    time::{Duration, SystemTime},
+    vec,
+};
 use strum::{AsRefStr, EnumIter, EnumString, IntoEnumIterator, VariantNames};
 use uuid::Uuid;
 
