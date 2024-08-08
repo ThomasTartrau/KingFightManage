@@ -22,7 +22,7 @@ FROM rust:1.19.0 AS build-rust
 WORKDIR /app/api
 
 # Copier les fichiers Cargo.toml et Cargo.lock
-COPY api/Cargo.toml api/Cargo.lock ./
+COPY api/ ./
 
 # Lister les fichiers
 RUN ls
