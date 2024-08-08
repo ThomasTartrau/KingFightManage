@@ -38,11 +38,16 @@ ENV DATABASE_URL={{environment.DATABASE_URL}}
 ENV EMAIL_SENDER_ADDRESS={{environment.EMAIL_SENDER_ADDRESS}}
 ENV SMTP_CONNECTION_URL={{environment.SMTP_CONNECTION_URL}}
 
+RUN echo $API_URL
+RUN echo {{environment.API_URL}}
+RUN echp ${{environment.API_URL}}
+RUN echo ${{API_URL}}
+
 # On défini le répertoire de travail pour le stage de build de l'api
 WORKDIR /app/api
 
 # On créer un volume docker pour le répertoire de travail pour pouvoir au prochain build utiliser les dépendances déjà installées et compiler. Cela permet de gagner du temps durant le build.
-VOLUME /volume/target
+VOLUME /app/storage
 
 # Copier les fichiers de configuration de l'api
 COPY api/ ./
