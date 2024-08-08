@@ -39,9 +39,6 @@ VOLUME /app/storage
 COPY api/ ./
 COPY .env ./api/.env
 
-RUN ls -al ./api
-RUN ls -al
-
 # Installation des dépendances & compilation de l'api
 RUN cargo build --release
 
