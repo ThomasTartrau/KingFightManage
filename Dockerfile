@@ -40,7 +40,7 @@ ENV SMTP_CONNECTION_URL={{environment.SMTP_CONNECTION_URL}}
 
 RUN echo $API_URL
 RUN echo {{environment.API_URL}}
-RUN echp ${{environment.API_URL}}
+RUN echo ${{environment.API_URL}}
 RUN echo ${{API_URL}}
 
 # On défini le répertoire de travail pour le stage de build de l'api
