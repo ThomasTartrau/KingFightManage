@@ -39,7 +39,7 @@ ENV EMAIL_SENDER_ADDRESS=$EMAIL_SENDER_ADDRESS
 ENV SMTP_CONNECTION_URL=$SMTP_CONNECTION_URL
 
 # Print all environment variables
-RUN print $API_URL
+RUN printenv
 
 # # On défini le répertoire de travail pour le stage de build de l'api
 # WORKDIR /app/api
