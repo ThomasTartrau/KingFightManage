@@ -24,5 +24,8 @@ WORKDIR /app/api
 # Copier les fichiers Cargo.toml et Cargo.lock
 COPY api/Cargo.toml api/Cargo.lock ./
 
+# Lister les fichiers
+RUN ls
+
 # Installer les dépendances
 RUN cargo build --release
