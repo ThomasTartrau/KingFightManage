@@ -30,32 +30,40 @@ RUN pnpm run build
 # Utiliser une image Rust pour builder l'api (on utilise la version 1.80.0 car c'est la latest stable version)
 FROM rust:1.80.0 AS build-rust
 
+# Set this environment variable with the format KEY={{environment.KEY}}
+ENV API_URL=$API_URL
+ENV APP_URL=$APP_URL
+ENV BISCUIT_PRIVATE_KEY=$BISCUIT_PRIVATE_KEY
+ENV DATABASE_URL=$DATABASE_URL
+ENV EMAIL_SENDER_ADDRESS=$EMAIL_SENDER_ADDRESS
+ENV SMTP_CONNECTION_URL=$SMTP_CONNECTION_URL
+
 # Print all environment variables
 RUN printenv
 
-# On défini le répertoire de travail pour le stage de build de l'api
-WORKDIR /app/api
+# # On défini le répertoire de travail pour le stage de build de l'api
+# WORKDIR /app/api
 
-# On créer un volume docker pour le répertoire de travail pour pouvoir au prochain build utiliser les dépendances déjà installées et compiler. Cela permet de gagner du temps durant le build.
-VOLUME /app/api/target
+# # On créer un volume docker pour le répertoire de travail pour pouvoir au prochain build utiliser les dépendances déjà installées et compiler. Cela permet de gagner du temps durant le build.
+# VOLUME /app/api/target
 
-# Copier les fichiers de configuration de l'api
-COPY api/ ./
+# # Copier les fichiers de configuration de l'api
+# COPY api/ ./
 
-# Installation des dépendances & compilation de l'api
-RUN cargo build --release
+# # Installation des dépendances & compilation de l'api
+# RUN cargo build --release
 
-## Étape 3 : stage de build final
-FROM debian:buster-slim
+# ## Étape 3 : stage de build final
+# FROM debian:buster-slim
 
-# Copier le frontend buildé dans le conteneur final
-COPY --from=build-frontend /app/frontend/dist /var/www/html
+# # Copier le frontend buildé dans le conteneur final
+# COPY --from=build-frontend /app/frontend/dist /var/www/html
 
-# Copier l'exécutable Rust dans le conteneur final
-COPY --from=build-rust /app/api/target/release/api /usr/local/bin/api
+# # Copier l'exécutable Rust dans le conteneur final
+# COPY --from=build-rust /app/api/target/release/api /usr/local/bin/api
 
-# Exposer le port sur lequel l'application va tourner
-EXPOSE 8080
+# # Exposer le port sur lequel l'application va tourner
+# EXPOSE 8080
 
-# Commande pour lancer l'application
-CMD 'cargo run -- "$@"'
+# # Commande pour lancer l'application
+# CMD 'cargo run -- "$@"'
