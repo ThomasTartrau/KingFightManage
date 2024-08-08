@@ -46,7 +46,7 @@ async function _onLoad() {
     }
   }
 
-  if (newSanctions.length > 1) {
+  if (newSanctions.length >= 1) {
     schema.shape.sanction_name = z.enum(newSanctions as [string, ...string[]]);
   }
 }
@@ -101,6 +101,8 @@ function onSubmit(values: Record<string, any>) {
         });
         break;
     }
+
+    emit("closeSanctionDialog");
   } else {
     push.error({
       title: "Erreur",
