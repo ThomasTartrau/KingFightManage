@@ -39,7 +39,6 @@ VOLUME /app/storage
 COPY api/ ./
 COPY .env ./api/.env
 
-RUN cat .env
 RUN ls -al
 
 # Installation des dépendances & compilation de l'api
