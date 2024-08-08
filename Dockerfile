@@ -31,12 +31,12 @@ RUN pnpm run build
 FROM rust:1.80.0 AS build-rust
 
 # Set this environment variable with the format KEY={{environment.KEY}}
-ENV API_URL=$API_URL
-ENV APP_URL=$APP_URL
-ENV BISCUIT_PRIVATE_KEY=$BISCUIT_PRIVATE_KEY
-ENV DATABASE_URL=$DATABASE_URL
-ENV EMAIL_SENDER_ADDRESS=$EMAIL_SENDER_ADDRESS
-ENV SMTP_CONNECTION_URL=$SMTP_CONNECTION_URL
+ENV API_URL={{environment.API_URL}}
+ENV APP_URL={{environment.APP_URL}}
+ENV BISCUIT_PRIVATE_KEY={{environment.BISCUIT_PRIVATE_KEY}}
+ENV DATABASE_URL={{environment.DATABASE_URL}}
+ENV EMAIL_SENDER_ADDRESS={{environment.EMAIL_SENDER_ADDRESS}}
+ENV SMTP_CONNECTION_URL={{environment.SMTP_CONNECTION_URL}}
 
 # On défini le répertoire de travail pour le stage de build de l'api
 WORKDIR /app/api
