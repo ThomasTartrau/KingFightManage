@@ -50,7 +50,7 @@ const props = withDefaults(
     filterOpacity: 0.2,
     showTooltip: true,
     showLegend: true,
-  },
+  }
 );
 
 type KeyOfT = Extract<keyof T, string>;
@@ -65,21 +65,21 @@ const colors = computed(() =>
   props.colors?.length
     ? props.colors
     : defaultColors(
-        props.data.filter((d) => d[props.category]).filter(Boolean).length,
-      ),
+        props.data.filter((d) => d[props.category]).filter(Boolean).length
+      )
 );
 const legendItems = computed(() =>
   props.data.map((item, i) => ({
     name: item[props.index],
     color: colors.value[i],
     inactive: false,
-  })),
+  }))
 );
 
 const totalValue = computed(() =>
   props.data.reduce((prev, curr) => {
     return prev + curr[props.category];
-  }, 0),
+  }, 0)
 );
 </script>
 
@@ -98,6 +98,7 @@ const totalValue = computed(() =>
         :custom-tooltip="customTooltip"
       />
 
+      <!-- @vue-ignore -->
       <VisDonut
         :value="(d: Data) => d[category]"
         :sort-function="sortFunction"
@@ -111,7 +112,7 @@ const totalValue = computed(() =>
               d: Data,
               ev: PointerEvent,
               i: number,
-              elements: HTMLElement[],
+              elements: HTMLElement[]
             ) => {
               if (d?.data?.[index] === activeSegmentKey) {
                 activeSegmentKey = undefined;
@@ -119,7 +120,7 @@ const totalValue = computed(() =>
               } else {
                 activeSegmentKey = d?.data?.[index];
                 elements.forEach(
-                  (el) => (el.style.opacity = `${filterOpacity}`),
+                  (el) => (el.style.opacity = `${filterOpacity}`)
                 );
                 elements[i].style.opacity = '1';
               }

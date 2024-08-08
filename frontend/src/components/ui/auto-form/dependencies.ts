@@ -27,21 +27,24 @@ export default function useDependencies(fieldName: string) {
 
   const currentFieldDependencies = computed(() =>
     dependencies.value?.filter(
-      (dependency) => dependency.targetField === currentFieldName,
-    ),
+      (dependency) => dependency.targetField === currentFieldName
+    )
   );
 
   function getSourceValue(dep: Dependency<any>) {
     const source = dep.sourceField as string;
     const index = getIndexIfArray(fieldName) ?? -1;
+    // @ts-ignore
     const [sourceLast, ...sourceInitial] = source.split(".").toReversed();
     const [_targetLast, ...targetInitial] = (dep.targetField as string)
       .split(".")
+      // @ts-ignore
       .toReversed();
 
     if (index >= 0 && sourceInitial.join(",") === targetInitial.join(",")) {
       const [_currentLast, ...currentInitial] = fieldName
         .split(".")
+        // @ts-ignore
         .toReversed();
       return getFromPath(form.value, currentInitial.join(".") + sourceLast);
     }
@@ -50,7 +53,7 @@ export default function useDependencies(fieldName: string) {
   }
 
   const sourceFieldValues = computed(() =>
-    currentFieldDependencies.value?.map((dep) => getSourceValue(dep)),
+    currentFieldDependencies.value?.map((dep) => getSourceValue(dep))
   );
 
   const resetConditionState = () => {
@@ -88,7 +91,7 @@ export default function useDependencies(fieldName: string) {
         }
       });
     },
-    { immediate: true, deep: true },
+    { immediate: true, deep: true }
   );
 
   return {
