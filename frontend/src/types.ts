@@ -185,5 +185,12 @@ export interface components {
         },
       ];
     };
+
+    Error: {
+      error_id: UUID;
+      content: string;
+      plugin_name: string;
+      priority: number;
+    };
   };
 }

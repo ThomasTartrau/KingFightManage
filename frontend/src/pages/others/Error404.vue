@@ -1,37 +1,54 @@
 <script setup lang="ts">
+import Code from "@/components/custom/code.vue";
+import CustomButton from "@/components/custom-button.vue";
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { routes } from "@/router/routes";
+import { Problem } from "@/http";
 import router from "@/router/router";
+import { routes } from "@/router/routes";
 
-function back_to_home() {
-  router.push({ name: routes.Home });
-}
+const error: Problem = {
+  id: "Error404",
+  title: "Page not found",
+  status: 404,
+  detail:
+    "An error occurred while processing the request. The requested resource was not found.",
+};
+const jsonError = JSON.stringify(error, null, 2);
 </script>
 
 <template>
-  <div class="flex items-center justify-center min-h-screen">
-    <Card class="mx-auto max-w-sm">
+  <div
+    class="flex flex-col items-center justify-center"
+    style="min-height: calc(100vh - 3.5rem)"
+  >
+    <Card class="shadow-2xl shadow-slate-900">
       <CardHeader>
-        <CardTitle>Erreur 404</CardTitle>
+        <CardTitle> Vous vous êtes perdu ? </CardTitle>
+
         <CardDescription>
-          La page que vous cherchez n'existe pas.
+          Il semble que vous ayez atterri sur une page qui n'existe pas. Ne vous
+          inquiétez pas, je suis là pour vous aider.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Separator class="my-4" />
-        <p>Oops! Je pense que vous êtes perdu.</p>
-        <Button class="mt-4" @click="back_to_home">
-          Revenir en lieu sûr
-        </Button>
+        <Code :content="jsonError" />
       </CardContent>
+      <CardFooter class="flex justify-end">
+        <CustomButton
+          variant="ringHover"
+          size="lg"
+          @click="router.push({ name: routes.Home })"
+        >
+          Retourner en lieu sûr
+        </CustomButton>
+      </CardFooter>
     </Card>
   </div>
 </template>

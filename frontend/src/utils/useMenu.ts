@@ -8,6 +8,7 @@ import {
   List,
   Shield,
   Skull,
+  TriangleAlert,
 } from "lucide-vue-next";
 import { Actions } from "./perms";
 import type { Group } from "@/lib/menu";
@@ -62,7 +63,7 @@ function _useMenu() {
             route: "PlayersOnline",
             label: "En ligne",
             active: currentRoute.value.fullPath.includes(
-              useRoute("PlayersOnline"),
+              useRoute("PlayersOnline")
             ),
             action: Actions.SidebarPlayers,
             icon: List,
@@ -86,7 +87,7 @@ function _useMenu() {
             route: "SanctionsLogs",
             label: "Logs",
             active: currentRoute.value.fullPath.includes(
-              useRoute("SanctionsLogs"),
+              useRoute("SanctionsLogs")
             ),
             action: Actions.SidebarSanctionsLogs,
             icon: Book,
@@ -102,7 +103,7 @@ function _useMenu() {
             route: "BoutiqueLogs",
             label: "Logs",
             active: currentRoute.value.fullPath.includes(
-              useRoute("BoutiqueLogs"),
+              useRoute("BoutiqueLogs")
             ),
             action: Actions.SidebarBoutiqueLogs,
             icon: Book,
@@ -112,7 +113,7 @@ function _useMenu() {
             route: "BoutiqueLogsPb",
             label: "Achats",
             active: currentRoute.value.fullPath.includes(
-              useRoute("BoutiqueLogsPb"),
+              useRoute("BoutiqueLogsPb")
             ),
             action: Actions.SidebarBoutiquePbLogs,
             icon: CircleDollarSign,
@@ -122,7 +123,7 @@ function _useMenu() {
             route: "BoutiqueGraphs",
             label: "Graphiques",
             active: currentRoute.value.fullPath.includes(
-              useRoute("BoutiqueGraphs"),
+              useRoute("BoutiqueGraphs")
             ),
             action: Actions.SidebarBoutiqueGraphs,
             icon: LineChart,
@@ -146,7 +147,7 @@ function _useMenu() {
             route: "LogsStaffs",
             label: "Logs",
             active: currentRoute.value.fullPath.includes(
-              useRoute("LogsStaffs"),
+              useRoute("LogsStaffs")
             ),
             action: Actions.SidebarLogsStaffs,
             icon: Book,
@@ -156,10 +157,18 @@ function _useMenu() {
             route: "ServiceAccess",
             label: "Service Access",
             active: currentRoute.value.fullPath.includes(
-              useRoute("ServiceAccess"),
+              useRoute("ServiceAccess")
             ),
             action: Actions.SidebarServiceAccess,
             icon: Skull,
+            submenus: [],
+          },
+          {
+            route: "Errors",
+            label: "Erreurs",
+            active: currentRoute.value.fullPath.includes(useRoute("Errors")),
+            action: Actions.SidebarErrors,
+            icon: TriangleAlert,
             submenus: [],
           },
         ],
