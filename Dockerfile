@@ -1,5 +1,5 @@
 # Étape 1 : Build du frontend
-FROM node:18 AS build-frontend
+FROM node:18.19.1 AS build-frontend
 
 # Définir le répertoire de travail
 WORKDIR /app/frontend
@@ -16,7 +16,7 @@ COPY frontend/ .
 RUN pnpm run build
 
 # Étape 2 : Builder et lancer l'application Rust
-FROM rust:1.69 AS build-rust
+FROM rust:1.19.0 AS build-rust
 
 # Définir le répertoire de travail
 WORKDIR /app
