@@ -42,7 +42,7 @@ ENV SMTP_CONNECTION_URL={{environment.SMTP_CONNECTION_URL}}
 WORKDIR /app/api
 
 # On créer un volume docker pour le répertoire de travail pour pouvoir au prochain build utiliser les dépendances déjà installées et compiler. Cela permet de gagner du temps durant le build.
-VOLUME /app/api/target
+VOLUME /volume/target
 
 # Copier les fichiers de configuration de l'api
 COPY api/ ./
