@@ -40,6 +40,9 @@ COPY api/ ./
 
 RUN ls -al
 RUN ls -al ../
+RUN ls -al ../../
+RUN ls -al ../../../
+RUN pwd
 
 # Installation des dépendances & compilation de l'api
 RUN cargo build --release
