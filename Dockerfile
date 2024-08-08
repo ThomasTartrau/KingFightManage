@@ -1,5 +1,5 @@
 # Étape 1 : Build du frontend
-FROM node:18.19.1 AS build-frontend
+FROM node:18.19.1-alpine AS build-frontend
 
 # Définir le répertoire de travail
 WORKDIR /app/frontend
@@ -20,6 +20,9 @@ FROM rust:1.80.0 AS build-rust
 
 # Définir le répertoire de travail
 WORKDIR /app/api
+
+# Créer un volume pour les dépendances Rust
+VOLUME /app/api/target
 
 # Copier les fichiers Cargo.toml et Cargo.lock
 COPY api/ ./
