@@ -264,7 +264,7 @@ pub async fn get_player_sanctions(
             s.name AS sanction_name,
             s.type AS sanction_type,
             s.duration AS sanction_duration,
-            s.created_at AS sanction_created_at
+            ls.created_at AS sanction_created_at
         FROM
             logs.sanction ls
         JOIN
@@ -350,39 +350,65 @@ pub async fn mute_player(
         return Err(MyProblem::Forbidden);
     }
 
-    query!(
-        "INSERT INTO logs.sanction(player__id, sanction__id, staff_name, sanction_motif) VALUES ($1, $2, $3, $4)",
-        body.player_id,
-        body.sanction_id,
-        body.staff_name,
-        body.motif
+    struct Sanction {
+        type_: String,
+        name: String,
+        duration: i64,
+    }
+
+    let sanction = query_as!(
+        Sanction,
+        "SELECT type as type_, name, duration FROM sanctions.sanction WHERE sanction__id = $1 AND type = 'mute' LIMIT 1",
+        body.sanction_id
     )
-    .execute(&state.db)
+    .fetch_optional(&state.db)
     .await
     .map_err(|e| {
-        error!("Failed to insert sanction: {:?}", e);
+        error!("Failed to fetch player: {:?}", e);
         MyProblem::InternalServerError
     })?;
 
-    if body.generate_event {
-        let event_type = "player_muted";
-        let event_data = json!({
-            "player_id": body.player_id,
-            "staff_name": body.staff_name,
-            "motif": body.motif,
-        });
+    match sanction {
+        Some(sanction) => {
+            query!(
+                "INSERT INTO logs.sanction(player__id, sanction__id, staff_name, sanction_motif) VALUES ($1, $2, $3, $4)",
+                body.player_id,
+                body.sanction_id,
+                body.staff_name,
+                body.motif
+            )
+            .execute(&state.db)
+            .await
+            .map_err(|e| {
+                error!("Failed to insert sanction: {:?}", e);
+                MyProblem::InternalServerError
+            })?;
 
-        query!(
-            "INSERT INTO events.event (event_type, event_data) VALUES ($1, $2)",
-            event_type,
-            event_data
-        )
-        .execute(&state.db)
-        .await
-        .map_err(MyProblem::from)?;
+            if body.generate_event {
+                let event_type = "player_muted";
+                let event_data = json!({
+                    "player_id": body.player_id,
+                    "staff_name": body.staff_name,
+                    "sanction_name": sanction.name,
+                    "sanction_type": sanction.type_,
+                    "sanction_duration": sanction.duration,
+                    "motif": body.motif,
+                });
+
+                query!(
+                    "INSERT INTO events.event (event_type, event_data) VALUES ($1, $2)",
+                    event_type,
+                    event_data
+                )
+                .execute(&state.db)
+                .await
+                .map_err(MyProblem::from)?;
+            }
+
+            Ok(NoContent)
+        }
+        None => Err(MyProblem::NotFound),
     }
-
-    Ok(NoContent)
 }
 
 #[api_v2_operation(
@@ -403,41 +429,66 @@ pub async fn kick_player(
         return Err(MyProblem::Forbidden);
     }
 
-    query!(
-        "INSERT INTO logs.sanction(player__id, sanction__id, staff_name, sanction_motif) VALUES ($1, $2, $3, $4)",
-        body.player_id,
-        body.sanction_id,
-        body.staff_name,
-        body.motif
+    struct Sanction {
+        type_: String,
+        name: String,
+        duration: i64,
+    }
+
+    let sanction = query_as!(
+        Sanction,
+        "SELECT type as type_, name, duration FROM sanctions.sanction WHERE sanction__id = $1 AND type = 'kick' LIMIT 1",
+        body.sanction_id
     )
-    .execute(&state.db)
+    .fetch_optional(&state.db)
     .await
     .map_err(|e| {
-        error!("Failed to insert sanction: {:?}", e);
+        error!("Failed to fetch player: {:?}", e);
         MyProblem::InternalServerError
     })?;
 
-    if body.generate_event {
-        let event_type = "player_kicked";
-        let event_data = json!({
-            "player_id": body.player_id,
-            "staff_name": body.staff_name,
-            "motif": body.motif,
-        });
+    match sanction {
+        Some(sanction) => {
+            query!(
+                "INSERT INTO logs.sanction(player__id, sanction__id, staff_name, sanction_motif) VALUES ($1, $2, $3, $4)",
+                body.player_id,
+                body.sanction_id,
+                body.staff_name,
+                body.motif
+            )
+            .execute(&state.db)
+            .await
+            .map_err(|e| {
+                error!("Failed to insert sanction: {:?}", e);
+                MyProblem::InternalServerError
+            })?;
 
-        query!(
-            "INSERT INTO events.event (event_type, event_data) VALUES ($1, $2)",
-            event_type,
-            event_data
-        )
-        .execute(&state.db)
-        .await
-        .map_err(MyProblem::from)?;
+            if body.generate_event {
+                let event_type = "player_kicked";
+                let event_data = json!({
+                    "player_id": body.player_id,
+                    "staff_name": body.staff_name,
+                    "sanction_name": sanction.name,
+                    "sanction_type": sanction.type_,
+                    "sanction_duration": sanction.duration,
+                    "motif": body.motif,
+                });
+
+                query!(
+                    "INSERT INTO events.event (event_type, event_data) VALUES ($1, $2)",
+                    event_type,
+                    event_data
+                )
+                .execute(&state.db)
+                .await
+                .map_err(MyProblem::from)?;
+            }
+
+            Ok(NoContent)
+        }
+        None => Err(MyProblem::NotFound),
     }
-
-    Ok(NoContent)
 }
-
 
 #[api_v2_operation(
     summary = "Ban a player",
@@ -457,37 +508,63 @@ pub async fn ban_player(
         return Err(MyProblem::Forbidden);
     }
 
-    query!(
-        "INSERT INTO logs.sanction(player__id, sanction__id, staff_name, sanction_motif) VALUES ($1, $2, $3, $4)",
-        body.player_id,
-        body.sanction_id,
-        body.staff_name,
-        body.motif
+    struct Sanction {
+        type_: String,
+        name: String,
+        duration: i64,
+    }
+
+    let sanction = query_as!(
+        Sanction,
+        "SELECT type as type_, name, duration FROM sanctions.sanction WHERE sanction__id = $1 AND type = 'ban' LIMIT 1",
+        body.sanction_id
     )
-    .execute(&state.db)
+    .fetch_optional(&state.db)
     .await
     .map_err(|e| {
-        error!("Failed to insert sanction: {:?}", e);
+        error!("Failed to fetch player: {:?}", e);
         MyProblem::InternalServerError
     })?;
 
-    if body.generate_event {
-        let event_type = "player_banned";
-        let event_data = json!({
-            "player_id": body.player_id,
-            "staff_name": body.staff_name,
-            "motif": body.motif,
-        });
+    match sanction {
+        Some(sanction) => {
+            query!(
+                "INSERT INTO logs.sanction(player__id, sanction__id, staff_name, sanction_motif) VALUES ($1, $2, $3, $4)",
+                body.player_id,
+                body.sanction_id,
+                body.staff_name,
+                body.motif
+            )
+            .execute(&state.db)
+            .await
+            .map_err(|e| {
+                error!("Failed to insert sanction: {:?}", e);
+                MyProblem::InternalServerError
+            })?;
 
-        query!(
-            "INSERT INTO events.event (event_type, event_data) VALUES ($1, $2)",
-            event_type,
-            event_data
-        )
-        .execute(&state.db)
-        .await
-        .map_err(MyProblem::from)?;
+            if body.generate_event {
+                let event_type = "player_banned";
+                let event_data = json!({
+                    "player_id": body.player_id,
+                    "staff_name": body.staff_name,
+                    "sanction_name": sanction.name,
+                    "sanction_type": sanction.type_,
+                    "sanction_duration": sanction.duration,
+                    "motif": body.motif,
+                });
+
+                query!(
+                    "INSERT INTO events.event (event_type, event_data) VALUES ($1, $2)",
+                    event_type,
+                    event_data
+                )
+                .execute(&state.db)
+                .await
+                .map_err(MyProblem::from)?;
+            }
+
+            Ok(NoContent)
+        }
+        None => Err(MyProblem::NotFound),
     }
-
-    Ok(NoContent)
 }

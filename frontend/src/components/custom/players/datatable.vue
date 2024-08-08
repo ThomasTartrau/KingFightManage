@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { ColumnDef, TableOptions } from '@tanstack/vue-table'
+import type { ColumnDef, TableOptions } from "@tanstack/vue-table";
 import {
   FlexRender,
   getCoreRowModel,
   getPaginationRowModel,
   useVueTable,
-} from '@tanstack/vue-table'
-import { h, onMounted, reactive, ref } from 'vue'
+} from "@tanstack/vue-table";
+import { h, onMounted, reactive, ref } from "vue";
 
-import { Button } from '@/components/ui/button'
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -16,102 +16,90 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import type { components } from '@/types'
-import { Input } from '@/components/ui/input'
-import { getRole } from '@/iam'
-import type { Roles } from '@/utils/perms'
-import dateConverter from '@/utils/dateConverter'
+} from "@/components/ui/table";
+import type { components } from "@/types";
+import { Input } from "@/components/ui/input";
+import { getRole } from "@/iam";
+import type { Roles } from "@/utils/perms";
+import dateConverter from "@/utils/dateConverter";
+import DropdownAction from "./dropdown-action.vue";
+import { promise$ } from "@/pages/players/GetPlayers.vue";
 
-type definitions = components['schemas']
-type Player = definitions['Player']
+type definitions = components["schemas"];
+type Player = definitions["Player"];
 
 const props = defineProps<{
-  data: Player[]
-}>()
-const emit = defineEmits(['refreshDatatable'])
+  data: promise$;
+}>();
+const emit = defineEmits(["refreshDatatable"]);
 
-const isCreateSanctionOpen = ref(false)
-function openCreateSanctionDialog() {
-  isCreateSanctionOpen.value = true
-}
-function closeCreateSanctionDialog() {
-  isCreateSanctionOpen.value = false
-}
-function closeAndRefresh() {
-  closeCreateSanctionDialog()
-  emitRefresh()
-}
+const datas = ref<Player[]>(props.data.players$ || []);
 
-const datas = ref<Player[]>(props.data || [])
-
-function emitRefresh() {
-  emit('refreshDatatable')
-}
-
-const role = ref<null | Roles>()
+const role = ref<null | Roles>();
 
 const columns: ColumnDef<Player>[] = [
   {
-    accessorKey: 'player_id',
-    header: 'UUID',
-    cell: ({ row }) => h('div', row.getValue('player_id')),
+    accessorKey: "player_id",
+    header: "UUID",
+    cell: ({ row }) => h("div", row.getValue("player_id")),
   },
   {
-    accessorKey: 'name',
-    header: 'Nom',
+    accessorKey: "name",
+    header: "Nom",
     cell: ({ row }) => {
-      return h('div', row.getValue('name'))
+      return h("div", row.getValue("name"));
     },
   },
   {
-    accessorKey: 'created_at',
-    header: 'Première connexion',
-    cell: ({ row }) => {
-      const sanction = row.original
-
-      return h('div', dateConverter.timestampToDateString(sanction.created_at))
-    },
-  },
-  /* {
-    id: "actions",
-    enableHiding: false,
+    accessorKey: "created_at",
+    header: "Première connexion",
     cell: ({ row }) => {
       const sanction = row.original;
 
+      return h("div", dateConverter.timestampToDateString(sanction.created_at));
+    },
+  },
+  {
+    id: "actions",
+    enableHiding: false,
+    cell: ({ row }) => {
+      const player = row.original;
+
       return h(DropdownAction, {
-        sanction,
+        player_id: player.player_id,
+        player_name: player.name,
+        sanctions: props.data.sanctions$,
       });
     },
-  }, */
-]
+  },
+];
 
 function onSearch(search: string) {
-  datas.value = props.data.filter(
-    player =>
-      player.player_id.toLowerCase().includes(search.toLowerCase())
-      || player.name.toLowerCase().includes(search.toLowerCase()),
-  )
+  datas.value = props.data.players$.filter(
+    (player) =>
+      player.player_id.toLowerCase().includes(search.toLowerCase()) ||
+      player.name.toLowerCase().includes(search.toLowerCase())
+  );
 }
 
 const tableOptions = reactive<TableOptions<Player>>({
   get data() {
-    return datas.value
+    return datas.value;
   },
   get columns() {
-    return columns
+    return columns;
   },
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
-})
+});
 
-const table = useVueTable(tableOptions)
+const table = useVueTable(tableOptions);
 
 function _onLoad() {
-  role.value = getRole().value
+  role.value = getRole().value;
 }
 
-onMounted(_onLoad)
+onMounted(_onLoad);
 </script>
 
 <template>
@@ -149,7 +137,6 @@ onMounted(_onLoad)
                   <FlexRender
                     :render="cell.column.columnDef.cell"
                     :props="cell.getContext()"
-                    @refresh-datatable="emitRefresh"
                   />
                 </TableCell>
               </TableRow>
@@ -174,12 +161,12 @@ onMounted(_onLoad)
       <div class="flex-1 text-sm text-muted-foreground">
         Affichage de
         {{
-          table.getFilteredRowModel().rows.length
-            < (table.getState().pagination.pageIndex + 1)
-            * table.getState().pagination.pageSize
+          table.getFilteredRowModel().rows.length <
+          (table.getState().pagination.pageIndex + 1) *
+            table.getState().pagination.pageSize
             ? table.getFilteredRowModel().rows.length
-            : (table.getState().pagination.pageIndex + 1)
-              * table.getState().pagination.pageSize
+            : (table.getState().pagination.pageIndex + 1) *
+              table.getState().pagination.pageSize
         }}
         sur {{ table.getFilteredRowModel().rows.length }} donnée(s).
       </div>
@@ -203,10 +190,4 @@ onMounted(_onLoad)
       </div>
     </div>
   </div>
-  <!-- <Dialog v-model:open="isCreateSanctionOpen">
-    <CreateSanctionDialog
-      @close-create-sanciton-dialog="closeCreateSanctionDialog"
-      @close-and-refresh-sanction-dialog="closeAndRefresh"
-    />
-  </Dialog> -->
 </template>

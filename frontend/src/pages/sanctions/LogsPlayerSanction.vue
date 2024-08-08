@@ -4,7 +4,7 @@ import { useRoute } from "vue-router";
 import { getPlayerSanctions } from "./SanctionsService";
 import Loader from "@/components/custom/loader.vue";
 import PromisedError from "@/components/custom/promised-error.vue";
-import Datatable from "@/components/custom/sanctions/sanctions-logs/datatable.vue";
+import Datatable from "@/components/custom/sanctions/sanctions-players-logs/datatable.vue";
 import type { components } from "@/types";
 import type { Problem, UUID } from "@/http";
 
