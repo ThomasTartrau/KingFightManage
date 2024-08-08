@@ -54,4 +54,4 @@ COPY --from=build-rust /app/api/target/release/api /usr/local/bin/api
 EXPOSE 8080
 
 # Commande pour lancer l'application
-CMD ["cargo", "run", "--", "$@"]
+CMD ["cargo", "run", "--", ".env"]
