@@ -35,7 +35,7 @@ FROM debian:buster-slim
 COPY --from=build-frontend /app/frontend/dist /var/www/html
 
 # Copier l'exécutable Rust dans le conteneur final
-COPY --from=build-rust /app/target/release/mon_app /usr/local/bin/mon_app
+COPY --from=build-rust /app/target/release/api /usr/local/bin/api
 
 # Exposer le port sur lequel l'application va tourner
 EXPOSE 8080
