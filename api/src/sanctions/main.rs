@@ -385,7 +385,7 @@ pub async fn mute_player(
             })?;
 
             if body.generate_event {
-                let event_type = "player_muted";
+                let event_type = "sanction_player";
                 let event_data = json!({
                     "player_id": body.player_id,
                     "staff_name": body.staff_name,
@@ -464,7 +464,7 @@ pub async fn kick_player(
             })?;
 
             if body.generate_event {
-                let event_type = "player_kicked";
+                let event_type = "sanction_player";
                 let event_data = json!({
                     "player_id": body.player_id,
                     "staff_name": body.staff_name,
@@ -543,7 +543,7 @@ pub async fn ban_player(
             })?;
 
             if body.generate_event {
-                let event_type = "player_banned";
+                let event_type = "sanction_player";
                 let event_data = json!({
                     "player_id": body.player_id,
                     "staff_name": body.staff_name,
