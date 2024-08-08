@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Ellipsis } from 'lucide-vue-next'
-import { onMounted, ref } from 'vue'
-import MessageDialog from './message-dialog.vue'
+import { Ellipsis } from "lucide-vue-next";
+import { onMounted, ref } from "vue";
+import MessageDialog from "./message-dialog.vue";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,47 +13,47 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import type { UUID } from '@/http'
-import { deleteUser, setRole } from '@/components/custom/staffs/StaffsService'
-import { getRole } from '@/iam'
-import type { Roles } from '@/utils/perms'
-import perms, { Actions } from '@/utils/perms'
-import { Dialog } from '@/components/ui/dialog'
+} from "@/components/ui/dropdown-menu";
+import type { UUID } from "@/http";
+import { deleteUser, setRole } from "@/components/custom/staffs/StaffsService";
+import { getRole } from "@/iam";
+import type { Roles } from "@/utils/perms";
+import perms, { Actions } from "@/utils/perms";
+import { Dialog } from "@/components/ui/dialog";
 
 const props = defineProps<{
-  userId: UUID
-  username: string
-}>()
+  userId: UUID;
+  username: string;
+}>();
 
-const emit = defineEmits(['refreshDatatable'])
-const role = ref<Roles | null>(null)
+const emit = defineEmits(["refreshDatatable"]);
+const role = ref<Roles | null>(null);
 
-const isMessageDialogOpen = ref(false)
+const isMessageDialogOpen = ref(false);
 function closeMessageDialog() {
-  isMessageDialogOpen.value = false
+  isMessageDialogOpen.value = false;
 }
 function openMessageDialog() {
-  isMessageDialogOpen.value = true
+  isMessageDialogOpen.value = true;
 }
 
 function handleSetRole(role: string) {
   setRole(props.userId, role).then(() => {
-    emit('refreshDatatable')
-  })
+    emit("refreshDatatable");
+  });
 }
 
 function handleDelete() {
   deleteUser(props.userId).then(() => {
-    emit('refreshDatatable')
-  })
+    emit("refreshDatatable");
+  });
 }
 
 function _onLoad() {
-  role.value = getRole().value
+  role.value = getRole().value;
 }
 
-onMounted(_onLoad)
+onMounted(_onLoad);
 </script>
 
 <template>

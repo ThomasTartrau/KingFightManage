@@ -1,28 +1,28 @@
 <script setup lang="ts">
-import { DropdownMenuArrow } from 'radix-vue'
-import { ref } from 'vue'
-import { ChevronDown, Dot } from 'lucide-vue-next'
-import CustomRouterLink from '../custom-router-link.vue'
-import { cn } from '@/lib/utils'
-import type { CollapseMenuButtonProps } from '@/lib/menu'
-import { useAdminPanel } from '@/utils/useAdminPanel'
-import Collapsible from '@/components/ui/collapsible/Collapsible.vue'
-import CollapsibleTrigger from '@/components/ui/collapsible/CollapsibleTrigger.vue'
-import Button from '@/components/ui/button/Button.vue'
-import CollapsibleContent from '@/components/ui/collapsible/CollapsibleContent.vue'
-import { DropdownMenu } from '@/components/ui/dropdown-menu'
-import DropdownMenuTrigger from '@/components/ui/dropdown-menu/DropdownMenuTrigger.vue'
-import DropdownMenuContent from '@/components/ui/dropdown-menu/DropdownMenuContent.vue'
-import DropdownMenuLabel from '@/components/ui/dropdown-menu/DropdownMenuLabel.vue'
-import DropdownMenuSeparator from '@/components/ui/dropdown-menu/DropdownMenuSeparator.vue'
-import DropdownMenuItem from '@/components/ui/dropdown-menu/DropdownMenuItem.vue'
+import { DropdownMenuArrow } from "radix-vue";
+import { ref } from "vue";
+import { ChevronDown, Dot } from "lucide-vue-next";
+import CustomRouterLink from "../custom-router-link.vue";
+import { cn } from "@/lib/utils";
+import type { CollapseMenuButtonProps } from "@/lib/menu";
+import { useAdminPanel } from "@/utils/useAdminPanel";
+import Collapsible from "@/components/ui/collapsible/Collapsible.vue";
+import CollapsibleTrigger from "@/components/ui/collapsible/CollapsibleTrigger.vue";
+import Button from "@/components/ui/button/Button.vue";
+import CollapsibleContent from "@/components/ui/collapsible/CollapsibleContent.vue";
+import { DropdownMenu } from "@/components/ui/dropdown-menu";
+import DropdownMenuTrigger from "@/components/ui/dropdown-menu/DropdownMenuTrigger.vue";
+import DropdownMenuContent from "@/components/ui/dropdown-menu/DropdownMenuContent.vue";
+import DropdownMenuLabel from "@/components/ui/dropdown-menu/DropdownMenuLabel.vue";
+import DropdownMenuSeparator from "@/components/ui/dropdown-menu/DropdownMenuSeparator.vue";
+import DropdownMenuItem from "@/components/ui/dropdown-menu/DropdownMenuItem.vue";
 
-const props = defineProps<CollapseMenuButtonProps>()
+const props = defineProps<CollapseMenuButtonProps>();
 
-const isSubmenuActive = props.submenus.some(submenu => submenu.active)
-const isCollapsed = ref(isSubmenuActive)
+const isSubmenuActive = props.submenus.some((submenu) => submenu.active);
+const isCollapsed = ref(isSubmenuActive);
 
-const { isOpen } = useAdminPanel()
+const { isOpen } = useAdminPanel();
 </script>
 
 <template>

@@ -39,6 +39,7 @@ export const routes: Record<TemplateRoutes, string> = {
   Staffs: "Staffs",
   LogsStaffs: "LogsStaffs",
   ServiceAccess: "ServiceAccess",
+  Errors: "Errors",
 
   Sanctions: "Sanctions",
   SanctionsLogs: "SanctionsLogs",
@@ -137,6 +138,12 @@ export default [
     path: "/service-access",
     component: ServiceAccess,
   },
+  {
+    name: routes.Errors,
+    path: "/errors",
+    component: Error404,
+  },
+
   {
     name: routes.BoutiqueGraphs,
     path: "/boutique/graphs",

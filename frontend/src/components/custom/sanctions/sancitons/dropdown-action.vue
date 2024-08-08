@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Ellipsis } from 'lucide-vue-next'
-import { onMounted, ref } from 'vue'
-import { deleteSanction } from './SanctionsService'
-import UpdateSanctionDialog from './update-sanction-dialog.vue'
+import { Ellipsis } from "lucide-vue-next";
+import { onMounted, ref } from "vue";
+import { deleteSanction } from "./SanctionsService";
+import UpdateSanctionDialog from "./update-sanction-dialog.vue";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,46 +11,46 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { getRole } from '@/iam'
-import type { Roles } from '@/utils/perms'
-import perms, { Actions } from '@/utils/perms'
-import { Dialog } from '@/components/ui/dialog'
-import type { components } from '@/types'
+} from "@/components/ui/dropdown-menu";
+import { getRole } from "@/iam";
+import type { Roles } from "@/utils/perms";
+import perms, { Actions } from "@/utils/perms";
+import { Dialog } from "@/components/ui/dialog";
+import type { components } from "@/types";
 
-type definitions = components['schemas']
-type Sanction = definitions['Sanction']
+type definitions = components["schemas"];
+type Sanction = definitions["Sanction"];
 
 const props = defineProps<{
-  sanction: Sanction
-}>()
-const emit = defineEmits(['refreshDatatable'])
-const isUpdateSanctionDialogOpen = ref(false)
+  sanction: Sanction;
+}>();
+const emit = defineEmits(["refreshDatatable"]);
+const isUpdateSanctionDialogOpen = ref(false);
 function closeUpdateSanctionDialog() {
-  isUpdateSanctionDialogOpen.value = false
+  isUpdateSanctionDialogOpen.value = false;
 }
 function openUpdateSanctionDialog() {
-  isUpdateSanctionDialogOpen.value = true
+  isUpdateSanctionDialogOpen.value = true;
 }
 
 function closeAndRefresh() {
-  closeUpdateSanctionDialog()
-  emit('refreshDatatable')
+  closeUpdateSanctionDialog();
+  emit("refreshDatatable");
 }
 
-const role = ref<Roles | null>(null)
+const role = ref<Roles | null>(null);
 
 function handleDelete() {
   deleteSanction(props.sanction.sanction_id).then(() => {
-    emit('refreshDatatable')
-  })
+    emit("refreshDatatable");
+  });
 }
 
 function _onLoad() {
-  role.value = getRole().value
+  role.value = getRole().value;
 }
 
-onMounted(_onLoad)
+onMounted(_onLoad);
 </script>
 
 <template>

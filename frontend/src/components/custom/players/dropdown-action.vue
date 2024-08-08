@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { Ellipsis } from "lucide-vue-next";
 import { onMounted, ref } from "vue";
+import MessageDialog from "../staffs/message-dialog.vue";
+import SanctionDialog from "./sanction-dialog.vue";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,18 +16,16 @@ import { getRole } from "@/iam";
 import type { Roles } from "@/utils/perms";
 import perms, { Actions } from "@/utils/perms";
 import { Dialog } from "@/components/ui/dialog";
-import { UUID } from "@/http";
-import MessageDialog from "../staffs/message-dialog.vue";
-import SanctionDialog from "./sanction-dialog.vue";
-import { components } from "@/types";
+import type { UUID } from "@/http";
+import type { components } from "@/types";
 import router from "@/router/router";
 
 type definitions = components["schemas"];
 type Sanction = definitions["Sanction"];
 
 const props = defineProps<{
-  player_id: UUID;
-  player_name: string;
+  playerId: UUID;
+  playerName: string;
   sanctions: Sanction[];
 }>();
 
@@ -66,7 +66,7 @@ function openBanDialog() {
 function handlePlayerSanctionsLogs() {
   router.push({
     name: "SanctionsPlayersLogs",
-    params: { player_id: props.player_id },
+    params: { player_id: props.playerId },
   });
 }
 
@@ -129,38 +129,38 @@ onMounted(_onLoad);
 
   <Dialog v-model:open="isMessageDialogOpen">
     <MessageDialog
-      :user-id="props.player_id"
-      :username="props.player_name"
+      :user-id="props.playerId"
+      :username="props.playerName"
       @close-message-modal="closeMessageDialog"
     />
   </Dialog>
 
   <Dialog v-model:open="isMuteDialogOpen">
     <SanctionDialog
-      :player_id="props.player_id"
-      :player_name="props.player_name"
+      :player-id="props.playerId"
+      :player-name="props.playerName"
       :sanctions="props.sanctions"
-      sanction_type="mute"
+      sanction-type="mute"
       @close-sanction-dialog="closeMuteDialog"
     />
   </Dialog>
 
   <Dialog v-model:open="isKickDialogOpen">
     <SanctionDialog
-      :player_id="props.player_id"
-      :player_name="props.player_name"
+      :player-id="props.playerId"
+      :player-name="props.playerName"
       :sanctions="props.sanctions"
-      sanction_type="kick"
+      sanction-type="kick"
       @close-sanction-dialog="closeKickDialog"
     />
   </Dialog>
 
   <Dialog v-model:open="isBanDialogOpen">
     <SanctionDialog
-      :player_id="props.player_id"
-      :player_name="props.player_name"
+      :player-id="props.playerId"
+      :player-name="props.playerName"
       :sanctions="props.sanctions"
-      sanction_type="ban"
+      sanction-type="ban"
       @close-sanction-dialog="closeBanDialog"
     />
   </Dialog>

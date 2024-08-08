@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { push } from 'notivue'
-import { ref } from 'vue'
-import { changePassword } from '../UserServices'
-import { Button } from '@/components/ui/button'
+import { push } from "notivue";
+import { ref } from "vue";
+import { changePassword } from "../UserServices";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -18,35 +18,35 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { displayProblem } from '@/http'
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { displayProblem } from "@/http";
 
-const isPasswordDialogOpen = ref<boolean>(false)
-const closePasswordDialog = () => (isPasswordDialogOpen.value = false)
+const isPasswordDialogOpen = ref<boolean>(false);
+const closePasswordDialog = () => (isPasswordDialogOpen.value = false);
 
-const new_password = ref<string>('')
-const confirm_password = ref<string>('')
+const new_password = ref<string>("");
+const confirm_password = ref<string>("");
 
 async function submit() {
   if (new_password.value !== confirm_password.value) {
     return push.error({
-      title: 'Mot de passe invalide',
-      message: 'Les mots de passe ne correspondent pas',
+      title: "Mot de passe invalide",
+      message: "Les mots de passe ne correspondent pas",
       duration: 5000,
-    })
+    });
   }
 
   await changePassword(new_password.value)
     .then(() => {
       push.success({
-        title: 'Mot de passe changé',
-        message: 'Votre mot de passe a été changé avec succès',
+        title: "Mot de passe changé",
+        message: "Votre mot de passe a été changé avec succès",
         duration: 5000,
-      })
+      });
     })
-    .catch(displayProblem)
+    .catch(displayProblem);
 }
 </script>
 
@@ -106,9 +106,7 @@ async function submit() {
                 <Button variant="secondary" @click="closePasswordDialog">
                   Annuler
                 </Button>
-                <Button @click="submit">
-                  Modifier
-                </Button>
+                <Button @click="submit"> Modifier </Button>
               </DialogFooter>
             </DialogContent>
           </form>

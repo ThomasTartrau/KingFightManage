@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { z } from "zod";
+import { onMounted, ref } from "vue";
+import { push } from "notivue";
+import { banPlayer, kickPlayer, mutePlayer } from "./PlayersService";
 import { Button } from "@/components/ui/button";
 import {
   DialogContent,
@@ -8,25 +11,24 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { AutoForm } from "@/components/ui/auto-form";
-import { UUID } from "@/http";
-import { components } from "@/types";
-import { onMounted, ref } from "vue";
-import { push } from "notivue";
-import { banPlayer, kickPlayer, mutePlayer } from "./PlayersService";
-import { getUserInfo, UserInfo } from "@/iam";
+import type { UUID } from "@/http";
+import type { components } from "@/types";
+import type { UserInfo } from "@/iam";
+import { getUserInfo } from "@/iam";
 import DialogDescription from "@/components/ui/dialog/DialogDescription.vue";
+
+const props = defineProps<{
+  playerId: UUID;
+  playerName: string;
+  sanctions: Sanction[];
+  sanctionType: string;
+}>();
 
 const emit = defineEmits(["closeSanctionDialog"]);
 
 type definitions = components["schemas"];
 export type Sanction = definitions["Sanction"];
 
-const props = defineProps<{
-  player_id: UUID;
-  player_name: string;
-  sanctions: Sanction[];
-  sanction_type: string;
-}>();
 const user_info = ref<UserInfo | null>(null);
 
 const schema = z.object({
@@ -41,7 +43,7 @@ async function _onLoad() {
   user_info.value = getUserInfo().value;
   const newSanctions = [];
   for (const sanction of props.sanctions) {
-    if (sanction.type_ === props.sanction_type) {
+    if (sanction.type_ === props.sanctionType) {
       newSanctions.push(sanction.name);
     }
   }
@@ -54,7 +56,7 @@ async function _onLoad() {
 function onSubmit(values: Record<string, any>) {
   if (values.sanction_name && user_info.value) {
     const sanction = props.sanctions.find(
-      (sanction) => sanction.name === values.sanction_name
+      (sanction) => sanction.name === values.sanction_name,
     );
 
     if (!sanction) {
@@ -66,32 +68,32 @@ function onSubmit(values: Record<string, any>) {
       return;
     }
 
-    switch (props.sanction_type) {
+    switch (props.sanctionType) {
       case "mute":
         mutePlayer(
-          props.player_id,
+          props.playerId,
           user_info.value?.username || "Undefined",
           sanction.sanction_id,
           values.motif,
-          true
+          true,
         );
         break;
       case "kick":
         kickPlayer(
-          props.player_id,
+          props.playerId,
           user_info.value?.username || "Undefined",
           sanction.sanction_id,
           values.motif,
-          true
+          true,
         );
         break;
       case "ban":
         banPlayer(
-          props.player_id,
+          props.playerId,
           user_info.value?.username || "Undefined",
           sanction.sanction_id,
           values.motif,
-          true
+          true,
         );
         break;
       default:
@@ -119,7 +121,7 @@ onMounted(_onLoad);
     <DialogHeader>
       <DialogTitle>Attribuer une sanction</DialogTitle>
       <DialogDescription>
-        Sanctionner <span class="font-bold">{{ props.player_name }}</span>
+        Sanctionner <span class="font-bold">{{ props.playerName }}</span>
       </DialogDescription>
     </DialogHeader>
     <AutoForm

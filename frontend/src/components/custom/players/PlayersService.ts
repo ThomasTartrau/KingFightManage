@@ -7,7 +7,7 @@ export async function mutePlayer(
   staff_name: string,
   sanction_id: UUID,
   motif: string,
-  generate_event: boolean
+  generate_event: boolean,
 ) {
   await http
     .post("/sanctions/mute", {
@@ -31,7 +31,7 @@ export async function kickPlayer(
   staff_name: string,
   sanction_id: UUID,
   motif: string,
-  generate_event: boolean
+  generate_event: boolean,
 ) {
   await http
     .post("/sanctions/kick", {
@@ -55,7 +55,7 @@ export async function banPlayer(
   staff_name: string,
   sanction_id: UUID,
   motif: string,
-  generate_event: boolean
+  generate_event: boolean,
 ) {
   await http
     .post("/sanctions/ban", {

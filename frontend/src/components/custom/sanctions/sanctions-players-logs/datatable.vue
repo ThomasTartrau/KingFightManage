@@ -70,7 +70,9 @@ const columns: ColumnDef<GetSanctionsLogs>[] = [
     cell: ({ row }) => {
       return h(
         "div",
-        dateConverter.timestampToDateString(row.getValue("sanction_created_at"))
+        dateConverter.timestampToDateString(
+          row.getValue("sanction_created_at"),
+        ),
       );
     },
   },
@@ -80,7 +82,7 @@ function onSearch(search: string) {
   datas.value = props.data.filter(
     (sanction) =>
       sanction.sanction_motif.toLowerCase().includes(search.toLowerCase()) ||
-      sanction.staff_name.toLowerCase().includes(search.toLowerCase())
+      sanction.staff_name.toLowerCase().includes(search.toLowerCase()),
   );
 }
 

@@ -1,68 +1,68 @@
 <script setup lang="ts">
-import { useDropzone } from 'vue3-dropzone'
-import { push } from 'notivue'
-import { UploadCloud } from 'lucide-vue-next'
-import http, { displayError } from '@/http'
+import { useDropzone } from "vue3-dropzone";
+import { push } from "notivue";
+import { UploadCloud } from "lucide-vue-next";
+import http, { displayError } from "@/http";
 
 const props = defineProps({
   accept: {
     type: String,
-    default: '*',
+    default: "*",
   },
-})
+});
 
-const emit = defineEmits(['closeProfileDialog'])
+const emit = defineEmits(["closeProfileDialog"]);
 
 async function onDrop(files: File[]) {
   if (files.length > 1 || files.length <= 0) {
     return push.error({
-      title: 'Invalid file count',
-      message: 'Only one file can be uploaded at a time',
+      title: "Invalid file count",
+      message: "Only one file can be uploaded at a time",
       duration: 5000,
-    })
+    });
   }
-  const file = files[0]
-  if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
+  const file = files[0];
+  if (!["image/jpeg", "image/jpg", "image/png"].includes(file.type)) {
     push.error({
-      title: 'Unsupported file type',
-      message: 'Only .jpeg, .jpg, and .png image are supported',
+      title: "Unsupported file type",
+      message: "Only .jpeg, .jpg, and .png image are supported",
       duration: 5000,
-    })
-    return
+    });
+    return;
   }
 
   if (file.size > 10 * 1024 * 1024) {
     push.error({
-      title: 'File size too large',
-      message: 'File size should be under 10 MB',
+      title: "File size too large",
+      message: "File size should be under 10 MB",
       duration: 5000,
-    })
-    return
+    });
+    return;
   }
 
-  const fd = new FormData()
-  fd.append('picture', file)
+  const fd = new FormData();
+  fd.append("picture", file);
   await http
-    .post('/user/profile-picture', fd, {
+    .post("/user/profile-picture", fd, {
       headers: {
-        'Content-Type': 'multipart/form-data; ',
+        "Content-Type": "multipart/form-data; ",
       },
     })
     .then(() => {
       push.success({
-        title: 'Profile picture updated',
-        message: 'Your profile picture has been updated successfully',
+        title: "Profile picture updated",
+        message: "Your profile picture has been updated successfully",
         duration: 5000,
-      })
+      });
     })
-    .catch(displayError)
-  emit('closeProfileDialog')
+    .catch(displayError);
+  emit("closeProfileDialog");
 }
 
 const { getRootProps, getInputProps } = useDropzone({
   onDrop,
   multiple: false,
-})
+});
 </script>
 
 <template>
@@ -93,7 +93,7 @@ const { getRootProps, getInputProps } = useDropzone({
           :accept="props.accept"
           type="file"
           class="hidden"
-        >
+        />
       </form>
     </div>
   </div>

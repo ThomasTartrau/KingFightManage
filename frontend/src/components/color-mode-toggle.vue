@@ -1,41 +1,41 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
-import { useColorMode } from '@vueuse/core'
-import { Moon, Sun } from 'lucide-vue-next'
+import { ref } from "vue";
+import { useColorMode } from "@vueuse/core";
+import { Moon, Sun } from "lucide-vue-next";
 import {
   Tooltip,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip'
-import Button from '@/components/ui/button/Button.vue'
+} from "@/components/ui/tooltip";
+import Button from "@/components/ui/button/Button.vue";
 
-const colorMode = useColorMode()
-const buttonRef = ref(null)
+const colorMode = useColorMode();
+const buttonRef = ref(null);
 
 async function toggleDarkMode() {
   if (
-    !buttonRef.value
+    !buttonRef.value ||
     // @ts-expect-error "No comment"
-    || !(document as Document).startViewTransition
-    || window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    !(document as Document).startViewTransition ||
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
   ) {
-    colorMode.value = colorMode.value === 'dark' ? 'light' : 'dark'
-    return
+    colorMode.value = colorMode.value === "dark" ? "light" : "dark";
+    return;
   }
 
   // @ts-expect-error "No comment"
   await (document as Document).startViewTransition(() => {
-    colorMode.value = colorMode.value === 'dark' ? 'light' : 'dark'
-  }).ready
+    colorMode.value = colorMode.value === "dark" ? "light" : "dark";
+  }).ready;
 
   const { top, left, width, height } = (
     buttonRef.value as HTMLElement
-  ).getBoundingClientRect()
-  const x = left + width / 2
-  const y = top + height / 2
-  const right = window.innerWidth - left
-  const bottom = window.innerHeight - top
-  const maxRadius = Math.hypot(Math.max(left, right), Math.max(top, bottom))
+  ).getBoundingClientRect();
+  const x = left + width / 2;
+  const y = top + height / 2;
+  const right = window.innerWidth - left;
+  const bottom = window.innerHeight - top;
+  const maxRadius = Math.hypot(Math.max(left, right), Math.max(top, bottom));
 
   document.documentElement.animate(
     {
@@ -46,10 +46,10 @@ async function toggleDarkMode() {
     },
     {
       duration: 500,
-      easing: 'ease-in-out',
-      pseudoElement: '::view-transition-new(root)',
+      easing: "ease-in-out",
+      pseudoElement: "::view-transition-new(root)",
     },
-  )
+  );
 }
 </script>
 

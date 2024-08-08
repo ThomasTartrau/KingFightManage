@@ -1,33 +1,33 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { getSanctionsLogs } from './SanctionsService'
-import Loader from '@/components/custom/loader.vue'
-import PromisedError from '@/components/custom/promised-error.vue'
-import Datatable from '@/components/custom/sanctions/sanctions-logs/datatable.vue'
-import type { components } from '@/types'
+import { onMounted, ref } from "vue";
+import { getSanctionsLogs } from "./SanctionsService";
+import Loader from "@/components/custom/loader.vue";
+import PromisedError from "@/components/custom/promised-error.vue";
+import Datatable from "@/components/custom/sanctions/sanctions-logs/datatable.vue";
+import type { components } from "@/types";
 
-type definitions = components['schemas']
-type GetSanctionsLogs = definitions['GetSanctionsLogs']
+type definitions = components["schemas"];
+type GetSanctionsLogs = definitions["GetSanctionsLogs"];
 
-const sanctionsLogs$ = ref<Promise<GetSanctionsLogs[]>>()
+const sanctionsLogs$ = ref<Promise<GetSanctionsLogs[]>>();
 
 async function get() {
   getSanctionsLogs()
     .then((data) => {
-      sanctionsLogs$.value = Promise.resolve(data)
+      sanctionsLogs$.value = Promise.resolve(data);
     })
     .catch((error) => {
-      sanctionsLogs$.value = Promise.reject(error)
-    })
+      sanctionsLogs$.value = Promise.reject(error);
+    });
 }
 
 async function _onLoad() {
-  await get()
+  await get();
 }
 
 onMounted(async () => {
-  await _onLoad()
-})
+  await _onLoad();
+});
 </script>
 
 <template>

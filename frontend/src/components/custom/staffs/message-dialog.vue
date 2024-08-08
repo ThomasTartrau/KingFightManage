@@ -1,57 +1,57 @@
 <script setup lang="ts">
-import { toTypedSchema } from '@vee-validate/zod'
-import { useForm } from 'vee-validate'
-import { z } from 'zod'
-import { sendMessage } from './StaffsService'
-import { Button } from '@/components/ui/button'
+import { toTypedSchema } from "@vee-validate/zod";
+import { useForm } from "vee-validate";
+import { z } from "zod";
+import { sendMessage } from "./StaffsService";
+import { Button } from "@/components/ui/button";
 import {
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from "@/components/ui/dialog";
 import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Textarea } from '@/components/ui/textarea'
-import type { UUID } from '@/http'
+} from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
+import type { UUID } from "@/http";
 
 const props = defineProps<{
-  userId: UUID
-  username: string
-}>()
+  userId: UUID;
+  username: string;
+}>();
 
-const emit = defineEmits(['closeMessageModal'])
+const emit = defineEmits(["closeMessageModal"]);
 
 const formSchema = toTypedSchema(
   z.object({
     message: z
-      .string({ message: 'Ce champ est requis.' })
+      .string({ message: "Ce champ est requis." })
       .min(1, {
-        message: 'Le message doit ne peut pas être nul.',
+        message: "Le message doit ne peut pas être nul.",
       })
       .max(1000, {
-        message: 'Le message ne peut pas dépasser 1000 caractères.',
+        message: "Le message ne peut pas dépasser 1000 caractères.",
       }),
   }),
-)
+);
 
 const { handleSubmit } = useForm({
   validationSchema: formSchema,
-})
+});
 
 const onSubmit = handleSubmit((values) => {
-  submit(values)
-})
+  submit(values);
+});
 
 function submit(values: { message: string }) {
-  sendMessage(props.userId, props.username, values.message)
-  emit('closeMessageModal')
+  sendMessage(props.userId, props.username, values.message);
+  emit("closeMessageModal");
 }
 </script>
 
@@ -83,9 +83,7 @@ function submit(values: { message: string }) {
         <Button variant="secondary" @click="emit('closeMessageModal')">
           Fermer
         </Button>
-        <Button type="submit">
-          Envoyer
-        </Button>
+        <Button type="submit"> Envoyer </Button>
       </DialogFooter>
     </form>
   </DialogContent>

@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import type { ColumnDef, TableOptions } from '@tanstack/vue-table'
+import type { ColumnDef, TableOptions } from "@tanstack/vue-table";
 import {
   FlexRender,
   getCoreRowModel,
   getPaginationRowModel,
   useVueTable,
-} from '@tanstack/vue-table'
-import { h, onMounted, reactive, ref } from 'vue'
+} from "@tanstack/vue-table";
+import { h, onMounted, reactive, ref } from "vue";
 
-import { KeyRound } from 'lucide-vue-next'
-import { push } from 'notivue'
-import ServiceAccessDropdown from './service-access-dropdown.vue'
-import { Button } from '@/components/ui/button'
+import { KeyRound } from "lucide-vue-next";
+import { push } from "notivue";
+import ServiceAccessDropdown from "./service-access-dropdown.vue";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -19,97 +19,97 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import type { components } from '@/types'
-import { Input } from '@/components/ui/input'
-import { getRole } from '@/iam'
-import type { Roles } from '@/utils/perms'
-import perms, { Actions } from '@/utils/perms'
-import { createServiceAccess } from '@/pages/staffs/StaffsService'
-import { displayProblem } from '@/http'
+} from "@/components/ui/table";
+import type { components } from "@/types";
+import { Input } from "@/components/ui/input";
+import { getRole } from "@/iam";
+import type { Roles } from "@/utils/perms";
+import perms, { Actions } from "@/utils/perms";
+import { createServiceAccess } from "@/pages/staffs/StaffsService";
+import { displayProblem } from "@/http";
 
-type definitions = components['schemas']
-type ServiceAccess = definitions['ServiceAccess']
+type definitions = components["schemas"];
+type ServiceAccess = definitions["ServiceAccess"];
 
 const props = defineProps<{
-  data: ServiceAccess[]
-}>()
-const emit = defineEmits(['refreshDatatable'])
+  data: ServiceAccess[];
+}>();
+const emit = defineEmits(["refreshDatatable"]);
 
-const datas = ref<ServiceAccess[]>(props.data || [])
+const datas = ref<ServiceAccess[]>(props.data || []);
 
 function emitRefresh() {
-  emit('refreshDatatable')
+  emit("refreshDatatable");
 }
 
-const role = ref<null | Roles>()
+const role = ref<null | Roles>();
 
 async function handleGenerateServiceAccessToken() {
   await createServiceAccess()
     .then(() => {
       push.success({
-        title: 'Token généré',
+        title: "Token généré",
         message:
-          'Le token a été généré avec succès. Vous pouvez désormais le copier',
-      })
-      emitRefresh()
+          "Le token a été généré avec succès. Vous pouvez désormais le copier",
+      });
+      emitRefresh();
     })
-    .catch(displayProblem)
+    .catch(displayProblem);
 }
 
 const columns: ColumnDef<ServiceAccess>[] = [
   {
-    accessorKey: 'token_id',
-    header: 'Token ID',
+    accessorKey: "token_id",
+    header: "Token ID",
     cell: ({ row }) => {
-      return h('div', { class: 'capitalize' }, row.getValue('token_id'))
+      return h("div", { class: "capitalize" }, row.getValue("token_id"));
     },
   },
   {
-    accessorKey: 'created_at',
-    header: 'Date de création',
+    accessorKey: "created_at",
+    header: "Date de création",
     cell: ({ row }) => {
-      return h('div', { class: 'capitalize' }, row.getValue('created_at'))
+      return h("div", { class: "capitalize" }, row.getValue("created_at"));
     },
   },
   {
-    id: 'actions',
+    id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const token = row.original
+      const token = row.original;
 
       return h(ServiceAccessDropdown, {
         tokenId: token.token_id,
         biscuit: token.biscuit,
-      })
+      });
     },
   },
-]
+];
 
 function onSearch(tokenId: string) {
-  datas.value = props.data.filter(serviceAccess =>
+  datas.value = props.data.filter((serviceAccess) =>
     serviceAccess.token_id.toLowerCase().includes(tokenId.toLowerCase()),
-  )
+  );
 }
 
 const tableOptions = reactive<TableOptions<ServiceAccess>>({
   get data() {
-    return datas.value
+    return datas.value;
   },
   get columns() {
-    return columns
+    return columns;
   },
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
-})
+});
 
-const table = useVueTable(tableOptions)
+const table = useVueTable(tableOptions);
 
 function _onLoad() {
-  role.value = getRole().value
+  role.value = getRole().value;
 }
 
-onMounted(_onLoad)
+onMounted(_onLoad);
 </script>
 
 <template>
@@ -183,12 +183,12 @@ onMounted(_onLoad)
       <div class="flex-1 text-sm text-muted-foreground">
         Affichage de
         {{
-          table.getFilteredRowModel().rows.length
-            < (table.getState().pagination.pageIndex + 1)
-            * table.getState().pagination.pageSize
+          table.getFilteredRowModel().rows.length <
+          (table.getState().pagination.pageIndex + 1) *
+            table.getState().pagination.pageSize
             ? table.getFilteredRowModel().rows.length
-            : (table.getState().pagination.pageIndex + 1)
-              * table.getState().pagination.pageSize
+            : (table.getState().pagination.pageIndex + 1) *
+              table.getState().pagination.pageSize
         }}
         sur {{ table.getFilteredRowModel().rows.length }} donnée(s).
       </div>

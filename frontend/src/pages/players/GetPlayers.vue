@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
+import { getSanctions } from "../sanctions/SanctionsService";
 import { getOnlinesPlayers } from "./PlayersService";
 import Loader from "@/components/custom/loader.vue";
 import PromisedError from "@/components/custom/promised-error.vue";
 import Datatable from "@/components/custom/players/datatable.vue";
 import type { components } from "@/types";
-import { getSanctions } from "../sanctions/SanctionsService";
 
 type definitions = components["schemas"];
 type Player = definitions["Player"];
@@ -16,19 +16,19 @@ export interface promise$ {
   sanctions$: Sanction[];
 }
 
-const promise$ = ref<Promise<promise$>>();
+const playersPromise$ = ref<Promise<promise$>>();
 
 async function get() {
   const players = await getOnlinesPlayers().catch((problem) => {
-    promise$.value = Promise.reject(problem);
+    playersPromise$.value = Promise.reject(problem);
   });
 
   const sanctions = await getSanctions().catch((problem) => {
-    promise$.value = Promise.reject(problem);
+    playersPromise$.value = Promise.reject(problem);
   });
 
   if (players && sanctions) {
-    promise$.value = Promise.resolve({
+    playersPromise$.value = Promise.resolve({
       players$: players,
       sanctions$: sanctions,
     });
@@ -45,13 +45,13 @@ onMounted(async () => {
 </script>
 
 <template>
-  <Loader v-if="!promise$" :size="36" />
-  <Promised :promise="promise$">
+  <Loader v-if="!playersPromise$" :size="36" />
+  <Promised :promise="playersPromise$">
     <template #pending>
       <Loader :size="36" />
     </template>
-    <template #default="promise">
-      <Datatable :data="promise" @refresh-datatable="_onLoad" />
+    <template #default="playersPromise">
+      <Datatable :data="playersPromise" @refresh-datatable="_onLoad" />
     </template>
     <template #rejected="error">
       <PromisedError :content="error" @reload="_onLoad" />

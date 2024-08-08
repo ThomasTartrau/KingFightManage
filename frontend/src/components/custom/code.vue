@@ -1,44 +1,43 @@
 <script setup lang="ts">
-import { Codemirror } from 'vue-codemirror'
-import { json } from '@codemirror/lang-json'
-import { oneDark } from '@codemirror/theme-one-dark'
-import { EditorView } from 'codemirror'
-import { computed, ref } from 'vue'
-import { push } from 'notivue'
-import { CopyIcon } from 'lucide-vue-next'
+import { Codemirror } from "vue-codemirror";
+import { json } from "@codemirror/lang-json";
+import { oneDark } from "@codemirror/theme-one-dark";
+import { EditorView } from "codemirror";
+import { computed, ref } from "vue";
+import { push } from "notivue";
+import { CopyIcon } from "lucide-vue-next";
 
 defineOptions({
   inheritAttrs: false,
-})
+});
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 interface Props {
-  content?: string
+  content?: string;
 }
-const content = computed(() => props.content ?? '')
+const content = computed(() => props.content ?? "");
 
-const extensions = [json(), oneDark, EditorView.lineWrapping]
+const extensions = [json(), oneDark, EditorView.lineWrapping];
 
 // Codemirror EditorView instance ref
-const view = ref<EditorView | undefined>(undefined)
+const view = ref<EditorView | undefined>(undefined);
 
 function handleReady(payload: Record<string, unknown>) {
-  view.value = payload.view as EditorView
+  view.value = payload.view as EditorView;
 }
 
 async function copyToClipboard() {
   try {
-    await navigator.clipboard.writeText(content.value)
+    await navigator.clipboard.writeText(content.value);
     push.success({
-      title: 'Copié',
-      message: 'Le contenu a été copié dans le presse-papiers.',
-    })
-  }
-  catch {
+      title: "Copié",
+      message: "Le contenu a été copié dans le presse-papiers.",
+    });
+  } catch {
     push.error({
-      title: 'Erreur',
-      message: 'Une erreur est survenue lors de la copie du contenu.',
-    })
+      title: "Erreur",
+      message: "Une erreur est survenue lors de la copie du contenu.",
+    });
   }
 }
 </script>

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { push } from 'notivue'
-import { onMounted, onUpdated, ref } from 'vue'
-import { Upload } from 'lucide-vue-next'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { push } from "notivue";
+import { onMounted, onUpdated, ref } from "vue";
+import { Upload } from "lucide-vue-next";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -12,77 +12,76 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
+} from "@/components/ui/dialog";
 import {
   FormControl,
   FormDescription,
   FormField,
   FormItem,
   FormLabel,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import type { UserInfo } from '@/iam'
-import { getUserInfo, refresh } from '@/iam'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import profilePictureUpload from '@/components/custom/profile-picture-upload.vue'
-import http, { displayError } from '@/http'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import type { UserInfo } from "@/iam";
+import { getUserInfo, refresh } from "@/iam";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import profilePictureUpload from "@/components/custom/profile-picture-upload.vue";
+import http, { displayError } from "@/http";
 
-const isProfileDialogOpen = ref<boolean>(false)
-const closeProfileDialog = () => (isProfileDialogOpen.value = false)
+const isProfileDialogOpen = ref<boolean>(false);
+const closeProfileDialog = () => (isProfileDialogOpen.value = false);
 
-const isNameDialogOpen = ref<boolean>(false)
-const closeNameDialog = () => (isNameDialogOpen.value = false)
+const isNameDialogOpen = ref<boolean>(false);
+const closeNameDialog = () => (isNameDialogOpen.value = false);
 
-const user_info = ref<UserInfo | null>(null)
+const user_info = ref<UserInfo | null>(null);
 
-const username = ref<string>('')
-const image_link = ref<string>('')
+const username = ref<string>("");
+const image_link = ref<string>("");
 
 async function changeName() {
   if (username.value !== user_info.value?.username) {
     if (username.value.length < 2) {
       push.error({
-        title: 'Nom invalide',
-        message: 'Le nom doit contenir au moins 2 caractères',
+        title: "Nom invalide",
+        message: "Le nom doit contenir au moins 2 caractères",
         duration: 5000,
-      })
+      });
     }
 
     await http
-      .post('/user/profile/username', {
+      .post("/user/profile/username", {
         username: username.value,
       })
       .then(() => {
         push.success({
-          title: 'Profil mis à jour',
-          message: 'Votre profil a été mis à jour avec succès',
+          title: "Profil mis à jour",
+          message: "Votre profil a été mis à jour avec succès",
           duration: 5000,
-        })
-        closeNameDialog()
+        });
+        closeNameDialog();
         refresh()
           .then(() => _load())
-          .catch(displayError)
+          .catch(displayError);
       })
-      .catch(displayError)
-  }
-  else {
+      .catch(displayError);
+  } else {
     push.error({
-      title: 'Aucun changement',
-      message: 'Aucun changement n\'a été apporté à votre profil',
+      title: "Aucun changement",
+      message: "Aucun changement n'a été apporté à votre profil",
       duration: 5000,
-    })
+    });
   }
 }
 
 function _load() {
-  user_info.value = getUserInfo().value
-  username.value = user_info.value?.username || ''
-  image_link.value = `/profile-pictures/${user_info.value?.user_id}.jpeg` || ''
+  user_info.value = getUserInfo().value;
+  username.value = user_info.value?.username || "";
+  image_link.value = `/profile-pictures/${user_info.value?.user_id}.jpeg` || "";
 }
 
-onMounted(_load)
-onUpdated(_load)
+onMounted(_load);
+onUpdated(_load);
 </script>
 
 <template>
@@ -167,9 +166,7 @@ onUpdated(_load)
         <Dialog v-model:open="isNameDialogOpen">
           <form>
             <DialogTrigger as-child>
-              <Button variant="outline">
-                Changer le nom d'utilisateur
-              </Button>
+              <Button variant="outline"> Changer le nom d'utilisateur </Button>
             </DialogTrigger>
             <DialogContent class="sm:max-w-[425px]">
               <DialogHeader>
@@ -191,9 +188,7 @@ onUpdated(_load)
                 <Button variant="secondary" @click="closeNameDialog">
                   Annuler
                 </Button>
-                <Button @click="changeName">
-                  Enregistrer
-                </Button>
+                <Button @click="changeName"> Enregistrer </Button>
               </DialogFooter>
             </DialogContent>
           </form>

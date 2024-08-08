@@ -18,7 +18,7 @@ type definitions = components["schemas"];
 
 async function getAxios(
   authenticated: boolean = true,
-  use_refresh_token: boolean = false
+  use_refresh_token: boolean = false,
 ): Promise<AxiosInstance> {
   const token = authenticated
     ? use_refresh_token
@@ -45,7 +45,7 @@ async function getAxios(
     // convert timeouts axios's error to Problem
     if (isAxiosError(error) && String(error.message).includes("timeout of")) {
       return Promise.reject(
-        new ProblemFactory(0, "TimeoutExceeded", error.message, error.message)
+        new ProblemFactory(0, "TimeoutExceeded", error.message, error.message),
       );
     }
 
@@ -58,46 +58,46 @@ async function getAxios(
 export default {
   get<T = any, R = AxiosResponse<T>>(
     url: string,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<R> {
     return getAxios().then((axios) => axios.get(url, config));
   },
   delete<T = any, R = AxiosResponse<T>>(
     url: string,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<R> {
     return getAxios().then((axios) => axios.delete(url, config));
   },
   head<T = any, R = AxiosResponse<T>>(
     url: string,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<R> {
     return getAxios().then((axios) => axios.head(url, config));
   },
   options<T = any, R = AxiosResponse<T>>(
     url: string,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<R> {
     return getAxios().then((axios) => axios.options(url, config));
   },
   post<T = any, R = AxiosResponse<T>>(
     url: string,
     data?: any,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<R> {
     return getAxios().then((axios) => axios.post(url, data, config));
   },
   put<T = any, R = AxiosResponse<T>>(
     url: string,
     data?: any,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<R> {
     return getAxios().then((axios) => axios.put(url, data, config));
   },
   patch<T = any, R = AxiosResponse<T>>(
     url: string,
     data?: any,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<R> {
     return getAxios().then((axios) => axios.patch(url, data, config));
   },
@@ -105,14 +105,14 @@ export default {
   unauthenticated: {
     get<T = any, R = AxiosResponse<T>>(
       url: string,
-      config?: AxiosRequestConfig
+      config?: AxiosRequestConfig,
     ): Promise<R> {
       return getAxios(false).then((axios) => axios.get(url, config));
     },
     post<T = any, R = AxiosResponse<T>>(
       url: string,
       data?: any,
-      config?: AxiosRequestConfig
+      config?: AxiosRequestConfig,
     ): Promise<R> {
       return getAxios(false).then((axios) => axios.post(url, data, config));
     },
@@ -122,10 +122,10 @@ export default {
     post<T = any, R = AxiosResponse<T>>(
       url: string,
       data?: any,
-      config?: AxiosRequestConfig
+      config?: AxiosRequestConfig,
     ): Promise<R> {
       return getAxios(true, true).then((axios) =>
-        axios.post(url, data, config)
+        axios.post(url, data, config),
       );
     },
   },

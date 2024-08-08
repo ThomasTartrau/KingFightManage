@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { CircleUserRound, ShieldHalf, Users } from 'lucide-vue-next'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { CircleUserRound, ShieldHalf, Users } from "lucide-vue-next";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 </script>
 
 <template>
@@ -13,9 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
         </div>
       </CardHeader>
       <CardContent>
-        <div class="text-2xl">
-          100
-        </div>
+        <div class="text-2xl">100</div>
       </CardContent>
     </Card>
 
@@ -27,9 +25,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
         </div>
       </CardHeader>
       <CardContent>
-        <div class="text-2xl">
-          2
-        </div>
+        <div class="text-2xl">2</div>
       </CardContent>
     </Card>
 
@@ -41,9 +37,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
         </div>
       </CardHeader>
       <CardContent>
-        <div class="text-2xl">
-          Moderateur
-        </div>
+        <div class="text-2xl">Moderateur</div>
       </CardContent>
     </Card>
   </div>

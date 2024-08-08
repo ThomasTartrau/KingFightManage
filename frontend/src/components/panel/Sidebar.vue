@@ -1,14 +1,14 @@
 <script setup>
-import { Code } from 'lucide-vue-next'
-import { cn } from '@/lib/utils'
-import { useAdminPanel } from '@/utils/useAdminPanel'
-import Menu from '@/components/panel/Menu.vue'
-import SidebarToggle from '@/components/panel/SidebarToggle.vue'
-import { Button } from '@/components/ui/button'
-import { routes } from '@/router/routes'
-import { config } from '@/lib/config'
+import { Code } from "lucide-vue-next";
+import { cn } from "@/lib/utils";
+import { useAdminPanel } from "@/utils/useAdminPanel";
+import Menu from "@/components/panel/Menu.vue";
+import SidebarToggle from "@/components/panel/SidebarToggle.vue";
+import { Button } from "@/components/ui/button";
+import { routes } from "@/router/routes";
+import { config } from "@/lib/config";
 
-const { isOpen, setOpen } = useAdminPanel()
+const { isOpen, setOpen } = useAdminPanel();
 </script>
 
 <template>

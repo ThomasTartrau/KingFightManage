@@ -8,6 +8,7 @@ import {
 } from "@tanstack/vue-table";
 import { h, onMounted, reactive, ref } from "vue";
 
+import DropdownAction from "./dropdown-action.vue";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -22,8 +23,7 @@ import { Input } from "@/components/ui/input";
 import { getRole } from "@/iam";
 import type { Roles } from "@/utils/perms";
 import dateConverter from "@/utils/dateConverter";
-import DropdownAction from "./dropdown-action.vue";
-import { promise$ } from "@/pages/players/GetPlayers.vue";
+import type { promise$ } from "@/pages/players/GetPlayers.vue";
 
 type definitions = components["schemas"];
 type Player = definitions["Player"];
@@ -31,7 +31,6 @@ type Player = definitions["Player"];
 const props = defineProps<{
   data: promise$;
 }>();
-const emit = defineEmits(["refreshDatatable"]);
 
 const datas = ref<Player[]>(props.data.players$ || []);
 
@@ -66,8 +65,8 @@ const columns: ColumnDef<Player>[] = [
       const player = row.original;
 
       return h(DropdownAction, {
-        player_id: player.player_id,
-        player_name: player.name,
+        playerId: player.player_id,
+        playerName: player.name,
         sanctions: props.data.sanctions$,
       });
     },
@@ -78,7 +77,7 @@ function onSearch(search: string) {
   datas.value = props.data.players$.filter(
     (player) =>
       player.player_id.toLowerCase().includes(search.toLowerCase()) ||
-      player.name.toLowerCase().includes(search.toLowerCase())
+      player.name.toLowerCase().includes(search.toLowerCase()),
   );
 }
 

@@ -1,33 +1,33 @@
 <script setup lang="ts">
-import { Ellipsis, LogOut } from 'lucide-vue-next'
-import { onMounted, ref } from 'vue'
-import CustomRouterLink from '../custom-router-link.vue'
-import CollapseMenu from './CollapseMenu.vue'
-import { cn } from '@/lib/utils'
-import { useMenu } from '@/utils/useMenu'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import TooltipProvider from '@/components/ui/tooltip/TooltipProvider.vue'
-import Tooltip from '@/components/ui/tooltip/Tooltip.vue'
-import TooltipTrigger from '@/components/ui/tooltip/TooltipTrigger.vue'
+import { Ellipsis, LogOut } from "lucide-vue-next";
+import { onMounted, ref } from "vue";
+import CustomRouterLink from "../custom-router-link.vue";
+import CollapseMenu from "./CollapseMenu.vue";
+import { cn } from "@/lib/utils";
+import { useMenu } from "@/utils/useMenu";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import TooltipProvider from "@/components/ui/tooltip/TooltipProvider.vue";
+import Tooltip from "@/components/ui/tooltip/Tooltip.vue";
+import TooltipTrigger from "@/components/ui/tooltip/TooltipTrigger.vue";
 
-import Button from '@/components/ui/button/Button.vue'
-import TooltipContent from '@/components/ui/tooltip/TooltipContent.vue'
-import { getRole, logout } from '@/iam'
-import type { Roles } from '@/utils/perms'
-import perms from '@/utils/perms'
+import Button from "@/components/ui/button/Button.vue";
+import TooltipContent from "@/components/ui/tooltip/TooltipContent.vue";
+import { getRole, logout } from "@/iam";
+import type { Roles } from "@/utils/perms";
+import perms from "@/utils/perms";
 
 defineProps<{
-  isOpen: boolean
-}>()
+  isOpen: boolean;
+}>();
 
-const role = ref<null | Roles>()
-const { menuList } = useMenu()
+const role = ref<null | Roles>();
+const { menuList } = useMenu();
 
 function _onLoad() {
-  role.value = getRole().value
+  role.value = getRole().value;
 }
 
-onMounted(_onLoad)
+onMounted(_onLoad);
 </script>
 
 <template>
@@ -75,12 +75,15 @@ onMounted(_onLoad)
           </template>
           <template
             v-for="(
-              { route, label, action, icon, active, submenus }, m_index
+              { route, label, action: menuAction, icon, active, submenus },
+              m_index
             ) in menus"
           >
             <template v-if="submenus.length === 0">
               <div
-                v-if="!action || (role && perms.hasPermission(role, action))"
+                v-if="
+                  !menuAction || (role && perms.hasPermission(role, menuAction))
+                "
                 :key="m_index"
                 class="w-full"
               >
@@ -127,7 +130,9 @@ onMounted(_onLoad)
             </template>
             <template v-else>
               <div
-                v-if="!action || (role && perms.hasPermission(role, action))"
+                v-if="
+                  !menuAction || (role && perms.hasPermission(role, menuAction))
+                "
                 :key="m_index"
                 class="w-full"
               >

@@ -5,14 +5,14 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
-import { Button } from '@/components/ui/button'
-import { routes } from '@/router/routes'
-import router from '@/router/router'
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { routes } from "@/router/routes";
+import router from "@/router/router";
 
 function back_to_home() {
-  router.push({ name: routes.Home })
+  router.push({ name: routes.Home });
 }
 </script>
 

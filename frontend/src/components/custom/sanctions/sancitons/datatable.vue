@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import type { ColumnDef, TableOptions } from '@tanstack/vue-table'
+import type { ColumnDef, TableOptions } from "@tanstack/vue-table";
 import {
   FlexRender,
   getCoreRowModel,
   getPaginationRowModel,
   useVueTable,
-} from '@tanstack/vue-table'
-import { h, onMounted, reactive, ref } from 'vue'
+} from "@tanstack/vue-table";
+import { h, onMounted, reactive, ref } from "vue";
 
-import { CirclePlus } from 'lucide-vue-next'
-import DropdownAction from './dropdown-action.vue'
-import CreateSanctionDialog from './create-sanction-dialog.vue'
-import { Button } from '@/components/ui/button'
+import { CirclePlus } from "lucide-vue-next";
+import DropdownAction from "./dropdown-action.vue";
+import CreateSanctionDialog from "./create-sanction-dialog.vue";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -19,104 +19,104 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import type { components } from '@/types'
-import { Input } from '@/components/ui/input'
-import { getRole } from '@/iam'
-import type { Roles } from '@/utils/perms'
-import perms, { Actions } from '@/utils/perms'
-import { Dialog } from '@/components/ui/dialog'
-import dateConverter from '@/utils/dateConverter'
+} from "@/components/ui/table";
+import type { components } from "@/types";
+import { Input } from "@/components/ui/input";
+import { getRole } from "@/iam";
+import type { Roles } from "@/utils/perms";
+import perms, { Actions } from "@/utils/perms";
+import { Dialog } from "@/components/ui/dialog";
+import dateConverter from "@/utils/dateConverter";
 
-type definitions = components['schemas']
-type Sanction = definitions['Sanction']
+type definitions = components["schemas"];
+type Sanction = definitions["Sanction"];
 
 const props = defineProps<{
-  data: Sanction[]
-}>()
-const emit = defineEmits(['refreshDatatable'])
+  data: Sanction[];
+}>();
+const emit = defineEmits(["refreshDatatable"]);
 
-const isCreateSanctionOpen = ref(false)
+const isCreateSanctionOpen = ref(false);
 function openCreateSanctionDialog() {
-  isCreateSanctionOpen.value = true
+  isCreateSanctionOpen.value = true;
 }
 function closeCreateSanctionDialog() {
-  isCreateSanctionOpen.value = false
+  isCreateSanctionOpen.value = false;
 }
 function closeAndRefresh() {
-  closeCreateSanctionDialog()
-  emitRefresh()
+  closeCreateSanctionDialog();
+  emitRefresh();
 }
 
-const datas = ref<Sanction[]>(props.data || [])
+const datas = ref<Sanction[]>(props.data || []);
 
 function emitRefresh() {
-  emit('refreshDatatable')
+  emit("refreshDatatable");
 }
 
-const role = ref<null | Roles>()
+const role = ref<null | Roles>();
 
 const columns: ColumnDef<Sanction>[] = [
   {
-    accessorKey: 'type_',
-    header: 'Type',
-    cell: ({ row }) => h('div', { class: 'capitalize' }, row.getValue('type_')),
+    accessorKey: "type_",
+    header: "Type",
+    cell: ({ row }) => h("div", { class: "capitalize" }, row.getValue("type_")),
   },
   {
-    accessorKey: 'name',
-    header: 'Nom',
+    accessorKey: "name",
+    header: "Nom",
     cell: ({ row }) => {
-      return h('div', row.getValue('name'))
+      return h("div", row.getValue("name"));
     },
   },
   {
-    accessorKey: 'duration',
-    header: 'Duration',
+    accessorKey: "duration",
+    header: "Duration",
     cell: ({ row }) => {
-      const sanction = row.original
+      const sanction = row.original;
 
-      return h('div', dateConverter.convertSecondToTime(sanction.duration))
+      return h("div", dateConverter.convertSecondToTime(sanction.duration));
     },
   },
   {
-    id: 'actions',
+    id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const sanction = row.original
+      const sanction = row.original;
 
       return h(DropdownAction, {
         sanction,
-      })
+      });
     },
   },
-]
+];
 
 function onSearch(username: string) {
   datas.value = props.data.filter(
-    sanction =>
-      sanction.type_.toLowerCase().includes(username.toLowerCase())
-      || sanction.name.toLowerCase().includes(username.toLowerCase()),
-  )
+    (sanction) =>
+      sanction.type_.toLowerCase().includes(username.toLowerCase()) ||
+      sanction.name.toLowerCase().includes(username.toLowerCase()),
+  );
 }
 
 const tableOptions = reactive<TableOptions<Sanction>>({
   get data() {
-    return datas.value
+    return datas.value;
   },
   get columns() {
-    return columns
+    return columns;
   },
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
-})
+});
 
-const table = useVueTable(tableOptions)
+const table = useVueTable(tableOptions);
 
 function _onLoad() {
-  role.value = getRole().value
+  role.value = getRole().value;
 }
 
-onMounted(_onLoad)
+onMounted(_onLoad);
 </script>
 
 <template>
@@ -190,12 +190,12 @@ onMounted(_onLoad)
       <div class="flex-1 text-sm text-muted-foreground">
         Affichage de
         {{
-          table.getFilteredRowModel().rows.length
-            < (table.getState().pagination.pageIndex + 1)
-            * table.getState().pagination.pageSize
+          table.getFilteredRowModel().rows.length <
+          (table.getState().pagination.pageIndex + 1) *
+            table.getState().pagination.pageSize
             ? table.getFilteredRowModel().rows.length
-            : (table.getState().pagination.pageIndex + 1)
-              * table.getState().pagination.pageSize
+            : (table.getState().pagination.pageIndex + 1) *
+              table.getState().pagination.pageSize
         }}
         sur {{ table.getFilteredRowModel().rows.length }} donnée(s).
       </div>

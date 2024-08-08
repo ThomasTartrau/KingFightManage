@@ -1,69 +1,69 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
-import donuts from './graphs/donuts'
-import line from './graphs/area'
+import { onMounted, ref, watch } from "vue";
+import donuts from "./graphs/donuts";
+import line from "./graphs/area";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import type { GraphsLogs } from '@/pages/boutique/BoutiqueGraphs.vue'
-import { DonutChart } from '@/components/ui/chart-donut'
-import dateConverter from '@/utils/dateConverter'
-import { Progress } from '@/components/ui/progress'
-import AreaChart from '@/components/ui/chart-area/AreaChart.vue'
+} from "@/components/ui/card";
+import type { GraphsLogs } from "@/pages/boutique/BoutiqueGraphs.vue";
+import { DonutChart } from "@/components/ui/chart-donut";
+import dateConverter from "@/utils/dateConverter";
+import { Progress } from "@/components/ui/progress";
+import AreaChart from "@/components/ui/chart-area/AreaChart.vue";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import CardDescription from '@/components/ui/card/CardDescription.vue'
+} from "@/components/ui/select";
+import CardDescription from "@/components/ui/card/CardDescription.vue";
 
 const props = defineProps<{
-  logs: GraphsLogs
-}>()
-const actualDate = new Date()
-const totalBuys = props.logs.pbLogs.reduce((acc, curr) => acc + curr.amount, 0)
+  logs: GraphsLogs;
+}>();
+const actualDate = new Date();
+const totalBuys = props.logs.pbLogs.reduce((acc, curr) => acc + curr.amount, 0);
 
 // Donuts
-const donutsData = ref<{ name: string, total: number }[]>([])
-const mensualyPbBuys = ref(0)
-const monthlyObjectivePercentage = ref(0)
+const donutsData = ref<{ name: string; total: number }[]>([]);
+const mensualyPbBuys = ref(0);
+const monthlyObjectivePercentage = ref(0);
 
 // Area
-const period = ref<'journalier' | 'hebdomadaire' | 'mensuel'>('journalier')
-const areaData = ref<{ date: string, total: number }[]>([])
-const averageBuyInPeriod = ref(0)
-const buyInThisPeriod = ref(0)
+const period = ref<"journalier" | "hebdomadaire" | "mensuel">("journalier");
+const areaData = ref<{ date: string; total: number }[]>([]);
+const averageBuyInPeriod = ref(0);
+const buyInThisPeriod = ref(0);
 
 function _onLoad() {
   // Donuts
-  donutsData.value = donuts.getDonutsData(props.logs, actualDate)
-  mensualyPbBuys.value = donuts.getMensualyPbBuys(props.logs, actualDate)
+  donutsData.value = donuts.getDonutsData(props.logs, actualDate);
+  mensualyPbBuys.value = donuts.getMensualyPbBuys(props.logs, actualDate);
   const tempMonthlyObjectivePercentage = donuts.getMonthlyObjectivePercentage(
     mensualyPbBuys.value,
     props.logs.objective,
-  )
-  monthlyObjectivePercentage.value
-    = tempMonthlyObjectivePercentage > 100 ? 100 : tempMonthlyObjectivePercentage
+  );
+  monthlyObjectivePercentage.value =
+    tempMonthlyObjectivePercentage > 100 ? 100 : tempMonthlyObjectivePercentage;
 
   // Area
-  areaData.value = line.getLineData(props.logs.pbLogs, period.value)
-  averageBuyInPeriod.value = line.getAverageBuyInPeriod(areaData.value)
-  buyInThisPeriod.value = line.buyInThisPeriod.value
+  areaData.value = line.getLineData(props.logs.pbLogs, period.value);
+  averageBuyInPeriod.value = line.getAverageBuyInPeriod(areaData.value);
+  buyInThisPeriod.value = line.buyInThisPeriod.value;
 
   watch(period, () => {
-    areaData.value = line.getLineData(props.logs.pbLogs, period.value)
-    averageBuyInPeriod.value = line.getAverageBuyInPeriod(areaData.value)
-    buyInThisPeriod.value = line.buyInThisPeriod.value
-  })
+    areaData.value = line.getLineData(props.logs.pbLogs, period.value);
+    averageBuyInPeriod.value = line.getAverageBuyInPeriod(areaData.value);
+    buyInThisPeriod.value = line.buyInThisPeriod.value;
+  });
 }
 
-onMounted(_onLoad)
+onMounted(_onLoad);
 </script>
 
 <template>
@@ -78,15 +78,9 @@ onMounted(_onLoad)
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="journalier">
-                Journalier
-              </SelectItem>
-              <SelectItem value="hebdomadaire">
-                Hebdomadaire
-              </SelectItem>
-              <SelectItem value="mensuel">
-                Mensuel
-              </SelectItem>
+              <SelectItem value="journalier"> Journalier </SelectItem>
+              <SelectItem value="hebdomadaire"> Hebdomadaire </SelectItem>
+              <SelectItem value="mensuel"> Mensuel </SelectItem>
             </SelectContent>
           </Select>
         </CardTitle>
@@ -120,7 +114,8 @@ onMounted(_onLoad)
               <h2>
                 <span class="font-bold text-xl">{{
                   new Intl.NumberFormat("fr-FR").format(buyInThisPeriod)
-                }}</span>€ récolté(s) durant cette période
+                }}</span
+                >€ récolté(s) durant cette période
               </h2>
             </CardContent>
           </Card>
