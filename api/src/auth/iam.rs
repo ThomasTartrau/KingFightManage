@@ -191,7 +191,7 @@ impl<'a> Action {
             Action::SanctionsKick => "sanctions:kick",
             Action::SanctionsBan => "sanctions:ban",
             Action::ErrorsGet => "errors:get",
-            Action::ErrorPost => "errors:post",
+            Action::ErrorsPost => "errors:post",
         }
     }
 
