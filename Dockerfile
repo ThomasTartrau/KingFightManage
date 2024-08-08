@@ -25,23 +25,9 @@ COPY frontend/ .
 RUN pnpm run build
 
 
-
 # #Étape 2 : stage de build de l'api
 # Utiliser une image Rust pour builder l'api (on utilise la version 1.80.0 car c'est la latest stable version)
 FROM rust:1.80.0 AS build-rust
-
-# Set this environment variable with the format KEY={{environment.KEY}}
-ENV API_URL={{environment.API_URL}}
-ENV APP_URL={{environment.APP_URL}}
-ENV BISCUIT_PRIVATE_KEY={{environment.BISCUIT_PRIVATE_KEY}}
-ENV DATABASE_URL={{environment.DATABASE_URL}}
-ENV EMAIL_SENDER_ADDRESS={{environment.EMAIL_SENDER_ADDRESS}}
-ENV SMTP_CONNECTION_URL={{environment.SMTP_CONNECTION_URL}}
-
-RUN echo $API_URL
-RUN echo {{environment.API_URL}}
-RUN echo ${{environment.API_URL}}
-RUN echo ${{API_URL}}
 
 # On défini le répertoire de travail pour le stage de build de l'api
 WORKDIR /app/api
@@ -68,4 +54,4 @@ COPY --from=build-rust /app/api/target/release/api /usr/local/bin/api
 EXPOSE 8080
 
 # Commande pour lancer l'application
-CMD 'cargo run -- "$@"'
+CMD ["cargo", "run", "--", "$@"]
