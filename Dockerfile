@@ -15,30 +15,14 @@ RUN pnpm install
 COPY frontend/ .
 RUN pnpm run build
 
-# # Étape 2 : Builder et lancer l'application Rust
-# FROM rust:1.19.0 AS build-rust
+# Étape 2 : Builder et lancer l'application Rust
+FROM rust:1.19.0 AS build-rust
 
-# # Définir le répertoire de travail
-# WORKDIR /app
+# Définir le répertoire de travail
+WORKDIR /app/api
 
-# # Copier les fichiers source Rust
-# COPY api/Cargo.toml api/Cargo.lock ./
-# COPY api/src ./src
+# Copier les fichiers Cargo.toml et Cargo.lock
+COPY api/Cargo.toml api/Cargo.lock ./
 
-# # Builder l'application Rust
-# RUN cargo build --release
-
-# # Étape 3 : Conteneur final
-# FROM debian:buster-slim
-
-# # Copier le frontend dans le conteneur final
-# COPY --from=build-frontend /app/frontend/dist /var/www/html
-
-# # Copier l'exécutable Rust dans le conteneur final
-# COPY --from=build-rust /app/target/release/api /usr/local/bin/api
-
-# # Exposer le port sur lequel l'application va tourner
-# EXPOSE 8080
-
-# # Commande pour lancer l'application
-# CMD 'cargo run -- "$@"'
+# Installer les dépendances
+RUN cargo build --release
