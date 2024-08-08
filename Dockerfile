@@ -16,7 +16,7 @@ COPY frontend/ .
 RUN pnpm run build
 
 # Étape 2 : Builder et lancer l'application Rust
-FROM rust:1.80.1 AS build-rust
+FROM rust:1.80.0 AS build-rust
 
 # Définir le répertoire de travail
 WORKDIR /app/api
