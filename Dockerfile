@@ -16,7 +16,7 @@ COPY frontend/ .
 RUN pnpm run build
 
 # Étape 2 : Builder et lancer l'application Rust
-FROM rust:1.19.0 AS build-rust
+FROM rust:1.80.1 AS build-rust
 
 # Définir le répertoire de travail
 WORKDIR /app/api
@@ -26,6 +26,7 @@ COPY api/ ./
 
 # Lister les fichiers
 RUN ls
+RUN cat Cargo.lock
 
 # Installer les dépendances
 RUN cargo build --release
