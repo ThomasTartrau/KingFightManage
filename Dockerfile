@@ -25,7 +25,8 @@ WORKDIR /app
 COPY api/Cargo.toml api/Cargo.lock ./
 COPY api/src ./src
 
-# Compiler l'application Rust en mode release
+# Aller d'abord dans le dossier api
+WORKDIR /app/api
 RUN cargo build --release
 
 # Étape 3 : Conteneur final
