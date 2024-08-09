@@ -33,7 +33,7 @@ FROM rust:1.80.0 AS build-rust
 RUN cargo install sccache
 
 # On défini les variables d'environnement
-ENV RUSTC_WRAPPER={{environment.RUSTC_WRAPPER}}
+ENV RUSTC_WRAPPER=/usr/local/cargo/bin/sccache
 ENV API_URL={{environment.API_URL}}
 ENV BISCUIT_PRIVATE_KEY={{environment.BISCUIT_PRIVATE_KEY}}
 ENV DATABASE_URL={{environment.DATABASE_URL}}
