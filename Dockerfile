@@ -54,7 +54,8 @@ FROM debian:buster-slim
 # Exposer le port sur lequel l'application va tourner
 EXPOSE 8080
 
-RUN ls -al
+RUN ls -al /app/
+RUN ls -al /app/api/
 
 # Commande pour lancer l'application run l'éxécutable de l'api
-CMD ["/app/api/target/release/api -- ./.env"]
+CMD ["/app/api/target/release/api -- /app/api/.env"]
