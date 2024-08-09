@@ -45,9 +45,14 @@ RUN cargo build --release
 ## Étape 3 : stage de build final
 FROM ubuntu:24.04
 
+ENV API_URL={{environment.API_URL}}
+ENV BISCUIT_PRIVATE_KEY={{environment.BISCUIT_PRIVATE_KEY}}
 ENV DATABASE_URL={{environment.DATABASE_URL}}
+ENV EMAIL_SENDER_ADDRESS={{environment.EMAIL_SENDER_ADDRESS}}
+ENV EMAIL_SENDER_ADDRESS={{environment.EMAIL_SENDER_ADDRESS}}
+ENV SMTP_CONNECTION_URL={{environment.SMTP_CONNECTION_URL}}
 
-RUN ENV
+RUN printenv
 
 # Copier le frontend buildé dans le conteneur final
 COPY --from=build-frontend /app/frontend/dist /prod/frontend/dist
