@@ -51,14 +51,10 @@ RUN cargo build --release
 ## Étape 3 : stage de build final
 FROM debian:buster-slim
 
-# Copier le frontend buildé dans le conteneur final
-COPY --from=build-frontend /app/frontend/dist /var/www/html
-
-# Copier l'exécutable Rust dans le conteneur final
-COPY --from=build-rust /app/api/target/release/api /usr/local/bin/api
-
 # Exposer le port sur lequel l'application va tourner
 EXPOSE 8080
 
-# Commande pour lancer l'application
-CMD ["cargo", "run", "--", ".env"]
+RUN ls -al
+
+# Commande pour lancer l'application run l'éxécutable de l'api
+CMD ["/app/api/target/release/api -- ./.env"]
