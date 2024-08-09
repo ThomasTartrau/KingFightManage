@@ -63,4 +63,4 @@ COPY --from=build-rust /app/api/target/release/api /prod/api/target/release/api
 COPY --from=build-rust /app/api/.env /prod/api/.env
 
 # Commande pour lancer l'api
-CMD ["/prod/api/target/release/api", "-- ", "/prod/api/.env"]
+CMD ["/prod/api/target/release/api", "--", "$@"]
