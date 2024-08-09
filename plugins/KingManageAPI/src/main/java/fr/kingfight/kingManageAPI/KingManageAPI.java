@@ -2,6 +2,10 @@ package fr.kingfight.kingManageAPI;
 
 import fr.kingfight.kingManageAPI.Objects.Status.Status;
 import fr.kingfight.kingManageAPI.api.HttpClientAPI;
+import fr.kingfight.kingManageAPI.api.events.ingested.LogsSanctionAPI;
+import fr.kingfight.kingManageAPI.api.events.ingested.SendErrorAPI;
+import fr.kingfight.kingManageAPI.events.ingested.LogsSanctionE;
+import fr.kingfight.kingManageAPI.events.ingested.SendErrorE;
 import fr.kingfight.kingManageAPI.managers.Disable;
 import fr.kingfight.kingManageAPI.managers.Enable;
 import fr.kingfight.kingManageAPI.utils.HttpClient;
@@ -30,7 +34,10 @@ public final class KingManageAPI extends JavaPlugin implements HttpClientAPI {
         enable.onEnable(this);
         httpClient = enable.getHttpClient();
 
-        Providers.register();
+        this.getServer().getServicesManager().register(KingManageAPI.class, this, this, ServicePriority.High);
+        this.getServer().getServicesManager().register(LogsSanctionAPI.class, new LogsSanctionE(), this, ServicePriority.Normal);
+        this.getServer().getServicesManager().register(SendErrorAPI.class, new SendErrorE(), this, ServicePriority.Normal);
+
 
         status = new Status();
     }

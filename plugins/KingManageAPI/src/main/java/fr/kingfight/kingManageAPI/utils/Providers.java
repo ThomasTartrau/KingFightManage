@@ -11,8 +11,5 @@ public class Providers {
     private static final KingManageAPI instance = KingManageAPI.getInstance();
 
     public static void register() {
-        instance.getServer().getServicesManager().register(KingManageAPI.class, instance, instance, ServicePriority.High);
-        instance.getServer().getServicesManager().register(LogsSanctionAPI.class, new LogsSanctionE(), instance, ServicePriority.Normal);
-        instance.getServer().getServicesManager().register(SendErrorAPI.class, new SendErrorE(), instance, ServicePriority.Normal);
-    }
+        }
 }
