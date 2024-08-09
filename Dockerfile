@@ -39,7 +39,10 @@ VOLUME /app/storage
 COPY api/ ./
 COPY .env ./.env
 
-# Run migrations
+# Instal sqlx-cli pour pouvoir utiliser sqlx
+RUN cargo install sqlx-cli
+
+# Run migration
 RUN sqlx migrate run
 
 # Installation des dépendances & compilation de l'api
