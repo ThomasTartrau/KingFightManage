@@ -45,6 +45,10 @@ RUN cargo build --release
 ## Étape 3 : stage de build final
 FROM ubuntu:24.04
 
+ENV DATABASE_URL=$DATABASE_URL
+
+RUN ENV
+
 # Copier le frontend buildé dans le conteneur final
 COPY --from=build-frontend /app/frontend/dist /prod/frontend/dist
 COPY --from=build-frontend /app/frontend/public /prod/frontend/public
