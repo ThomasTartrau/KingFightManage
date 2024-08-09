@@ -39,8 +39,8 @@ WORKDIR /app/api
 COPY api/ ./
 COPY .env ./.env
 
-# # Installation des dépendances & compilation de l'api
-# RUN cargo build --release
+# Installation des dépendances & compilation de l'api
+RUN cargo build --release
 
 ## Étape 3 : stage de build final
 FROM ubuntu:24.04
