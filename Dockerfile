@@ -37,7 +37,7 @@ VOLUME /app/storage
 
 # Copier les fichiers de configuration de l'api
 COPY api/ ./
-COPY .env ./api/.env
+COPY .env ./.env
 
 # Installation des dépendances & compilation de l'api
 RUN cargo build --release
@@ -51,7 +51,7 @@ COPY --from=build-frontend /app/frontend/public /prod/frontend/public
 
 # Copier l'exécutable Rust dans le conteneur final
 COPY --from=build-rust /app/api/target/release/api /prod/api/target/release/api
-COPY --from=build-rust /app/api/.env /prod/api/.env
+COPY --from=build-rust /app/.env /prod/api/.env
 
 # Exposer le port sur lequel l'application va tourner
 EXPOSE 8080
