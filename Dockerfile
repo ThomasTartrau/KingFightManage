@@ -61,4 +61,5 @@ COPY --from=build-rust /app/api/target/release/api /prod/api/target/release/api
 COPY --from=build-rust /app/api/.env /prod/api/.env
 
 # Commande pour lancer l'api
-CMD [ "/prod/api/target/release/api", "--", "$@" ]
+# CMD [ "/prod/api/target/release/api", "--", "$@" ]
+CMD [ "/prod/api/target/release/api", "--", "--api-url=$API_URL", "--biscuit-private-key=${{BISCUIT_PRIVATE_KEY}}", "--database-url=${{environment.DATABASE_URL}}"]
