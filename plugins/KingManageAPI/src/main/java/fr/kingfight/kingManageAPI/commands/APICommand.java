@@ -2,12 +2,16 @@ package fr.kingfight.kingManageAPI.commands;
 
 import fr.kingfight.kingManageAPI.KingManageAPI;
 import fr.kingfight.kingManageAPI.Objects.Status.status;
+import fr.kingfight.kingManageAPI.events.ingested.LogsSanctionE;
+import fr.kingfight.kingManageAPI.events.ingested.SendErrorE;
 import fr.kingfight.kingManageAPI.utils.Helpers;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.UUID;
 
 public class APICommand implements CommandExecutor {
     private final KingManageAPI instance;
@@ -18,7 +22,7 @@ public class APICommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        Boolean hasPermission = Helpers.hasPermission(sender, instance.getConfiguration().getString("permission.api"));
+        Boolean hasPermission = Helpers.hasPermission(sender, instance.getConfiguration().getString("permissions.api"));
         if (!hasPermission) {
             sender.sendMessage(instance.getConfiguration().getString("messages.errors.permission"));
             return false;
@@ -38,12 +42,6 @@ public class APICommand implements CommandExecutor {
                 break;
             case "resume":
                 instance.getStatus().setStatus(status.ENABLED);
-                break;
-            case "stop":
-                instance.getStatus().setStatus(status.STOPPED);
-                break;
-            case "status":
-                sender.sendMessage(instance.getConfiguration().getString("messages.success.status").replace("{status}", instance.getStatus().getStatus().toString()));
                 break;
             default:
                 sendHelp(sender);

@@ -11,10 +11,10 @@ public class SanctionsE {
     private String staff_name;
     private String sanction_name;
     private String sanction_type;
-    private Integer sanction_duration; // in seconds
+    private Long sanction_duration; // in seconds
     private String sanction_motif;
 
-    public SanctionsE(UUID player_id, String staff_name, String sanction_name, String sanction_type, Integer sanction_duration, String sanction_motif) {
+    public SanctionsE(UUID player_id, String staff_name, String sanction_name, String sanction_type, Long sanction_duration, String sanction_motif) {
         this.player_id = player_id;
         this.staff_name = staff_name;
         this.sanction_name = sanction_name;
@@ -27,7 +27,7 @@ public class SanctionsE {
         Player player = Bukkit.getPlayer(player_id);
         if (player == null) return;
 
-        String command = KingManageAPI.getInstance().getConfiguration().getString("commands.sanction." + sanction_type);
+        String command = KingManageAPI.getInstance().getConfiguration().getString("commands.sanctions." + sanction_type);
         command.replace("{player}", player.getName());
         command.replace("{motif}", sanction_motif);
         command.replace("{time}", sanction_duration.toString());

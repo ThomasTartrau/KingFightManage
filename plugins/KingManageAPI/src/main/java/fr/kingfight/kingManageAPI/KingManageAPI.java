@@ -6,6 +6,7 @@ import fr.kingfight.kingManageAPI.managers.Disable;
 import fr.kingfight.kingManageAPI.managers.Enable;
 import fr.kingfight.kingManageAPI.utils.HttpClient;
 import fr.kingfight.kingManageAPI.utils.Problem;
+import fr.kingfight.kingManageAPI.utils.Providers;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -24,19 +25,14 @@ public final class KingManageAPI extends JavaPlugin implements HttpClientAPI {
     @Override
     public void onEnable() {
         instance = this;
-        httpClient = Enable.onEnable(this);
-        this.getServer().getServicesManager().register(KingManageAPI.class, this, this, ServicePriority.Normal);
-        status = new Status();
+        configuration = this.getConfig();
+        Enable enable = new Enable();
+        enable.onEnable(this);
+        httpClient = enable.getHttpClient();
 
-        /* CompletableFuture<Object> response = httpClient.sendRequest("GET", "/staffs", null);
-        response.thenAccept(result -> {
-            if (result instanceof Problem) {
-                Problem problem = (Problem) result;
-                System.out.println("Problem: " + problem.getProblem());
-            } else {
-                getLogger().info(result.toString());
-            }
-        }); */
+        Providers.register();
+
+        status = new Status();
     }
 
     @Override

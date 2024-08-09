@@ -42,8 +42,8 @@ public class Event {
                     String staff_name = (String) event_data.get("staff_name");
                     String sanction_name = (String) event_data.get("sanction_name");
                     String sanction_type = (String) event_data.get("sanction_type");
-                    Integer sanction_duration = (Integer) event_data.get("sanction_duration");
-                    String sanction_motif = (String) event_data.get("sanction_motif");
+                    Long sanction_duration = (Long) event_data.get("sanction_duration");
+                    String sanction_motif = (String) event_data.get("motif");
 
                     if (player_id == null || staff_name == null || sanction_name == null || sanction_type == null || sanction_duration == null || sanction_motif == null) {
                         Helpers.sendAPIErrorMessage(new Exception("Missing required fields in sanction_player event"));
@@ -54,6 +54,7 @@ public class Event {
                 } catch (Exception e) {
                     Helpers.sendAPIErrorMessage(new Exception("Error dispatching sanction_player event: " + e.getMessage()));
                 }
+                break;
             default:
                 Helpers.sendAPIErrorMessage(new Exception("Unknown event type: " + event_type));
                 break;

@@ -5,7 +5,7 @@ import org.json.simple.JSONObject;
 
 import java.util.concurrent.CompletableFuture;
 
-public abstract class SendErrorE implements SendErrorAPI {
+public class SendErrorE implements SendErrorAPI {
 
     @Override
     public CompletableFuture<Object> dispatch(String content, String plugin_name, Integer priority) {

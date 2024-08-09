@@ -6,7 +6,7 @@ import org.json.simple.JSONObject;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public abstract class LogsSanctionE implements LogsSanctionAPI {
+public class LogsSanctionE implements LogsSanctionAPI {
 
     @Override
     public CompletableFuture<Object> dispatch(UUID player_id, String staff_name, UUID sanction_id, String motif, Boolean generate_event, String sanction_type) {
