@@ -39,6 +39,9 @@ VOLUME /app/storage
 COPY api/ ./
 COPY .env ./.env
 
+# Run migrations
+RUN sqlx migrate run
+
 # Installation des dépendances & compilation de l'api
 RUN cargo build --release
 
