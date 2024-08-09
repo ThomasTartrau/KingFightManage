@@ -37,22 +37,25 @@ VOLUME /app/storage
 
 # Copier les fichiers de configuration de l'api
 COPY api/ ./
-COPY .env .env
+COPY .env ./
 
-# Installation des dépendances & compilation de l'api
-RUN cargo build --release
+RUN ls -al ./
+RUN cat ./env
 
-## Étape 3 : stage de build final
-FROM debian:buster-slim
+# # Installation des dépendances & compilation de l'api
+# RUN cargo build --release
 
-# Copier le frontend buildé dans le conteneur final
-COPY --from=build-frontend /app/frontend/dist /var/www/html
+# ## Étape 3 : stage de build final
+# FROM debian:buster-slim
 
-# Copier l'exécutable Rust dans le conteneur final
-COPY --from=build-rust /app/api/target/release/api /usr/local/bin/api
+# # Copier le frontend buildé dans le conteneur final
+# COPY --from=build-frontend /app/frontend/dist /var/www/html
 
-# Exposer le port sur lequel l'application va tourner
-EXPOSE 8080
+# # Copier l'exécutable Rust dans le conteneur final
+# COPY --from=build-rust /app/api/target/release/api /usr/local/bin/api
+
+# # Exposer le port sur lequel l'application va tourner
+# EXPOSE 8080
 
 # Commande pour lancer l'application
 CMD ["cargo", "run", "--", ".env"]
