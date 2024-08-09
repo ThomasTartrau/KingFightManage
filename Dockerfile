@@ -51,6 +51,7 @@ ENV DATABASE_URL={{environment.DATABASE_URL}}
 ENV EMAIL_SENDER_ADDRESS={{environment.EMAIL_SENDER_ADDRESS}}
 ENV EMAIL_SENDER_ADDRESS={{environment.EMAIL_SENDER_ADDRESS}}
 ENV SMTP_CONNECTION_URL={{environment.SMTP_CONNECTION_URL}}
+ENV WEBAPP_PATH={{environment.WEBAPP_PATH}}
 
 # Copier le frontend buildé dans le conteneur final
 COPY --from=build-frontend /app/frontend/dist /prod/frontend/dist
@@ -61,4 +62,4 @@ COPY --from=build-rust /app/api/target/release/api /prod/api/target/release/api
 COPY --from=build-rust /app/api/.env /prod/api/.env
 
 # Commande pour lancer l'api
-CMD /prod/api/target/release/api --api-url ${API_URL} --biscuit-private-key ${BISCUIT_PRIVATE_KEY} --database-url ${DATABASE_URL} --email-sender-address ${EMAIL_SENDER_ADDRESS} --smtp-connection-url ${SMTP_CONNECTION_URL}
+CMD /prod/api/target/release/api --api-url ${API_URL} --biscuit-private-key ${BISCUIT_PRIVATE_KEY} --database-url ${DATABASE_URL} --email-sender-address ${EMAIL_SENDER_ADDRESS} --smtp-connection-url ${SMTP_CONNECTION_URL} --webapp_path ${WEBAPP_PATH}
