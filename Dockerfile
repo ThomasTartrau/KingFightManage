@@ -43,7 +43,7 @@ COPY .env ./.env
 RUN cargo build --release
 
 ## Étape 3 : stage de build final
-FROM debian:buster-slim
+FROM ubuntu:24.04
 
 # Copier le frontend buildé dans le conteneur final
 COPY --from=build-frontend /app/frontend/dist /prod/frontend/dist
