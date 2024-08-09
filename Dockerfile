@@ -39,8 +39,8 @@ WORKDIR /app/api
 COPY api/ ./
 COPY .env ./.env
 
-# Installation des dépendances & compilation de l'api
-RUN cargo build --release
+# # Installation des dépendances & compilation de l'api
+# RUN cargo build --release
 
 ## Étape 3 : stage de build final
 FROM ubuntu:24.04
@@ -52,8 +52,6 @@ ENV EMAIL_SENDER_ADDRESS={{environment.EMAIL_SENDER_ADDRESS}}
 ENV EMAIL_SENDER_ADDRESS={{environment.EMAIL_SENDER_ADDRESS}}
 ENV SMTP_CONNECTION_URL={{environment.SMTP_CONNECTION_URL}}
 
-RUN printenv
-
 # Copier le frontend buildé dans le conteneur final
 COPY --from=build-frontend /app/frontend/dist /prod/frontend/dist
 COPY --from=build-frontend /app/frontend/public /prod/frontend/public
@@ -63,4 +61,4 @@ COPY --from=build-rust /app/api/target/release/api /prod/api/target/release/api
 COPY --from=build-rust /app/api/.env /prod/api/.env
 
 # Commande pour lancer l'api
-CMD ["/prod/api/target/release/api", "--", "$@"]
+CMD [ "/prod/api/target/release/api", "--", "api-url=", "${{environment.API_URL}}", "biscuit-private-key=", "$BISCUIT_PRIVATE_KEY", "database-url=", "$DATABASE_URL", "email-sender-address=", "$EMAIL_SENDER_ADDRESS", "email-sender-address=", "$EMAIL_SENDER_ADDRESS", "smtp-connection-url=", "$SMTP_CONNECTION_URL" ]
