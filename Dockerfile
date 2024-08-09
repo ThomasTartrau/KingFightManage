@@ -37,13 +37,7 @@ VOLUME /app/storage
 
 # Copier les fichiers de configuration de l'api
 COPY api/ ./
-COPY .env ./.env
-
-# Instal sqlx-cli pour pouvoir utiliser sqlx
-RUN cargo install sqlx-cli
-
-# Run migration
-RUN sqlx migrate run
+COPY .env ./api/.env
 
 # Installation des dépendances & compilation de l'api
 RUN cargo build --release
@@ -51,11 +45,16 @@ RUN cargo build --release
 ## Étape 3 : stage de build final
 FROM debian:buster-slim
 
+# Copier le frontend buildé dans le conteneur final
+COPY --from=build-frontend /app/frontend/dist /prod/frontend/dist
+COPY --from=build-frontend /app/frontend/public /prod/frontend/public
+
+# Copier l'exécutable Rust dans le conteneur final
+COPY --from=build-rust /app/api/target/release/api /prod/api/target/release/api
+COPY --from=build-rust /app/api/.env /prod/api/.env
+
 # Exposer le port sur lequel l'application va tourner
 EXPOSE 8080
 
-RUN ls -al /app/
-RUN ls -al /app/api/
-
-# Commande pour lancer l'application run l'éxécutable de l'api
-CMD ["/app/api/target/release/api -- /app/api/.env"]
+# Commande pour lancer l'api
+CMD ["/prod/api/target/release/api", "-- ", "/prod/api/.env"]
