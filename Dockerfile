@@ -45,7 +45,7 @@ RUN cargo build --release
 ## Étape 3 : stage de build final
 FROM ubuntu:24.04
 
-ENV DATABASE_URL=${{environment.DATABASE_URL}}
+ENV DATABASE_URL={{environment.DATABASE_URL}}
 
 RUN ENV
 
